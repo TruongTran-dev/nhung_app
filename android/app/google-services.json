@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1086071160978",
+    "project_id": "nhung-wallet",
+    "storage_bucket": "nhung-wallet.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086071160978:android:b30b702e60e8f72424e64b",
+        "android_client_info": {
+          "package_name": "com.kma.nhung"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl1KW_1x0hwcG6hyhzCq5qpuG_-jZ7qe0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

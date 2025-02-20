@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDXeRJ-CnlFZjgKUnaAkZ8_f6Wz3YI1hK4',
-    appId: '1:576830555998:android:8b6f5a9f503fda120bb1cf',
-    messagingSenderId: '576830555998',
-    projectId: 'manage-exchange-app',
-    storageBucket: 'manage-exchange-app.appspot.com',
+    apiKey: 'AIzaSyDl1KW_1x0hwcG6hyhzCq5qpuG_-jZ7qe0',
+    appId: '1:1086071160978:android:b30b702e60e8f72424e64b',
+    messagingSenderId: '1086071160978',
+    projectId: 'nhung-wallet',
+    storageBucket: 'nhung-wallet.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA4cfxagUVBMD0DF-ePxQZ9Klx5ONoS5N8',
-    appId: '1:576830555998:ios:7680ed64828e746f0bb1cf',
-    messagingSenderId: '576830555998',
-    projectId: 'manage-exchange-app',
-    storageBucket: 'manage-exchange-app.appspot.com',
-    iosBundleId: 'com.kulltran.meapp.manageExchangeAppz',
+    apiKey: 'AIzaSyAoutqWBI65sAK3_ntMKvC4-v6g7RvdkGo',
+    appId: '1:1086071160978:ios:4f2f2470379ad69624e64b',
+    messagingSenderId: '1086071160978',
+    projectId: 'nhung-wallet',
+    storageBucket: 'nhung-wallet.firebasestorage.app',
+    iosBundleId: 'com.kma.nhung',
   );
+
 }
