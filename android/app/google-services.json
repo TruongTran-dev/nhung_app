@@ -1,26 +1,65 @@
 {
   "project_info": {
-    "project_number": "1086071160978",
-    "project_id": "nhung-wallet",
-    "storage_bucket": "nhung-wallet.firebasestorage.app"
+    "project_number": "686540413195",
+    "project_id": "viet-wallet",
+    "storage_bucket": "viet-wallet.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1086071160978:android:b30b702e60e8f72424e64b",
+        "mobilesdk_app_id": "1:686540413195:android:b7c5904245d4f7331bea0e",
         "android_client_info": {
-          "package_name": "com.kma.nhung"
+          "package_name": "com.example.viet_wallet"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "686540413195-ljc6kkudjmej0qtrgj84499s1s81lgmg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDl1KW_1x0hwcG6hyhzCq5qpuG_-jZ7qe0"
+          "current_key": "AIzaSyDnjCjIZptR69Ii71OZC3SeP7wCULrQLwI"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "686540413195-ljc6kkudjmej0qtrgj84499s1s81lgmg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686540413195:android:eb394b6d23b23d8c1bea0e",
+        "android_client_info": {
+          "package_name": "com.kma.nhung"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "686540413195-ljc6kkudjmej0qtrgj84499s1s81lgmg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnjCjIZptR69Ii71OZC3SeP7wCULrQLwI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "686540413195-ljc6kkudjmej0qtrgj84499s1s81lgmg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

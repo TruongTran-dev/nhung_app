@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyAoutqWBI65sAK3_ntMKvC4-v6g7RvdkGo</string>
+	<string>AIzaSyD75kVSv28EyqYNFI2AktyHNtDhDSO6re4</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1086071160978</string>
+	<string>686540413195</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.kma.nhung</string>
 	<key>PROJECT_ID</key>
-	<string>nhung-wallet</string>
+	<string>viet-wallet</string>
 	<key>STORAGE_BUCKET</key>
-	<string>nhung-wallet.firebasestorage.app</string>
+	<string>viet-wallet.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1086071160978:ios:4f2f2470379ad69624e64b</string>
+	<string>1:686540413195:ios:1fee38758584fc561bea0e</string>
 </dict>
 </plist>
