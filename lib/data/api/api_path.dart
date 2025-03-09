@@ -1,6 +1,6 @@
 class ApiPath {
   //Change ip 192.168.1.206 to your ipv4 with command ipconfig in cmd (macOs), ipconfig/all in cmd (window)
-  static const String apiDomain = 'http://192.168.1.206:8081';
+  static const String apiDomain = 'http://192.168.1.177:8081';
 
   static const String signup = '$apiDomain/api/auth/sign-up';
 
@@ -22,7 +22,8 @@ class ApiPath {
 
   static const String apiLogoCategory = '$apiDomain/api/v1/category-logo';
 
-  static const String categoryReport = '$apiDomain/api/v1/report/category-report';
+  static const String categoryReport =
+      '$apiDomain/api/v1/report/category-report';
 
   static const String weekReport = '$apiDomain/api/v1/report/week-report';
 

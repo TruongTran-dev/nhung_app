@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    _usernameController.text = 'testad';
+    _usernameController.text = 'test';
     _passwordController.text = '123456';
     super.initState();
   }
@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
               },
             );
           }
-          if(state is LoginSuccess){
+          if (state is LoginSuccess) {
             Navigator.pushNamed(context, AppRoutes.home);
           }
         },
@@ -67,7 +67,8 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
-                child: SingleChildScrollView(child: Form(key: _formKey, child: _loginForm(context))),
+                child: SingleChildScrollView(
+                    child: Form(key: _formKey, child: _loginForm(context))),
               ),
               Positioned(bottom: 0, child: _logInButton(context)),
             ],
@@ -134,7 +135,11 @@ class _LoginPageState extends State<LoginPage> {
                 onTap: () => _navToForgotPassword(context),
                 child: Text(
                   'Quên mật khẩu?',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic, color: Theme.of(context).primaryColor),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w300,
+                      fontStyle: FontStyle.italic,
+                      color: Theme.of(context).primaryColor),
                 ),
               ),
             ],
@@ -170,9 +175,18 @@ class _LoginPageState extends State<LoginPage> {
               const Text('Chưa có tài khoản? ', style: TextStyle(fontSize: 14)),
               GestureDetector(
                 onTap: () {
-                 Navigator.push(context, MaterialPageRoute(builder: (_)=> BlocProvider<SignUpBloc>(create: (_) => SignUpBloc(),child: const SignUpPage())));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => BlocProvider<SignUpBloc>(
+                              create: (_) => SignUpBloc(),
+                              child: const SignUpPage())));
                 },
-                child: Text(' Đăng ký ngay', style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 14, fontStyle: FontStyle.italic)),
+                child: Text(' Đăng ký ngay',
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic)),
               ),
             ],
           )
@@ -185,18 +199,24 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.only(top: 120, bottom: 30),
         child: Column(
           children: [
-            Image.asset('images/logo_app.png', width: 150, height: 160, color: Theme.of(context).primaryColor),
+            Image.asset('images/logo_app.png',
+                width: 150, height: 160, color: Theme.of(context).primaryColor),
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Text(
                 'Vui lòng đăng nhập!',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold, fontStyle: FontStyle.italic, color: Theme.of(context).primaryColor, fontSize: 20),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 20),
               ),
             ),
           ],
         ),
       );
 
-  _navToForgotPassword(BuildContext context) => Navigator.pushNamed(context, AppRoutes.forgotPassword);
+  _navToForgotPassword(BuildContext context) =>
+      Navigator.pushNamed(context, AppRoutes.forgotPassword);
 }

@@ -31,11 +31,13 @@ class _WalletDetailState extends State<WalletDetail> {
   final String currency = SharedPreferencesStorage().getCurrency();
 
   String toDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  String fromDate = DateFormat('yyyy-MM-dd').format(DateTime(DateTime.now().year, DateTime.now().month - 1, DateTime.now().day));
+  String fromDate = DateFormat('yyyy-MM-dd').format(DateTime(
+      DateTime.now().year, DateTime.now().month - 1, DateTime.now().day));
 
   @override
   void initState() {
-    _walletDetailsBloc = BlocProvider.of<WalletDetailBloc>(context)..add(WalletDetailInit(walletId: widget.wallet.id));
+    _walletDetailsBloc = BlocProvider.of<WalletDetailBloc>(context)
+      ..add(WalletDetailInit(walletId: widget.wallet.id));
     super.initState();
   }
 
@@ -46,7 +48,8 @@ class _WalletDetailState extends State<WalletDetail> {
 
   void _reloadPage() {
     showLoading(context);
-    _walletDetailsBloc.add(WalletDetailInit(walletId: widget.wallet.id, fromDate: fromDate, toDate: toDate));
+    _walletDetailsBloc.add(WalletDetailInit(
+        walletId: widget.wallet.id, fromDate: fromDate, toDate: toDate));
     Future.delayed(const Duration(milliseconds: 1500), () {
       Navigator.pop(context);
       setState(() {});
@@ -61,10 +64,12 @@ class _WalletDetailState extends State<WalletDetail> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showMessage1OptionDialog(context, 'Error!', content: 'Internal_server_error');
+          showMessage1OptionDialog(context, 'Error!',
+              content: 'Internal_server_error');
         }
         if (curState.apiError == ApiError.noInternetConnection) {
-          showMessage1OptionDialog(context, 'Error!', content: 'No_internet_connection');
+          showMessage1OptionDialog(context, 'Error!',
+              content: 'No_internet_connection');
         }
       },
       builder: (context, curState) {
@@ -74,8 +79,7 @@ class _WalletDetailState extends State<WalletDetail> {
   }
 
   Widget _body(BuildContext context, WalletReport? walletReport) {
-
-    if(walletReport == null){
+    if (walletReport == null) {
       return const SizedBox.shrink();
     }
     return Scaffold(
@@ -85,10 +89,15 @@ class _WalletDetailState extends State<WalletDetail> {
         backgroundColor: Theme.of(context).primaryColor,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
+          child:
+              const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
         ),
         centerTitle: true,
-        title: Text(widget.wallet.name ?? '', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(widget.wallet.name ?? '',
+            style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
       ),
       body: RefreshIndicator(
         onRefresh: () async => _reloadPage(),
@@ -101,7 +110,9 @@ class _WalletDetailState extends State<WalletDetail> {
               padding: const EdgeInsets.all(16),
               child: Container(
                 height: 60,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Colors.white),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.white),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: Row(
@@ -112,8 +123,15 @@ class _WalletDetailState extends State<WalletDetail> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text('Tổng thu', style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
-                            Text('${formatterDouble(walletReport.incomeTotal)} $currency', style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
+                            Text('Tổng thu',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context).primaryColor)),
+                            Text(
+                                '${formatterDouble(walletReport.incomeTotal)} $currency',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context).primaryColor)),
                           ],
                         ),
                       ),
@@ -123,8 +141,13 @@ class _WalletDetailState extends State<WalletDetail> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            const Text('Tổng chi', style: TextStyle(fontSize: 16, color: Colors.redAccent)),
-                            Text('${formatterDouble(walletReport.expenseTotal)} $currency', style: const TextStyle(fontSize: 16, color: Colors.redAccent)),
+                            const Text('Tổng chi',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.redAccent)),
+                            Text(
+                                '${formatterDouble(walletReport.expenseTotal)} $currency',
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.redAccent)),
                           ],
                         ),
                       ),
@@ -136,15 +159,17 @@ class _WalletDetailState extends State<WalletDetail> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
               child: Container(
-                height: 60,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Số dư hiện tại', style: TextStyle(fontSize: 16, color: Colors.black)),
+                      const Text('Số dư hiện tại',
+                          style: TextStyle(fontSize: 16, color: Colors.black)),
                       Text(
                         '${formatterDouble(walletReport.currentBalance)} $currency',
                         style: const TextStyle(
@@ -157,7 +182,9 @@ class _WalletDetailState extends State<WalletDetail> {
                 ),
               ),
             ),
-            Expanded(child: _infoReport(context, walletReport.dayTransactionList ?? []))
+            Expanded(
+                child:
+                    _infoReport(context, walletReport.dayTransactionList ?? []))
           ],
         ),
       ),
@@ -174,7 +201,8 @@ class _WalletDetailState extends State<WalletDetail> {
         children: [
           const Padding(
             padding: EdgeInsets.only(left: 16.0),
-            child: Text('Thời gian', style: TextStyle(fontSize: 16, color: Colors.black)),
+            child: Text('Thời gian',
+                style: TextStyle(fontSize: 16, color: Colors.black)),
           ),
           Expanded(
             child: Padding(
@@ -207,10 +235,15 @@ class _WalletDetailState extends State<WalletDetail> {
                   context,
                   minTime: DateTime(2000, 01, 01),
                   maxTime: DateTime(2025, 12, 30),
-                  currentTime: isFrom ? DateTime(DateTime.now().year, DateTime.now().month - 1, DateTime.now().day) : DateTime.now(),
+                  currentTime: isFrom
+                      ? DateTime(DateTime.now().year, DateTime.now().month - 1,
+                          DateTime.now().day)
+                      : DateTime.now(),
                   onConfirm: (date) {
                     setState(() {
-                      isFrom ? fromDate = DateFormat('yyyy-MM-dd').format(date) : toDate = DateFormat('yyyy-MM-dd').format(date);
+                      isFrom
+                          ? fromDate = DateFormat('yyyy-MM-dd').format(date)
+                          : toDate = DateFormat('yyyy-MM-dd').format(date);
                     });
                   },
                   onCancel: () {
@@ -223,14 +256,18 @@ class _WalletDetailState extends State<WalletDetail> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 1, color: Theme.of(context).primaryColor),
+                    border: Border.all(
+                        width: 1, color: Theme.of(context).primaryColor),
                   ),
                   child: Row(
                     children: [
                       Expanded(
-                        child: Padding(padding: const EdgeInsets.only(left: 10.0), child: Text(isFrom ? fromDate : toDate)),
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text(isFrom ? fromDate : toDate)),
                       ),
-                      Icon(Icons.expand_more, size: 16, color: Theme.of(context).primaryColor),
+                      Icon(Icons.expand_more,
+                          size: 16, color: Theme.of(context).primaryColor),
                     ],
                   ),
                 ),
@@ -242,24 +279,30 @@ class _WalletDetailState extends State<WalletDetail> {
     );
   }
 
-  Widget _infoReport(BuildContext context, List<DayTransaction> listDayTransaction) {
+  Widget _infoReport(
+      BuildContext context, List<DayTransaction> listDayTransaction) {
     return SizedBox(
       child: isNotNullOrEmpty(listDayTransaction)
           ? ListView.builder(
               itemCount: listDayTransaction.length,
-              itemBuilder: (context, index) => _createItemReport(context, listDayTransaction[index]),
+              itemBuilder: (context, index) =>
+                  _createItemReport(context, listDayTransaction[index]),
             )
           : Center(
-              child: Text('Chưa có ghi chép chi tiêu nào', style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
+              child: Text('Chưa có ghi chép chi tiêu nào',
+                  style: TextStyle(
+                      fontSize: 16, color: Theme.of(context).primaryColor)),
             ),
     );
   }
 
-  Widget _createItemReport(BuildContext context, DayTransaction? dayTransaction) {
+  Widget _createItemReport(
+      BuildContext context, DayTransaction? dayTransaction) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10), color: Colors.white),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -271,8 +314,11 @@ class _WalletDetailState extends State<WalletDetail> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${dayTransaction?.date}', style: const TextStyle(fontSize: 16, color: Colors.black)),
-                    Text('${formatterDouble(dayTransaction?.amountTotal)} $currency'),
+                    Text('${dayTransaction?.date}',
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.black)),
+                    Text(
+                        '${formatterDouble(dayTransaction?.amountTotal)} $currency'),
                   ],
                 ),
               ),
@@ -280,11 +326,14 @@ class _WalletDetailState extends State<WalletDetail> {
             const Divider(height: 1, color: Colors.grey),
             if (isNotNullOrEmpty(dayTransaction?.transactionOutputs))
               SizedBox(
-                height: 60 * (dayTransaction?.transactionOutputs!.length ?? 1).toDouble(),
+                height: 60 *
+                    (dayTransaction?.transactionOutputs!.length ?? 1)
+                        .toDouble(),
                 child: ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: dayTransaction?.transactionOutputs!.length,
-                  itemBuilder: (context, index) => _createItemTransaction(context, dayTransaction?.transactionOutputs![index]),
+                  itemBuilder: (context, index) => _createItemTransaction(
+                      context, dayTransaction?.transactionOutputs![index]),
                 ),
               ),
           ],
@@ -293,7 +342,8 @@ class _WalletDetailState extends State<WalletDetail> {
     );
   }
 
-  Widget _createItemTransaction(BuildContext context, CollectionModel? collectionInfo) {
+  Widget _createItemTransaction(
+      BuildContext context, CollectionModel? collectionInfo) {
     final isExpense = collectionInfo?.transactionType == 'EXPENSE';
     if (isNullOrEmpty(collectionInfo)) {
       return const SizedBox.shrink();
@@ -302,7 +352,9 @@ class _WalletDetailState extends State<WalletDetail> {
       height: 60,
       child: ListTile(
         onTap: () async {
-          final result = await Navigator.pushNamed(context, AppRoutes.collection, arguments: collectionInfo);
+          final result = await Navigator.pushNamed(
+              context, AppRoutes.collection,
+              arguments: collectionInfo);
           if (result != null) {
             _reloadPage();
           } else {
@@ -314,19 +366,28 @@ class _WalletDetailState extends State<WalletDetail> {
           child: Container(
             height: 40,
             width: 40,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey.withOpacity(0.2)),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.withOpacity(0.2)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: AppImage(
                 localPathOrUrl: collectionInfo?.categoryLogo,
                 boxFit: BoxFit.contain,
-                errorWidget: const Icon(Icons.help_outline, size: 30, color: Colors.grey),
+                errorWidget: const Icon(Icons.help_outline,
+                    size: 30, color: Colors.grey),
               ),
             ),
           ),
         ),
-        title: Text('${collectionInfo?.categoryName}', style: const TextStyle(fontSize: 16, color: Colors.black)),
-        trailing: Text('${formatterDouble(collectionInfo?.amount)} $currency', style: TextStyle(fontSize: 16, color: isExpense ? Colors.redAccent : Theme.of(context).primaryColor)),
+        title: Text('${collectionInfo?.categoryName}',
+            style: const TextStyle(fontSize: 16, color: Colors.black)),
+        trailing: Text('${formatterDouble(collectionInfo?.amount)} $currency',
+            style: TextStyle(
+                fontSize: 16,
+                color: isExpense
+                    ? Colors.redAccent
+                    : Theme.of(context).primaryColor)),
       ),
     );
   }

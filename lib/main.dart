@@ -7,7 +7,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-
 @pragma('vm:entry-point')
 Future<void> _backgroundHandlerMessaging(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -15,8 +14,9 @@ Future<void> _backgroundHandlerMessaging(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseMessaging.onBackgroundMessage(_backgroundHandlerMessaging);
+  //TODO: recheck noti on bg
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // FirebaseMessaging.onBackgroundMessage(_backgroundHandlerMessaging);
   // await FirebaseMessagingServices().initializedNotification();
 
   // Init SharedPreferences storage
@@ -28,7 +28,8 @@ Future<void> main() async {
 bool _checkIsLoggedIn() {
   bool isLoggedOut = SharedPreferencesStorage().getLoggedOutStatus();
   bool isExpired = true;
-  String passwordExpiredTime = SharedPreferencesStorage().getAccessTokenExpired();
+  String passwordExpiredTime =
+      SharedPreferencesStorage().getAccessTokenExpired();
 
   if (passwordExpiredTime.isNotEmpty) {
     try {
@@ -63,7 +64,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  FirebaseMessagingServices notificationService = FirebaseMessagingServices();
+  // FirebaseMessagingServices notificationService = FirebaseMessagingServices();
 
   @override
   void initState() {

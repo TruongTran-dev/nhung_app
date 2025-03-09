@@ -1,16 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:share/share.dart';
 import 'package:expensive_management/business/blocs/export_file_bloc.dart';
 import 'package:expensive_management/data/models/wallet.dart';
-import 'package:expensive_management/data/provider/export_file_provider.dart';
-import 'package:expensive_management/data/response/base_response.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/limit_expenditure/limit_info/select_wallets.dart';
 import 'package:expensive_management/presentation/widgets/animation_loading.dart';
 import 'package:expensive_management/presentation/widgets/primary_button.dart';
@@ -61,13 +53,15 @@ class _ExportPageState extends State<ExportPage> {
         centerTitle: true,
         title: const Text(
           'Xuất file excel',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
         ),
       ),
       body: BlocConsumer<ExportBloc, ExportState>(
         listener: (context, state) {
           if (state is ErrorServerState) {
-            showMessage1OptionDialog(context, 'Error!', content: 'Internal_server_error');
+            showMessage1OptionDialog(context, 'Error!',
+                content: 'Internal_server_error');
           }
         },
         builder: (context, state) {
@@ -103,58 +97,63 @@ class _ExportPageState extends State<ExportPage> {
           child: PrimaryButton(
             text: 'Xuất file',
             onTap: () async {
-              if (isNullOrEmpty(listWalletSelected)) {
-                showMessage1OptionDialog(
-                  context,
-                  'Vui lòng chọn tài khoản/ví trước khi xuất file',
-                );
-              } else {
-                await Permission.manageExternalStorage.request();
+              //TODO: @Kull check update change lib share to share_plus
+              showMessage1OptionDialog(
+                context,
+                'Chờ check đổi package share sang share_plus nhé',
+              );
+              // if (isNullOrEmpty(listWalletSelected)) {
+              // (
+              //     context,
+              //     'Vui lòng chọn tài khoản/ví trước khi xuất file',
+              //   );
+              // } else {
+              //   await Permission.manageExternalStorage.request();
 
-                List<int> walletIDs = [];
-                listWalletSelected.map((e) => walletIDs.add(e.id!)).toList();
-                final Map<String, dynamic> query = {
-                  'fromDate': dateStart,
-                  if (dateEnd != null) 'toDate': dateEnd,
-                  'walletIds': walletIDs,
-                };
-                final Directory downloadPath = await getApplicationDocumentsDirectory();
-                final String fileName = (dateEnd != null) ? 'report_${dateStart}_$dateEnd.xlsx' : 'report_$dateStart.xlsx';
+              //   List<int> walletIDs = [];
+              //   listWalletSelected.map((e) => walletIDs.add(e.id!)).toList();
+              //   final Map<String, dynamic> query = {
+              //     'fromDate': dateStart,
+              //     if (dateEnd != null) 'toDate': dateEnd,
+              //     'walletIds': walletIDs,
+              //   };
+              //   final Directory downloadPath = await getApplicationDocumentsDirectory();
+              //   final String fileName = (dateEnd != null) ? 'report_${dateStart}_$dateEnd.xlsx' : 'report_$dateStart.xlsx';
 
-                final savePath = isNullOrEmpty(downloadPath) ? '/storage/emulated/0/Download/$fileName' : '${downloadPath.path}/$fileName';
+              //   final savePath = isNullOrEmpty(downloadPath) ? '/storage/emulated/0/Download/$fileName' : '${downloadPath.path}/$fileName';
 
-                // print('savePath: $savePath');
+              //   // print('savePath: $savePath');
 
-                final response = await ExportProvider().getFileReport(
-                  query: query,
-                  // fromDate: dateStart,
-                  // toDate: dateEnd,
-                  // walletIDs: walletIDs,
-                  savePath: savePath,
-                );
+              //   final response = await ExportProvider().getFileReport(
+              //     query: query,
+              //     // fromDate: dateStart,
+              //     // toDate: dateEnd,
+              //     // walletIDs: walletIDs,
+              //     savePath: savePath,
+              //   );
 
-                if (response is File) {
-                  // print('file: ${response.path}');
+              //   if (response is File) {
+              //     // print('file: ${response.path}');
 
-                  await OpenFile.open(response.path);
+              //     await OpenFile.open(response.path);
 
-                  await Share.shareFiles([response.path], text: fileName);
+              //     await Share.shareFiles([response.path], text: fileName);
 
-                  // if (await canLaunchUrl(Uri.file(response.path))) {
-                  //   await launchUrl(Uri.file(response.path));
-                  // } else {
-                  //   throw 'Could not launch ${Uri.file(response.path)}';
-                  // }
-                } else if (response is ExpiredTokenResponse) {
-                  logoutIfNeed(this.context);
-                } else {
-                  showMessage1OptionDialog(
-                    this.context,
-                    'Error!',
-                    content: 'Có lỗi xảy ra, không thể xuất file',
-                  );
-                }
-              }
+              //     // if (await canLaunchUrl(Uri.file(response.path))) {
+              //     //   await launchUrl(Uri.file(response.path));
+              //     // } else {
+              //     //   throw 'Could not launch ${Uri.file(response.path)}';
+              //     // }
+              //   } else if (response is ExpiredTokenResponse) {
+              //     logoutIfNeed(this.context);
+              //   } else {
+              //(
+              //       this.context,
+              //       'Error!',
+              //       content: 'Có lỗi xảy ra, không thể xuất file',
+              //     );
+              //   }
+              // }
             },
           ),
         ),
@@ -164,14 +163,16 @@ class _ExportPageState extends State<ExportPage> {
 
   Widget _selectWallets(List<Wallet>? listWallet) {
     List<Wallet> listWalled = listWallet ?? [];
-    List<String> titles = listWalletSelected.map((wallet) => wallet.name ?? '').toList();
+    List<String> titles =
+        listWalletSelected.map((wallet) => wallet.name ?? '').toList();
     String walletsName = titles.join(', ');
 
     return ListTile(
       onTap: () async {
         final List<Wallet>? result = await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SelectWalletsPage(listWallet: listWalled)),
+          MaterialPageRoute(
+              builder: (context) => SelectWalletsPage(listWallet: listWalled)),
         );
         setState(() {
           listWalletSelected = result ?? [];
@@ -191,7 +192,8 @@ class _ExportPageState extends State<ExportPage> {
           color: isNullOrEmpty(listWalletSelected) ? Colors.grey : Colors.black,
         ),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      trailing:
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
@@ -218,11 +220,15 @@ class _ExportPageState extends State<ExportPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Ngày bắt đầu', style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
-          Text(dateStart, style: const TextStyle(fontSize: 16, color: Colors.black)),
+          Text('Ngày bắt đầu',
+              style:
+                  TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
+          Text(dateStart,
+              style: const TextStyle(fontSize: 16, color: Colors.black)),
         ],
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      trailing:
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
@@ -249,11 +255,15 @@ class _ExportPageState extends State<ExportPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Ngày kêt thúc', style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
-          Text(dateEnd ?? 'Không xác định', style: const TextStyle(fontSize: 16, color: Colors.black)),
+          Text('Ngày kêt thúc',
+              style:
+                  TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
+          Text(dateEnd ?? 'Không xác định',
+              style: const TextStyle(fontSize: 16, color: Colors.black)),
         ],
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      trailing:
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 }

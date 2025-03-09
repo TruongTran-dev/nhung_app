@@ -25,7 +25,8 @@ class _MyWalletPageState extends State<MyWalletPage> {
 
   @override
   void initState() {
-    _myWalletPageBloc = BlocProvider.of<MyWalletPageBloc>(context)..add(GetListWalletEvent());
+    _myWalletPageBloc = BlocProvider.of<MyWalletPageBloc>(context)
+      ..add(GetListWalletEvent());
     super.initState();
   }
 
@@ -60,7 +61,8 @@ class _MyWalletPageState extends State<MyWalletPage> {
         automaticallyImplyLeading: false,
         title: const Text(
           'Tài khoản',
-          style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: state.isLoading
@@ -72,7 +74,8 @@ class _MyWalletPageState extends State<MyWalletPage> {
                 child: ListView.separated(
                   itemCount: (state.listWallet?.length ?? 0) + 1,
                   separatorBuilder: (context, index) {
-                    if (index == 0 || index == (state.listWallet?.length ?? 0)) {
+                    if (index == 0 ||
+                        index == (state.listWallet?.length ?? 0)) {
                       return const SizedBox.shrink();
                     }
                     return Container(
@@ -88,13 +91,16 @@ class _MyWalletPageState extends State<MyWalletPage> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Container(
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).colorScheme.background),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Theme.of(context).colorScheme.background),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Center(
                               child: Text(
                                 'Tổng tiền : ${formatterDouble(state.moneyTotal)} ${SharedPreferencesStorage().getCurrency()}',
-                                style: const TextStyle(fontSize: 16, color: Colors.black),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.black),
                               ),
                             ),
                           ),
@@ -102,21 +108,34 @@ class _MyWalletPageState extends State<MyWalletPage> {
                       );
                     }
                     if (state.listWallet != null) {
-                      return _createItemWallet(context, state.listWallet![index - 1], index: index - 1, endIndex: (state.listWallet?.length ?? 0) - 1);
+                      return _createItemWallet(
+                          context, state.listWallet![index - 1],
+                          index: index - 1,
+                          endIndex: (state.listWallet?.length ?? 0) - 1);
                     }
                     return Container(
-                      decoration: BoxDecoration(color: Theme.of(context).colorScheme.background, borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.background,
+                          borderRadius: BorderRadius.circular(10)),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Container(
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), border: Border.all(color: Theme.of(context).primaryColor, width: 2)),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 2)),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: InkWell(
                               onTap: () {
-                                Navigator.pushNamed(context, AppRoutes.addWallet);
+                                Navigator.pushNamed(
+                                    context, AppRoutes.addWallet);
                               },
-                              child: Text('+ Thêm tài khoản', style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
+                              child: Text('+ Thêm tài khoản',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Theme.of(context).primaryColor)),
                             ),
                           ),
                         ),
@@ -128,25 +147,30 @@ class _MyWalletPageState extends State<MyWalletPage> {
             ),
       floatingActionButton: InkWell(
         borderRadius: BorderRadius.circular(25),
-        overlayColor: const MaterialStatePropertyAll(Colors.grey),
+        overlayColor: const WidgetStatePropertyAll(Colors.grey),
         onTap: () => Navigator.pushNamed(context, AppRoutes.addWallet),
         child: Container(
           width: 50,
           height: 50,
-          decoration: BoxDecoration(color: Theme.of(context).primaryColor, borderRadius: BorderRadius.circular(25)),
+          decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(25)),
           child: const Icon(Icons.add, size: 40, color: Colors.white),
         ),
       ),
     );
   }
 
-  Widget _createItemWallet(BuildContext context, Wallet wallet, {int? index, int? endIndex}) {
+  Widget _createItemWallet(BuildContext context, Wallet wallet,
+      {int? index, int? endIndex}) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BlocProvider(create: (context) => WalletDetailBloc(context), child: WalletDetail(wallet: wallet)),
+            builder: (context) => BlocProvider(
+                create: (context) => WalletDetailBloc(context),
+                child: WalletDetail(wallet: wallet)),
           ),
         );
       },
@@ -171,8 +195,11 @@ class _MyWalletPageState extends State<MyWalletPage> {
                 child: Container(
                   height: 40,
                   width: 40,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey.withOpacity(0.2)),
-                  child: Icon(getIconWallet(walletType: wallet.accountType), size: 30, color: Theme.of(context).primaryColor),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.grey.withOpacity(0.2)),
+                  child: Icon(getIconWallet(walletType: wallet.accountType),
+                      size: 30, color: Theme.of(context).primaryColor),
                 ),
               ),
               Expanded(
@@ -180,8 +207,13 @@ class _MyWalletPageState extends State<MyWalletPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(wallet.name ?? '', style: const TextStyle(fontSize: 16, color: Colors.black)),
-                    Text('${formatterInt(wallet.accountBalance)} ${wallet.currency}', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text(wallet.name ?? '',
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.black)),
+                    Text(
+                        '${formatterInt(wallet.accountBalance)} ${wallet.currency}',
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.grey)),
                   ],
                 ),
               ),
@@ -193,10 +225,12 @@ class _MyWalletPageState extends State<MyWalletPage> {
                       context: context,
                       isDismissible: true,
                       enableDrag: true,
-                      builder: (context) => _bottomOption(context: context, wallet: wallet),
+                      builder: (context) =>
+                          _bottomOption(context: context, wallet: wallet),
                     );
                   },
-                  child: const Icon(Icons.more_vert, size: 24, color: Colors.grey),
+                  child:
+                      const Icon(Icons.more_vert, size: 24, color: Colors.grey),
                 ),
               ),
             ],
@@ -214,20 +248,30 @@ class _MyWalletPageState extends State<MyWalletPage> {
       color: Colors.grey[600],
       height: 130,
       child: Container(
-        decoration: const BoxDecoration(borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)), color: Colors.white),
+        decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+            color: Colors.white),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 6, horizontal: MediaQuery.of(context).size.width * 0.45),
-              child: Container(height: 4, decoration: BoxDecoration(borderRadius: BorderRadius.circular(2), color: Colors.grey)),
+              padding: EdgeInsets.symmetric(
+                  vertical: 6,
+                  horizontal: MediaQuery.of(context).size.width * 0.45),
+              child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      color: Colors.grey)),
             ),
             InkWell(
               overlayColor: const MaterialStatePropertyAll(Colors.grey),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => EditWalletPage(wallet: wallet)),
+                  MaterialPageRoute(
+                      builder: (context) => EditWalletPage(wallet: wallet)),
                 );
               },
               child: const Padding(
@@ -238,7 +282,8 @@ class _MyWalletPageState extends State<MyWalletPage> {
                     Icon(Icons.edit, size: 24, color: Colors.grey),
                     Padding(
                       padding: EdgeInsets.only(left: 10),
-                      child: Text('Sửa', style: TextStyle(fontSize: 16, color: Colors.black)),
+                      child: Text('Sửa',
+                          style: TextStyle(fontSize: 16, color: Colors.black)),
                     ),
                   ],
                 ),
@@ -250,27 +295,33 @@ class _MyWalletPageState extends State<MyWalletPage> {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('Xóa tài khoản này?', style: TextStyle(fontSize: 16, color: Colors.black)),
-                    content: Text(AppConstants.contentDeleteWallet, style: TextStyle(fontSize: 14, color: Colors.black.withOpacity(0.5))),
+                    title: const Text('Xóa tài khoản này?',
+                        style: TextStyle(fontSize: 16, color: Colors.black)),
+                    content: Text(AppConstants.contentDeleteWallet,
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black.withOpacity(0.5))),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Text('Huỷ', style: TextStyle(fontSize: 16, color: Colors.black)),
+                        child: const Text('Huỷ',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.black)),
                       ),
                       TextButton(
                         onPressed: () async {
                           setState(() {
-                            _myWalletPageBloc.add(
-                              RemoveWalletEvent(walletId: wallet.id!)
-                            );
+                            _myWalletPageBloc
+                                .add(RemoveWalletEvent(walletId: wallet.id!));
                           });
                           Navigator.pop(context);
                           Navigator.pop(context);
                           await reloadPageWallet();
                         },
-                        child: const Text('Xóa', style: TextStyle(fontSize: 16, color: Colors.red)),
+                        child: const Text('Xóa',
+                            style: TextStyle(fontSize: 16, color: Colors.red)),
                       ),
                     ],
                   ),
@@ -282,7 +333,11 @@ class _MyWalletPageState extends State<MyWalletPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Icon(Icons.delete, size: 24, color: Colors.grey),
-                    Padding(padding: EdgeInsets.only(left: 10), child: Text('Xoá', style: TextStyle(fontSize: 16, color: Colors.black))),
+                    Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Text('Xoá',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.black))),
                   ],
                 ),
               ),

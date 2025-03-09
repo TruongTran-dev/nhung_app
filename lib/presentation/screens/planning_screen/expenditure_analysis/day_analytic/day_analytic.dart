@@ -60,7 +60,8 @@ class _DayAnalyticState extends State<DayAnalytic> {
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(bottom: 8.0),
-                      child: Text('(Đơn vị: nghìn VNĐ)', style: TextStyle(fontSize: 12, color: Colors.black)),
+                      child: Text('(Đơn vị: nghìn VNĐ)',
+                          style: TextStyle(fontSize: 12, color: Colors.black)),
                     ),
                     SfCartesianChart(
                       primaryXAxis: CategoryAxis(),
@@ -68,8 +69,11 @@ class _DayAnalyticState extends State<DayAnalytic> {
                       series: [
                         LineSeries<CategoryReport, String>(
                           dataSource: listReport,
-                          xValueMapper: (CategoryReport data, _) => DateFormat('dd/MM').format(DateTime.parse(data.time)),
-                          yValueMapper: (CategoryReport data, _) => (data.totalAmount / 1000),
+                          xValueMapper: (CategoryReport data, _) =>
+                              DateFormat('dd/MM')
+                                  .format(DateTime.parse(data.time)),
+                          yValueMapper: (CategoryReport data, _) =>
+                              (data.totalAmount / 1000),
                           name: 'Chi tiêu ngày',
                           color: Colors.lightBlueAccent,
                         ),
@@ -80,10 +84,13 @@ class _DayAnalyticState extends State<DayAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          const Text('Tổng chi tiêu',
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
                             '${formatterDouble(state.data?.totalAmount)} $currency',
-                            style: const TextStyle(fontSize: 14, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black),
                           )
                         ],
                       ),
@@ -93,15 +100,21 @@ class _DayAnalyticState extends State<DayAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Trung bình chỉ/ngày', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          const Text('Trung bình chỉ/ngày',
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
                             '${formatterDouble(state.data?.mediumAmount)} $currency',
-                            style: const TextStyle(fontSize: 14, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black),
                           ),
                         ],
                       ),
                     ),
-                    Divider(color: Colors.grey.withOpacity(0.2), height: 10, thickness: 10),
+                    Divider(
+                        color: Colors.grey.withOpacity(0.2),
+                        height: 10,
+                        thickness: 10),
                     listFilter(listReport),
                   ],
                 ),
@@ -127,8 +140,17 @@ class _DayAnalyticState extends State<DayAnalytic> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Xem chi tiết', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
-                  Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
+                  const Text('Xem chi tiết',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black)),
+                  Icon(
+                      _showDetail
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      size: 20,
+                      color: Colors.grey),
                 ],
               ),
             ),
@@ -151,28 +173,28 @@ class _DayAnalyticState extends State<DayAnalytic> {
   }
 
   Widget details(CategoryReport report) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-            bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-          ),
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        border: BorderDirectional(
+          top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
+          bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-            Row(
-              children: [
-                Text('${formatterDouble(report.totalAmount)} $currency ', style: const TextStyle(color: Colors.red)),
-                const Icon(Icons.keyboard_arrow_right_rounded, size: 20, color: Colors.grey),
-              ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(report.time,
+              style:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+          Expanded(
+            child: Text(
+              '${formatterDouble(report.totalAmount)} $currency ',
+              textAlign: TextAlign.right,
+              style: const TextStyle(color: Colors.red),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
