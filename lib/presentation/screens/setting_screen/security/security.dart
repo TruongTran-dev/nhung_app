@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:expensive_management/presentation/screens/password_screen/change_password/change_password.dart';
 
 class SecurityPage extends StatefulWidget {
-  const SecurityPage({Key? key}) : super(key: key);
+  const SecurityPage({super.key});
 
   @override
   State<SecurityPage> createState() => _SecurityPageState();
@@ -15,7 +15,7 @@ class _SecurityPageState extends State<SecurityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         elevation: 0.5,
         backgroundColor: Theme.of(context).primaryColor,
@@ -24,7 +24,10 @@ class _SecurityPageState extends State<SecurityPage> {
           icon: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
         ),
         centerTitle: true,
-        title: const Text('Bảo mật', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Bảo mật',
+          style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -69,14 +72,22 @@ class _SecurityPageState extends State<SecurityPage> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.grey.withOpacity(0.2)),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: Image.asset('images/ic_change_password.png', color: Theme.of(context).primaryColor),
                       ),
                     ),
                   ),
-                  const Expanded(child: Text('Đổi mật khẩu', style: TextStyle(fontSize: 16, color: Colors.black))),
+                  const Expanded(
+                    child: Text(
+                      'Đổi mật khẩu',
+                      style: TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -86,6 +97,7 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
+  // ignore: unused_element
   Widget _itemOption({IconData? icon, String? title, bool value = false, Function()? onTap}) {
     return InkWell(
       onTap: onTap,
@@ -105,7 +117,10 @@ class _SecurityPageState extends State<SecurityPage> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.grey.withOpacity(0.2)),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
                       child: Icon(icon, size: 30, color: Theme.of(context).primaryColor),
                     ),
                   ),
@@ -115,9 +130,9 @@ class _SecurityPageState extends State<SecurityPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: Switch(
-                      activeColor: Theme.of(context).colorScheme.background,
+                      activeColor: Theme.of(context).colorScheme.surface,
                       activeTrackColor: Theme.of(context).primaryColor,
-                      inactiveThumbColor: Theme.of(context).colorScheme.background,
+                      inactiveThumbColor: Theme.of(context).colorScheme.surface,
                       inactiveTrackColor: Colors.grey,
                       value: value,
                       onChanged: (v) {},

@@ -30,10 +30,8 @@ class CollectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<NewsCollectionBloc>(
-      create: (context) =>
-          NewsCollectionBloc(context)..add(CollectionInitialized()),
-      child:
-          NewCollectionPage(isEdit: isEdit, collectionReport: collectionReport),
+      create: (context) => NewsCollectionBloc(context)..add(CollectionInitialized()),
+      child: NewCollectionPage(isEdit: isEdit, collectionReport: collectionReport),
     );
   }
 }
@@ -42,9 +40,7 @@ class NewCollectionPage extends StatefulWidget {
   final bool isEdit;
   final CollectionModel? collectionReport;
 
-  const NewCollectionPage(
-      {Key? key, this.isEdit = false, this.collectionReport})
-      : super(key: key);
+  const NewCollectionPage({super.key, this.isEdit = false, this.collectionReport});
 
   @override
   State<NewCollectionPage> createState() => _NewCollectionPageState();
@@ -57,13 +53,13 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
   final _noteController = TextEditingController();
   bool _showIconClear = false;
 
-  ItemOption itemOption =
-      ItemOption(itemId: 0, title: 'Chi tiền', icon: Icons.remove);
+  ItemOption itemOption = ItemOption(itemId: 0, title: 'Chi tiền', icon: Icons.remove);
   ItemCategory itemCategorySelected = ItemCategory(
-      categoryId: null,
-      title: "Chọn hạng mục",
-      iconLeading: '',
-      type: TransactionType.expense);
+    categoryId: null,
+    title: "Chọn hạng mục",
+    iconLeading: '',
+    type: TransactionType.expense,
+  );
 
   String datePicker = formatToLocaleVietnam(DateTime.now());
   String timePicker = DateFormat.Hms().format(DateTime.now());
@@ -83,12 +79,10 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
         itemOption = (widget.collectionReport?.transactionType == 'EXPENSE')
             ? ItemOption(itemId: 0, title: 'Chi tiền', icon: Icons.remove)
             : ItemOption(itemId: 1, title: 'Thu tiền', icon: Icons.add);
-        datePicker = formatToLocaleVietnam(
-            DateTime.tryParse(widget.collectionReport?.ariseDate ?? '') ??
-                DateTime.now());
-        timePicker = DateFormat.Hms().format(
-            DateTime.tryParse(widget.collectionReport?.ariseDate ?? '') ??
-                DateTime.now());
+        datePicker =
+            formatToLocaleVietnam(DateTime.tryParse(widget.collectionReport?.ariseDate ?? '') ?? DateTime.now());
+        timePicker =
+            DateFormat.Hms().format(DateTime.tryParse(widget.collectionReport?.ariseDate ?? '') ?? DateTime.now());
         _noteController.text = widget.collectionReport?.description ?? '';
         _moneyController.text = (widget.collectionReport?.amount).toString();
         walletId = widget.collectionReport?.walletId;
@@ -130,17 +124,21 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       child: BlocConsumer<NewsCollectionBloc, CollectionState>(
         listener: (context, state) {
           if (state is AddSuccessState) {
-            showMessage1OptionDialog(this.context, 'Thêm giao dịch thành công',
-                onClose: () => reloadPage(context));
+            showMessage1OptionDialog(
+              this.context,
+              'Thêm giao dịch thành công',
+              onClose: () => reloadPage(context),
+            );
           }
           if (state is UpdateSuccessState) {
             showMessage1OptionDialog(
-                this.context, 'Cập nhật giao dịch thành công',
-                onClose: () => _popBack(context, true));
+              this.context,
+              'Cập nhật giao dịch thành công',
+              onClose: () => _popBack(context, true),
+            );
           }
           if (state is FailureState) {
-            showMessage1OptionDialog(context, 'Error!',
-                content: state.errorMessage);
+            showMessage1OptionDialog(context, 'Error!', content: state.errorMessage);
           }
         },
         builder: (context, state) {
@@ -158,7 +156,6 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
   }
 
   void _popBack(BuildContext context, value) {
-    // Navigator.pop(context);
     Navigator.of(context).pop(value);
   }
 
@@ -174,40 +171,29 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
           leading: widget.isEdit
               ? InkWell(
                   onTap: () => Navigator.of(context).pop(true),
-                  child: const Icon(Icons.arrow_back_ios,
-                      size: 24, color: Colors.white),
+                  child: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
                 )
               : const SizedBox(width: 24),
           centerTitle: true,
           title: GestureDetector(
             onTap: () async {
-              await showDialog(
-                  context: context,
-                  builder: (context) => _buildOptionDialog(context));
+              await showDialog(context: context, builder: (context) => _buildOptionDialog(context));
             },
             child: Container(
               height: 40,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColorDark,
-                  borderRadius: BorderRadius.circular(20)),
+              decoration:
+                  BoxDecoration(color: Theme.of(context).primaryColorDark, borderRadius: BorderRadius.circular(20)),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(itemOption.title,
-                      style:
-                          const TextStyle(fontSize: 20, color: Colors.white)),
-                  const Icon(Icons.arrow_drop_down,
-                      size: 20, color: Colors.white),
+                  Text(itemOption.title, style: const TextStyle(fontSize: 20, color: Colors.white)),
+                  const Icon(Icons.arrow_drop_down, size: 20, color: Colors.white),
                 ],
               ),
             ),
           ),
-          actions: const [
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(width: 24))
-          ],
+          actions: const [Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: SizedBox(width: 24))],
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -246,8 +232,9 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                       cancelLabel: 'Hủy',
                       okLabel: 'Xóa',
                       onOK: () {
-                        context.read<NewsCollectionBloc>().add(DeleteCollection(
-                            collectionId: widget.collectionReport!.id!));
+                        context
+                            .read<NewsCollectionBloc>()
+                            .add(DeleteCollection(collectionId: widget.collectionReport!.id!));
                         Navigator.of(context).pop(true);
                       },
                     );
@@ -258,19 +245,15 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                   onTap: () async {
                     context.read<NewsCollectionBloc>().add(UpdateCollection(
                           collectionId: widget.collectionReport!.id!,
-                          amount: double.parse(
-                              _moneyController.text.trim().toString()),
-                          ariseDate: _getDateTimePicked() ??
-                              (widget.collectionReport?.ariseDate ?? ''),
+                          amount: double.parse(_moneyController.text.trim().toString()),
+                          ariseDate: _getDateTimePicked() ?? (widget.collectionReport?.ariseDate ?? ''),
                           categoryId: itemCategorySelected.categoryId!,
                           description: _noteController.text.trim(),
-                          transactionType:
-                              (itemOption.itemId == 0) ? 'EXPENSE' : 'INCOME',
+                          transactionType: (itemOption.itemId == 0) ? 'EXPENSE' : 'INCOME',
                           walletId: walletId!,
                           imageUrl: isOnline
                               ? imageUrl
-                              : await FirebaseService()
-                                  .uploadImageToStorage(image: File(imageUrl!)),
+                              : await FirebaseService().uploadImageToStorage(image: File(imageUrl!)),
                         ));
                   },
                 ),
@@ -282,8 +265,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                 if (_moneyController.text.trim().isEmpty) {
                   showMessage1OptionDialog(context, 'Vui lòng nhập số tiền');
                 } else if (itemCategorySelected.categoryId == null) {
-                  showMessage1OptionDialog(
-                      context, 'Vui lòng chọn danh mục thu/chi');
+                  showMessage1OptionDialog(context, 'Vui lòng chọn danh mục thu/chi');
                 } else if (walletId == null) {
                   showMessage1OptionDialog(context, 'Vui lòng chọn ví');
                 } else {
@@ -296,16 +278,14 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
 
   Future<void> _postCollection(BuildContext context) async {
     context.read<NewsCollectionBloc>().add(AddNewCollection(
-          amount: double.parse(_moneyController.text.trim().toString()),
+          amount: double.parse(_moneyController.text.trim().replaceAll(',', '')),
           ariseDate: _getDateTimePicked() ?? DateTime.now().toIso8601String(),
           categoryId: itemCategorySelected.categoryId!,
           description: _noteController.text.trim(),
           transactionType: (itemOption.itemId == 0) ? 'EXPENSE' : 'INCOME',
           walletId: walletId!,
-          imageUrl: isNotNullOrEmpty(imageUrl)
-              ? await FirebaseService()
-                  .uploadImageToStorage(image: File(imageUrl!))
-              : '',
+          imageUrl:
+              isNotNullOrEmpty(imageUrl) ? await FirebaseService().uploadImageToStorage(image: File(imageUrl!)) : '',
         ));
   }
 
@@ -318,8 +298,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       walletId = null;
       walletName = null;
       walletType = null;
-      itemCategorySelected = ItemCategory(
-          categoryId: null, title: "Chọn hạng mục", iconLeading: '');
+      itemCategorySelected = ItemCategory(categoryId: null, title: "Chọn hạng mục", iconLeading: '');
       itemOption = ItemOption(itemId: 0, title: 'Chi tiền', icon: Icons.remove);
       datePicker = formatToLocaleVietnam(DateTime.now());
       timePicker = DateFormat.Hms().format(DateTime.now());
@@ -363,8 +342,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                   });
                 }
               },
-              child: const Text('Chụp ảnh',
-                  style: TextStyle(fontSize: 16, color: Colors.black)),
+              child: const Text('Chụp ảnh', style: TextStyle(fontSize: 16, color: Colors.black)),
             ),
             CupertinoActionSheetAction(
               onPressed: () async {
@@ -380,21 +358,19 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                   });
                 }
               },
-              child: const Text('Chọn ảnh từ thư viện',
-                  style: TextStyle(fontSize: 16, color: Colors.black)),
+              child: const Text('Chọn ảnh từ thư viện', style: TextStyle(fontSize: 16, color: Colors.black)),
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
             onPressed: () => Navigator.pop(context),
-            child: Text('Hủy',
-                style: TextStyle(
-                    fontSize: 16, color: Colors.black.withOpacity(0.7))),
+            child: Text('Hủy', style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7))),
           ),
         );
       },
     );
   }
 
+  // ignore: unused_element
   Widget _selectImage() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -406,8 +382,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.grey.withOpacity(0.1),
-                border:
-                    Border.all(width: 0.5, color: Colors.grey.withOpacity(0.9)),
+                border: Border.all(width: 0.5, color: Colors.grey.withOpacity(0.9)),
               ),
               child: isNotNullOrEmpty(imageUrl)
                   ? ClipRRect(
@@ -423,15 +398,11 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Icon(Icons.add,
-                                    size: 32,
-                                    color: Theme.of(context).primaryColor),
+                                Icon(Icons.add, size: 32, color: Theme.of(context).primaryColor),
                                 const SizedBox(height: 10),
                                 Text('Thêm ảnh',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: Theme.of(context).primaryColor)),
+                                    style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
                               ],
                             ),
                           ),
@@ -445,15 +416,11 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Icon(Icons.add,
-                                size: 32,
-                                color: Theme.of(context).primaryColor),
+                            Icon(Icons.add, size: 32, color: Theme.of(context).primaryColor),
                             const SizedBox(height: 10),
                             Text('Thêm ảnh',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: Theme.of(context).primaryColor)),
+                                style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
                           ],
                         ),
                       ),
@@ -471,8 +438,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                         imageUrl = '';
                       });
                     },
-                    child: const Icon(Icons.cancel,
-                        size: 24, color: Colors.redAccent),
+                    child: const Icon(Icons.cancel, size: 24, color: Colors.redAccent),
                   ),
                 )
               : const SizedBox.shrink(),
@@ -487,7 +453,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -514,8 +480,9 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
             builder: (context) => BlocProvider(
               create: (context) => OptionCategoryBloc(context),
               child: OptionCategoryPage(
-                  categoryIdSelected: itemCategorySelected.categoryId,
-                  tabIndex: itemOption.itemId == 0 ? 0 : 1),
+                categoryIdSelected: itemCategorySelected.categoryId,
+                tabIndex: itemOption.itemId == 0 ? 0 : 1,
+              ),
             ),
           ),
         );
@@ -532,9 +499,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       leading: Container(
         height: 30,
         width: 30,
-        decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: AppImage(
@@ -543,21 +508,15 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
             height: 30,
             boxFit: BoxFit.cover,
             alignment: Alignment.center,
-            errorWidget:
-                const Icon(Icons.help_outline, color: Colors.grey, size: 30),
+            errorWidget: const Icon(Icons.help_outline, color: Colors.grey, size: 30),
           ),
         ),
       ),
       title: Text(
         itemCategorySelected.title ?? '',
-        style: TextStyle(
-            fontSize: 20,
-            color: (itemCategorySelected.categoryId != null)
-                ? Colors.black
-                : Colors.grey),
+        style: TextStyle(fontSize: 20, color: (itemCategorySelected.categoryId != null) ? Colors.black : Colors.grey),
       ),
-      trailing:
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
@@ -567,8 +526,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       controller: _noteController,
       textAlign: TextAlign.start,
       onChanged: (_) {},
-      style: const TextStyle(
-          fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
+      style: const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
       textInputAction: TextInputAction.done,
       textAlignVertical: TextAlignVertical.center,
       decoration: InputDecoration(
@@ -668,24 +626,17 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: const Icon(Icons.arrow_back_ios,
-                            color: Colors.white, size: 24),
+                        child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
                       ),
                       centerTitle: true,
                       title: const Text('Chọn tài khoản',
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                     body: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: isNullOrEmpty(listWallet)
-                          ? Text(
-                              'Không có dữ liệu tài khoản, vui lòng thêm tài khoản mới.',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).primaryColor))
+                          ? Text('Không có dữ liệu tài khoản, vui lòng thêm tài khoản mới.',
+                              style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor))
                           : ListView.builder(
                               itemCount: listWallet.length,
                               itemBuilder: (context, index) {
@@ -696,75 +647,51 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                                       setState(() {
                                         walletId = listWallet[index].id;
                                         walletName = listWallet[index].name;
-                                        walletType =
-                                            listWallet[index].accountType;
-                                        _currency =
-                                            listWallet[index].currency ??
-                                                _currency;
+                                        walletType = listWallet[index].accountType;
+                                        _currency = listWallet[index].currency ?? _currency;
                                       });
                                       Navigator.pop(context);
                                     },
                                     child: Container(
                                       height: 60,
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .background),
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: Theme.of(context).colorScheme.background),
                                       alignment: Alignment.center,
                                       child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(horizontal: 10),
                                             child: Icon(
-                                              isNotNullOrEmpty(listWallet[index]
-                                                      .accountType)
-                                                  ? getIconWallet(
-                                                      walletType:
-                                                          listWallet[index]
-                                                              .accountType)
+                                              isNotNullOrEmpty(listWallet[index].accountType)
+                                                  ? getIconWallet(walletType: listWallet[index].accountType)
                                                   : Icons.help,
                                               size: 30,
-                                              color:
-                                                  Colors.grey.withOpacity(0.6),
+                                              color: Colors.grey.withOpacity(0.6),
                                             ),
                                           ),
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                               children: [
                                                 Text(
                                                   listWallet[index].name ?? '',
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black),
+                                                  style: const TextStyle(fontSize: 16, color: Colors.black),
                                                 ),
                                                 Text(
                                                   '${listWallet[index].accountBalance} ${listWallet[index].currency}',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.grey),
+                                                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                                                 ),
                                               ],
                                             ),
                                           ),
                                           if (walletId == listWallet[index].id)
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Icon(
-                                                  Icons.check_circle_outline,
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
-                                                  size: 24),
+                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                              child: Icon(Icons.check_circle_outline,
+                                                  color: Theme.of(context).primaryColor, size: 24),
                                             ),
                                         ],
                                       ),
@@ -782,22 +709,13 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
             },
             dense: false,
             horizontalTitleGap: 6,
-            leading: Icon(
-                isNotNullOrEmpty(walletType)
-                    ? getIconWallet(walletType: walletType!)
-                    : Icons.help_outline,
-                size: 30,
-                color: Colors.grey),
+            leading: Icon(isNotNullOrEmpty(walletType) ? getIconWallet(walletType: walletType!) : Icons.help_outline,
+                size: 30, color: Colors.grey),
             title: Text(
               walletName ?? 'Chọn tài khoản/ ví',
-              style: TextStyle(
-                  fontSize: 16,
-                  color: isNotNullOrEmpty(walletName)
-                      ? Colors.black
-                      : Colors.grey),
+              style: TextStyle(fontSize: 16, color: isNotNullOrEmpty(walletName) ? Colors.black : Colors.grey),
             ),
-            trailing: const Icon(Icons.arrow_forward_ios,
-                size: 16, color: Colors.grey),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
           );
   }
 
@@ -806,16 +724,15 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       padding: const EdgeInsets.only(top: 16),
       child: Container(
         decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
-            borderRadius: BorderRadius.circular(10)),
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                  padding: EdgeInsets.only(bottom: 16.0),
-                  child: Text('Số tiền:')),
+              Text('Số tiền:'),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -828,19 +745,36 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                         keyboardType: TextInputType.phone,
                         maxLines: 1,
                         textAlign: TextAlign.end,
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Theme.of(context).primaryColor),
+                        style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
                         // inputFormatters: [InputFormatter()],
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            // Remove all non-digit characters
+                            String digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+
+                            // Convert to number and format with thousand separators
+                            if (digitsOnly.isNotEmpty) {
+                              int number = int.parse(digitsOnly);
+                              String formatted = number
+                                  .toString()
+                                  .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+
+                              // Update controller without triggering another onChanged
+                              if (formatted != value) {
+                                _moneyController.value = TextEditingValue(
+                                  text: formatted,
+                                  selection: TextSelection.collapsed(offset: formatted.length),
+                                );
+                              }
+                            }
+                          }
+                        },
                       ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child: Text(_currency,
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Theme.of(context).primaryColor)),
+                    child: Text(_currency, style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor)),
                   )
                 ],
               )
@@ -874,13 +808,11 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(26),
-                        color: Colors.grey.withOpacity(0.2)),
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(26), color: Colors.grey.withOpacity(0.2)),
                     child: ListTile(
                       dense: false,
-                      visualDensity:
-                          const VisualDensity(vertical: -4, horizontal: 0),
+                      visualDensity: const VisualDensity(vertical: -4, horizontal: 0),
                       horizontalTitleGap: 0,
                       minVerticalPadding: -4,
                       selectedColor: Colors.grey.withOpacity(0.3),
@@ -891,23 +823,18 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                           Container(
                             height: 40,
                             width: 40,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Icon(itemsOption[index].icon,
-                                size: 24,
-                                color: Theme.of(context).primaryColor),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+                            child: Icon(itemsOption[index].icon, size: 24, color: Theme.of(context).primaryColor),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 10.0),
                             child: Text(itemsOption[index].title,
-                                style: const TextStyle(
-                                    fontSize: 16, color: Colors.black)),
+                                style: const TextStyle(fontSize: 16, color: Colors.black)),
                           ),
                         ],
                       ),
                       trailing: (itemsOption[index].itemId == itemOption.itemId)
-                          ? Icon(Icons.check,
-                              color: Theme.of(context).primaryColor, size: 16)
+                          ? Icon(Icons.check, color: Theme.of(context).primaryColor, size: 16)
                           : null,
                     ),
                   ),

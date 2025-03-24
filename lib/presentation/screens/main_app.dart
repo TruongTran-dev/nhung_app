@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -57,17 +59,16 @@ class MainAppState extends State<MainApp> with WidgetsBindingObserver {
       activeColor: Theme.of(context).primaryColor,
       inactiveColor: Colors.grey.withOpacity(0.9),
       backgroundColor: Colors.grey[50],
-      iconSize: 30,
-      height: 50,
+      height: 56,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home, size: 30, color: Colors.grey.withOpacity(0.9)),
-          activeIcon: Icon(Icons.home_outlined, size: 30, color: Theme.of(context).primaryColor),
+          icon: Icon(Icons.home, size: 24, color: Colors.grey.withOpacity(0.9)),
+          activeIcon: Icon(Icons.home_outlined, size: 24, color: Theme.of(context).primaryColor),
           label: 'Trang chủ',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet, size: 30, color: Colors.grey.withOpacity(0.9)),
-          activeIcon: Icon(Icons.account_balance_wallet_outlined, size: 30, color: Theme.of(context).primaryColor),
+          icon: Icon(Icons.account_balance_wallet, size: 24, color: Colors.grey.withOpacity(0.9)),
+          activeIcon: Icon(Icons.account_balance_wallet_outlined, size: 24, color: Theme.of(context).primaryColor),
           label: 'Tài khoản',
         ),
         BottomNavigationBarItem(
@@ -85,13 +86,13 @@ class MainAppState extends State<MainApp> with WidgetsBindingObserver {
           ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart, size: 30, color: Colors.grey.withOpacity(0.9)),
-          activeIcon: Icon(Icons.bar_chart_outlined, size: 30, color: Theme.of(context).primaryColor),
+          icon: Icon(Icons.bar_chart, size: 24, color: Colors.grey.withOpacity(0.9)),
+          activeIcon: Icon(Icons.bar_chart_outlined, size: 24, color: Theme.of(context).primaryColor),
           label: 'Báo cáo',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.grid_view, size: 30, color: Colors.grey.withOpacity(0.9)),
-          activeIcon: Icon(Icons.grid_view, size: 30, color: Theme.of(context).primaryColor),
+          icon: Icon(Icons.grid_view, size: 24, color: Colors.grey.withOpacity(0.9)),
+          activeIcon: Icon(Icons.grid_view, size: 24, color: Theme.of(context).primaryColor),
           label: 'Menu',
         ),
       ],
@@ -105,13 +106,19 @@ class MainAppState extends State<MainApp> with WidgetsBindingObserver {
         currentTab = const HomePage();
         break;
       case 1:
-        currentTab = BlocProvider<MyWalletPageBloc>(create: (context) => MyWalletPageBloc(context), child: const MyWalletPage());
+        currentTab = BlocProvider<MyWalletPageBloc>(
+          create: (context) => MyWalletPageBloc(context),
+          child: const MyWalletPage(),
+        );
         break;
       case 2:
-        currentTab =  const CollectionPage(isEdit: false);
+        currentTab = const CollectionPage(isEdit: false);
         break;
       case 3:
-        currentTab = BlocProvider<PlanningBloc>(create: (context) => PlanningBloc(context), child: const PlanningPage());
+        currentTab = BlocProvider<PlanningBloc>(
+          create: (context) => PlanningBloc(context),
+          child: const PlanningPage(),
+        );
         break;
       case 4:
         currentTab = const SettingPage();
@@ -126,7 +133,10 @@ class MainAppState extends State<MainApp> with WidgetsBindingObserver {
     return (await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text(AppConstants.exitApp, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            title: const Text(
+              AppConstants.exitApp,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),

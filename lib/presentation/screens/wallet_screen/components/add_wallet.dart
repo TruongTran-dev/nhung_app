@@ -1,15 +1,13 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:expensive_management/app/app_routes.dart';
 import 'package:expensive_management/data/repository/wallet_repository.dart';
-import 'package:expensive_management/presentation/widgets/no_internet_widget.dart';
 import 'package:expensive_management/presentation/widgets/primary_button.dart';
 import 'package:expensive_management/utils/enum/wallet_type.dart';
 import 'package:expensive_management/utils/screen_utilities.dart';
 import 'package:expensive_management/utils/shared_preferences_storage.dart';
 
 class AddNewWalletPage extends StatefulWidget {
-  const AddNewWalletPage({Key? key}) : super(key: key);
+  const AddNewWalletPage({super.key});
 
   @override
   State<AddNewWalletPage> createState() => _AddNewWalletPageState();
@@ -55,7 +53,7 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Theme.of(context).primaryColor,
@@ -66,7 +64,10 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
           child: const Icon(Icons.close, size: 24, color: Colors.white),
         ),
         centerTitle: true,
-        title: const Text('Thêm tài khoản', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Thêm tài khoản',
+          style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -129,7 +130,10 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.background),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
                       child: const Icon(Icons.attach_money, size: 30, color: Colors.grey),
                     ),
                   ),
@@ -162,13 +166,19 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
                       Container(
                         height: 40,
                         width: 40,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.background),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Theme.of(context).colorScheme.surface,
+                        ),
                         child: Icon(itemSelected.walletTypeIcon, size: 30, color: Colors.grey),
                       ),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(left: 16.0),
-                          child: Text(itemSelected.walletTypeName, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                          child: Text(
+                            itemSelected.walletTypeName,
+                            style: const TextStyle(fontSize: 16, color: Colors.black),
+                          ),
                         ),
                       ),
                       const Padding(
@@ -201,7 +211,10 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: BoxDecoration(color: Theme.of(context).colorScheme.background, borderRadius: BorderRadius.circular(20)),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: const Icon(Icons.event_note, size: 30, color: Colors.grey),
                     ),
                   ),
@@ -248,11 +261,32 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
                       child: TextFormField(
                         controller: _moneyController,
                         textInputAction: TextInputAction.done,
-                        keyboardType: TextInputType.phone,
+                        keyboardType: TextInputType.number,
                         maxLines: 1,
                         textAlign: TextAlign.end,
                         style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
-                        // inputFormatters: [InputFormatter()],
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            // Remove all non-digit characters
+                            String digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+
+                            // Convert to number and format with thousand separators
+                            if (digitsOnly.isNotEmpty) {
+                              int number = int.parse(digitsOnly);
+                              String formatted = number
+                                  .toString()
+                                  .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+
+                              // Update controller without triggering another onChanged
+                              if (formatted != value) {
+                                _moneyController.value = TextEditingValue(
+                                  text: formatted,
+                                  selection: TextSelection.collapsed(offset: formatted.length),
+                                );
+                              }
+                            }
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -290,7 +324,8 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
               },
               child: Container(
                 height: 50,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Theme.of(context).colorScheme.background),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15), color: Theme.of(context).colorScheme.background),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -301,11 +336,13 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
-                        child: Icon(listWalletType[index].walletTypeIcon, size: 30, color: Theme.of(context).primaryColor),
+                        child:
+                            Icon(listWalletType[index].walletTypeIcon, size: 30, color: Theme.of(context).primaryColor),
                       ),
                     ),
                     Expanded(
-                      child: Text(listWalletType[index].walletTypeName, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                      child: Text(listWalletType[index].walletTypeName,
+                          style: const TextStyle(fontSize: 16, color: Colors.black)),
                     ),
                     itemSelected == listWalletType[index]
                         ? Padding(
@@ -350,23 +387,23 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
       // if (networkStatus == ConnectivityResult.none && mounted) {
       //   await showDialog(context: context, builder: (context) => const NoInternetWidget());
       // } else {
-        //send request create wallet
-        await _walletRepository.createNewWallet(
-          accountBalance: int.parse(_moneyController.text.trim()),
-          accountType: walletType(itemSelected.walletTypeIcon).name,
-          currency: currency,
-          description: _noteController.text.trim(),
-          name: _nameController.text.trim(),
-          // report: _showOnReport,
-        );
-        if (mounted) {
-          showMessage1OptionDialog(context, 'Tạo tài khoản thành công', onClose: () {
-            // backToHome(context);
-            Navigator.pushNamed(context, AppRoutes.myWallet);
-          });
-        }
+      //send request create wallet
+      await _walletRepository.createNewWallet(
+        accountBalance: int.parse(_moneyController.text.trim().replaceAll(',', '')),
+        accountType: walletType(itemSelected.walletTypeIcon).name,
+        currency: currency,
+        description: _noteController.text.trim(),
+        name: _nameController.text.trim(),
+        // report: _showOnReport,
+      );
+      if (mounted) {
+        showMessage1OptionDialog(context, 'Tạo tài khoản thành công', onClose: () {
+          // backToHome(context);
+          Navigator.pushNamed(context, AppRoutes.myWallet);
+        });
       }
     }
+  }
   // }
 }
 

@@ -29,13 +29,16 @@ class HomePage extends StatelessWidget {
         BlocProvider<ExpenditureReportBloc>(create: (context) => ExpenditureReportBloc(context)),
         BlocProvider<RevenueReportBloc>(create: (context) => RevenueReportBloc(context)),
       ],
-      child: BlocProvider(create: (context) => HomePageBloc(context)..add(InitializedEvent()), child: const HomeView()),
+      child: BlocProvider(
+        create: (context) => HomePageBloc(context)..add(InitializedEvent()),
+        child: const HomeView(),
+      ),
     );
   }
 }
 
 class HomeView extends StatefulWidget {
-  const HomeView({Key? key}) : super(key: key);
+  const HomeView({super.key});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -51,6 +54,7 @@ class _HomeViewState extends State<HomeView> {
 
   void _reloadPage() {
     Future.delayed(const Duration(milliseconds: 1500), () {
+      if (!mounted) return;
       context.read<HomePageBloc>().add(InitializedEvent());
     });
   }
@@ -74,21 +78,23 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _body(BuildContext context, SuccessState state) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: RefreshIndicator(
-        onRefresh: () async => _reloadPage(),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _balance(state.amount),
-                _myWallet(state.listWallet),
-                _reportWeek(state.weekReport),
-                ReportScreen(preContext: context),
-              ],
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async => _reloadPage(),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _balance(state.amount),
+                  _myWallet(state.listWallet),
+                  _reportWeek(state.weekReport),
+                  ReportScreen(preContext: context),
+                ],
+              ),
             ),
           ),
         ),
@@ -258,16 +264,6 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              // if (notificationBadge > 0)
-              //   badge.Badge(
-              //     showBadge: (notificationBadge > 0),
-              //     badgeContent: Text((notificationBadge.toString()),
-              //         textAlign: TextAlign.center,
-              //         style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
-              //     badgeStyle: const badge.BadgeStyle(badgeColor: Colors.red, padding: EdgeInsets.fromLTRB(4, 2, 4, 2)),
-              //     position: badge.BadgePosition.topEnd(top: -3, end: -3),
-              //     child: const Icon(Icons.notifications, size: 26, color: Colors.black),
-              //   ),
             ],
           ),
         ],

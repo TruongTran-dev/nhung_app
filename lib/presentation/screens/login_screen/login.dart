@@ -10,7 +10,7 @@ import 'package:expensive_management/presentation/widgets/input_password_field.d
 import 'package:expensive_management/presentation/widgets/primary_button.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -68,7 +68,11 @@ class _LoginPageState extends State<LoginPage> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: SingleChildScrollView(
-                    child: Form(key: _formKey, child: _loginForm(context))),
+                  child: Form(
+                    key: _formKey,
+                    child: _loginForm(context),
+                  ),
+                ),
               ),
               Positioned(bottom: 0, child: _logInButton(context)),
             ],
@@ -178,15 +182,11 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => BlocProvider<SignUpBloc>(
-                              create: (_) => SignUpBloc(),
-                              child: const SignUpPage())));
+                          builder: (_) =>
+                              BlocProvider<SignUpBloc>(create: (_) => SignUpBloc(), child: const SignUpPage())));
                 },
                 child: Text(' Đăng ký ngay',
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic)),
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 14, fontStyle: FontStyle.italic)),
               ),
             ],
           )
@@ -199,8 +199,7 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.only(top: 120, bottom: 30),
         child: Column(
           children: [
-            Image.asset('images/logo_app.png',
-                width: 150, height: 160, color: Theme.of(context).primaryColor),
+            Image.asset('images/logo_app.png', width: 150, height: 160, color: Theme.of(context).primaryColor),
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Text(
@@ -217,6 +216,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-  _navToForgotPassword(BuildContext context) =>
-      Navigator.pushNamed(context, AppRoutes.forgotPassword);
+  _navToForgotPassword(BuildContext context) => Navigator.pushNamed(context, AppRoutes.forgotPassword);
 }

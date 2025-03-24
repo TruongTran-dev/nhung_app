@@ -4,7 +4,8 @@ import 'package:expensive_management/business/blocs/revenue_report_bloc.dart';
 import 'package:expensive_management/data/models/category_report_model.dart';
 import 'package:expensive_management/presentation/screens/planning_screen/balance_payments/balance_payment.dart';
 import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
-import 'package:expensive_management/presentation/screens/report_screen/expenditure_report/expenditure_report_state.dart' as e;
+import 'package:expensive_management/presentation/screens/report_screen/expenditure_report/expenditure_report_state.dart'
+    as e;
 import 'package:expensive_management/presentation/screens/report_screen/revenue_report/revenue_report_event.dart';
 import 'package:expensive_management/presentation/screens/report_screen/revenue_report/revenue_report_state.dart' as r;
 
@@ -45,7 +46,13 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text('Báo cáo tỉ lệ chi tiêu theo hạng mục', textAlign: TextAlign.left, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+            Text(
+              'Báo cáo tỉ lệ chi tiêu theo hạng mục',
+              textAlign: TextAlign.left,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(top: 10),
@@ -53,25 +60,55 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(color: Theme.of(context).colorScheme.background, borderRadius: BorderRadius.circular(10)),
-                          child: TabBar(
-                            controller: _tabController,
-                            unselectedLabelColor: Colors.grey[500],
-                            labelColor: Colors.black,
-                            labelStyle: const TextStyle(fontSize: 14),
-                            padding: const EdgeInsets.all(2),
-                            indicatorWeight: 1.5,
-                            indicatorColor: Colors.black,
-                            indicator: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                            tabs: const [
-                              Tab(text: 'Hạng mục chi'),
-                              Tab(text: 'Hạng mục thu'),
-                            ],
-                          ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        height: 48,
+                        child: TabBar(
+                          controller: _tabController,
+                          dividerHeight: 0,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          automaticIndicatorColorAdjustment: false,
+                          padding: EdgeInsets.symmetric(vertical: 4),
+                          indicatorColor: Colors.transparent,
+                          onTap: (value) {
+                            setState(() {});
+                          },
+                          tabs: [
+                            Tab(
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: _tabController.index == 0 ? Colors.white : Colors.transparent,
+                                ),
+                                child: Text('Hạng mục chi',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: _tabController.index == 0 ? Colors.black : Colors.grey,
+                                    )),
+                              ),
+                            ),
+                            Tab(
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: _tabController.index == 1 ? Colors.white : Colors.transparent,
+                                ),
+                                child: Text('Hạng mục thu',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: _tabController.index == 1 ? Colors.black : Colors.grey,
+                                    )),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Expanded(
@@ -168,7 +205,7 @@ class _ReportViewState extends State<ReportView> {
               ],
             ),
           ),
-         // listDetails(widget.reports),
+          // listDetails(widget.reports),
         ],
       ),
     );
@@ -191,7 +228,8 @@ class _ReportViewState extends State<ReportView> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Xem chi tiết', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+                  const Text('Xem chi tiết',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
                   Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
                 ],
               ),

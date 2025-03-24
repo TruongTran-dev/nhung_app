@@ -15,9 +15,9 @@ bool isNullOrEmpty(dynamic obj) => obj == null || ((obj is String || obj is List
 
 String formatterDouble(double? value) {
   if (value == null) {
-    return '0.00';
+    return '0';
   }
-  final formatter = NumberFormat("#,##0.00", "en_US");
+  final formatter = NumberFormat("#,###", "en_US");
   return formatter.format(value);
 }
 
@@ -25,7 +25,7 @@ String formatterInt(double? value) {
   if (value == null) {
     return '0';
   }
-  final formatter = NumberFormat("#,##0.00", "en_US");
+  final formatter = NumberFormat("#,###", "en_US");
   return formatter.format(value);
 }
 

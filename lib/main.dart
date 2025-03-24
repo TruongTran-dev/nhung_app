@@ -14,7 +14,6 @@ Future<void> _backgroundHandlerMessaging(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //TODO: recheck noti on bg
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // FirebaseMessaging.onBackgroundMessage(_backgroundHandlerMessaging);
   // await FirebaseMessagingServices().initializedNotification();
@@ -28,8 +27,7 @@ Future<void> main() async {
 bool _checkIsLoggedIn() {
   bool isLoggedOut = SharedPreferencesStorage().getLoggedOutStatus();
   bool isExpired = true;
-  String passwordExpiredTime =
-      SharedPreferencesStorage().getAccessTokenExpired();
+  String passwordExpiredTime = SharedPreferencesStorage().getAccessTokenExpired();
 
   if (passwordExpiredTime.isNotEmpty) {
     try {
@@ -92,7 +90,7 @@ class _MyAppState extends State<MyApp> {
             secondary: const Color(0xffe6e6e6),
           )
           .copyWith(error: const Color(0xFFCA0000))
-          .copyWith(background: Colors.grey[200]),
+          .copyWith(surface: Colors.grey[200]),
     );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
