@@ -72,16 +72,17 @@ class _MyWalletPageState extends State<MyWalletPage> {
                 child: ListView.separated(
                   itemCount: (state.listWallet?.length ?? 0) + 1,
                   separatorBuilder: (context, index) {
-                    if (index == 0 || index == (state.listWallet?.length ?? 0)) {
-                      return const SizedBox.shrink();
-                    }
-                    return Container(
-                      color: Theme.of(context).colorScheme.surface,
-                      child: const Padding(
-                        padding: EdgeInsets.only(left: 70),
-                        child: Divider(height: 0.5, color: Colors.grey),
-                      ),
-                    );
+                    // if (index == 0 || index == (state.listWallet?.length ?? 0)) {
+                    //   return const SizedBox.shrink();
+                    // }
+                    // return Container(
+                    //   color: Theme.of(context).colorScheme.surface,
+                    //   child: const Padding(
+                    //     padding: EdgeInsets.only(left: 70),
+                    //     child: Divider(height: 0.5, color: Colors.grey),
+                    //   ),
+                    // );
+                    return SizedBox.shrink();
                   },
                   itemBuilder: (context, index) {
                     String currency = SharedPreferencesStorage().getCurrency();
@@ -99,7 +100,7 @@ class _MyWalletPageState extends State<MyWalletPage> {
                             child: Center(
                               child: Text(
                                 'Tổng tiền : $moneyTotal $currency',
-                                style: const TextStyle(fontSize: 16, color: Colors.black),
+                                style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
@@ -159,78 +160,84 @@ class _MyWalletPageState extends State<MyWalletPage> {
   }
 
   Widget _createItemWallet(BuildContext context, Wallet wallet, {int? index, int? endIndex}) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                BlocProvider(create: (context) => WalletDetailBloc(context), child: WalletDetail(wallet: wallet)),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => WalletDetailBloc(context),
+                child: WalletDetail(wallet: wallet),
+              ),
+            ),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.primaries[index! % Colors.primaries.length].withOpacity(0.2),
+            borderRadius: BorderRadius.circular(16),
+            // borderRadius: BorderRadius.only(
+            //   topLeft: Radius.circular(index == 0 ? 10 : 0),
+            //   topRight: Radius.circular(index == 0 ? 10 : 0),
+            //   bottomLeft: Radius.circular((index == endIndex) ? 10 : 0),
+            //   bottomRight: Radius.circular((index == endIndex) ? 10 : 0),
+            // ),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(index == 0 ? 10 : 0),
-            topRight: Radius.circular(index == 0 ? 10 : 0),
-            bottomLeft: Radius.circular((index == endIndex) ? 10 : 0),
-            bottomRight: Radius.circular((index == endIndex) ? 10 : 0),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey.withOpacity(0.2),
-                  ),
-                  child: Icon(
-                    getIconWallet(walletType: wallet.accountType),
-                    size: 30,
-                    color: Theme.of(context).primaryColor,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.grey.withOpacity(0.2),
+                    ),
+                    child: Icon(
+                      getIconWallet(walletType: wallet.accountType),
+                      size: 30,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      wallet.name ?? '',
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                    Text(
-                      '${formatterInt(wallet.accountBalance)} ${wallet.currency}',
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        wallet.name ?? '',
+                        style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${formatterInt(wallet.accountBalance)} ${wallet.currency}',
+                        style: const TextStyle(fontSize: 20, color: Colors.black),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: InkWell(
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isDismissible: true,
-                      enableDrag: true,
-                      builder: (context) => _bottomOption(context: context, wallet: wallet),
-                    );
-                  },
-                  child: const Icon(Icons.more_vert, size: 24, color: Colors.grey),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: InkWell(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isDismissible: true,
+                        enableDrag: true,
+                        builder: (context) => _bottomOption(context: context, wallet: wallet),
+                      );
+                    },
+                    child: const Icon(Icons.more_vert, size: 24, color: Colors.grey),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

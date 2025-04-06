@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/provider/category_provider.dart';
@@ -11,7 +11,6 @@ import 'package:expensive_management/presentation/screens/planning_screen/planni
 import 'package:expensive_management/utils/enum/api_error_result.dart';
 import 'package:expensive_management/utils/screen_utilities.dart';
 
-
 class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
   final BuildContext context;
   final _categoryProvider = CategoryProvider();
@@ -22,8 +21,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
       if (event is PlanningEvent) {
         emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(
             state.copyWith(
               isLoading: false,
@@ -31,8 +29,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
             ),
           );
         } else {
-          final responseExpense =
-              await _categoryProvider.getAllListCategory(param: "EXPENSE");
+          final responseExpense = await _categoryProvider.getAllListCategory(param: "EXPENSE");
           if (responseExpense is GetCategoryResponse) {
             emit(state.copyWith(
               isLoading: false,
@@ -47,8 +44,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
             ));
           }
 
-          final responseIncome =
-              await _categoryProvider.getAllListCategory(param: "INCOME");
+          final responseIncome = await _categoryProvider.getAllListCategory(param: "INCOME");
           if (responseIncome is GetCategoryResponse) {
             emit(
               state.copyWith(

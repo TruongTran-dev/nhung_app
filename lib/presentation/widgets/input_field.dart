@@ -12,6 +12,7 @@ class Input extends StatelessWidget {
   final TextInputType? keyboardType;
   final IconData? prefixIcon;
   final String? Function(String?)? validator;
+  final FocusNode? focusNode;
 
   const Input({
     super.key,
@@ -25,6 +26,7 @@ class Input extends StatelessWidget {
     this.whiteList,
     this.prefixIcon,
     this.validator,
+    this.focusNode,
   });
 
   @override
@@ -34,14 +36,14 @@ class Input extends StatelessWidget {
       textInputAction: textInputAction ?? TextInputAction.done,
       keyboardType: keyboardType ?? TextInputType.text,
       onFieldSubmitted: onSubmit,
+      focusNode: focusNode,
       controller: controller,
       onChanged: onChanged,
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxText),
         FilteringTextInputFormatter.allow(whiteList ?? RegExp('([\\S])'))
       ],
-      style: const TextStyle(
-          fontSize: 16, color: Color.fromARGB(255, 26, 26, 26), height: 1.35),
+      style: const TextStyle(fontSize: 16, color: Color.fromARGB(255, 26, 26, 26), height: 1.35),
       decoration: InputDecoration(
           prefixIcon: Icon(
             prefixIcon,
@@ -79,4 +81,3 @@ class Input extends StatelessWidget {
     );
   }
 }
-

@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,7 +11,7 @@ import 'package:expensive_management/utils/screen_utilities.dart';
 import 'package:expensive_management/utils/utils.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({Key? key}) : super(key: key);
+  const ForgotPasswordPage({super.key});
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
@@ -63,7 +63,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             onTap: () => Navigator.pop(context),
             child: const Icon(Icons.arrow_back_ios_new, size: 24, color: Colors.white),
           ),
-          title: const Text('Quên mật khẩu', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+          title: const Text('Quên mật khẩu',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
         ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16, 80, 16, 0),
@@ -79,7 +80,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         child: Text(
                           AppConstants.forgotPassword,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: Theme.of(context).primaryColor, height: 1.4),
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontStyle: FontStyle.italic,
+                              color: Theme.of(context).primaryColor,
+                              height: 1.4),
                         ),
                       ),
                       Padding(
@@ -141,8 +146,7 @@ class ForgotPasswordBloc extends Bloc<ForgotPasswordEvent, ForgotPasswordState> 
       if (event is SubmitEmail) {
         emit(LoadingState());
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(const FailureState(errorMessage: 'No Internet Connection'));
         }
         final response = await _authProvider.forgotPassword(email: event.email);

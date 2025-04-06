@@ -140,6 +140,7 @@ class CategoryProvider with ProviderMixin {
         ApiPath.weekReport,
         options: await defaultOptions(url: ApiPath.weekReport),
       );
+      log("response: ${response.data}");
       return WeekReportResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       return errorResponse(error, stacktrace, ApiPath.weekReport);

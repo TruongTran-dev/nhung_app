@@ -19,10 +19,10 @@ class OptionCategoryPage extends StatefulWidget {
   final int tabIndex;
 
   const OptionCategoryPage({
-    Key? key,
+    super.key,
     this.categoryIdSelected,
     required this.tabIndex,
-  }) : super(key: key);
+  });
 
   @override
   State<OptionCategoryPage> createState() => _OptionCategoryPageState();
@@ -50,6 +50,7 @@ class _OptionCategoryPageState extends State<OptionCategoryPage> with SingleTick
     showLoading(context);
     _optionCategoryBloc.add(GetOptionCategoryEvent());
     await Future.delayed(const Duration(seconds: 1), () {
+      if(!mounted) return;
       Navigator.pop(context);
       setState(() {});
     });

@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:expensive_management/app/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -77,25 +80,31 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _body(BuildContext context, SuccessState state) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
-        child: RefreshIndicator(
+    return RefreshIndicator(
+      onRefresh: () async => _reloadPage(),
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: RefreshIndicator(
           onRefresh: () async => _reloadPage(),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  _balance(state.amount),
-                  _myWallet(state.listWallet),
-                  _reportWeek(state.weekReport),
-                  ReportScreen(preContext: context),
-                ],
+          child: Column(
+            children: [
+              _balance(state.amount),
+              const SizedBox(height: 24),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _myWallet(state.listWallet),
+                      _reportWeek(state.weekReport),
+                      ReportScreen(preContext: context),
+                      const SizedBox(height: 48),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -104,164 +113,281 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _reportWeek(WeekReportModel report) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-      child: SizedBox(
-        height: report.detailReport.isEmpty
-            ? 140
-            : _showDetail
-                ? 400 + 40 * (report.detailReport.length).toDouble()
-                : 400,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10.0),
-              child: Text('Báo cáo chi tiêu theo tuần',
-                  textAlign: TextAlign.left,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              'Báo cáo chi tiêu theo tuần',
+              textAlign: TextAlign.left,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 16, color: Colors.black.withValues(alpha: 0.7)),
             ),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 10, top: 10, bottom: 10.0),
-                      child: Text('(Đơn vị: triệu VNĐ)', style: TextStyle(fontSize: 12, color: Colors.black)),
-                    ),
-                    report.detailReport.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                            child: Text(
-                              'Không thể hiển thị báo cáo tuần do chưa có hoạt động chi tiêu nào trong tuần.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Theme.of(context).primaryColor.withOpacity(0.7)),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: const [
+                BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 2)),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 10, top: 10, bottom: 10.0),
+                  child: Text('(Đơn vị: triệu VNĐ)', style: TextStyle(fontSize: 12, color: Colors.black)),
+                ),
+                report.detailReport.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                        child: Text(
+                          'Không thể hiển thị báo cáo tuần do chưa có hoạt động chi tiêu nào trong tuần.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black.withValues(alpha: 0.5), fontSize: 16),
+                        ),
+                      )
+                    : SfCartesianChart(
+                        primaryXAxis: CategoryAxis(),
+                        tooltipBehavior: TooltipBehavior(enable: true),
+                        series: [
+                          ColumnSeries<dynamic, String>(
+                            dataSource: report.detailReport,
+                            xValueMapper: (data, _) => data.title,
+                            yValueMapper: (data, _) => data.value / 1000000,
+                            name: 'Báo cáo tuần',
+                            pointColorMapper: (data, index) {
+                              // Define a list of colors
+                              final colors = [
+                                Colors.blue,
+                                Colors.green,
+                                Colors.red,
+                                Colors.orange,
+                                Colors.purple,
+                                Colors.teal,
+                              ];
+                              // Use index to pick a color from the list
+                              return colors[index % colors.length];
+                            },
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(5),
+                              topLeft: Radius.circular(5),
                             ),
                           )
-                        : SfCartesianChart(
-                            primaryXAxis: CategoryAxis(),
-                            tooltipBehavior: TooltipBehavior(enable: true),
-                            series: [
-                              ColumnSeries<dynamic, String>(
-                                dataSource: report.detailReport,
-                                xValueMapper: (data, _) => data.title,
-                                yValueMapper: (data, _) => data.value / 1000000,
-                                name: 'Báo cáo tuần',
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(5),
-                                  topLeft: Radius.circular(5),
-                                ),
-                              )
-                            ],
-                          ),
-                    if (report.detailReport.isNotEmpty) listDetails(report.detailReport),
-                  ],
-                ),
-              ),
+                        ],
+                      ),
+                if (report.detailReport.isNotEmpty) listDetails(report.detailReport),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _myWallet(List<Wallet> listWallet) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Container(
-        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(15)), color: Colors.white),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
-              child: SizedBox(
-                height: 20,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Ví của tôi', style: TextStyle(fontSize: 16, color: Colors.black)),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, AppRoutes.myWallet);
-                      },
-                      child: Text('Xem tất cả', style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor)),
-                    )
-                  ],
+    // return Container(
+    //   margin: const EdgeInsets.only(top: 16),
+    //   decoration: const BoxDecoration(
+    //     borderRadius: BorderRadius.all(Radius.circular(15)),
+    //     color: Colors.white,
+    //     boxShadow: [
+    //       BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 2)),
+    //     ],
+    //   ),
+    //   child: Column(
+    //     children: [
+    //       Padding(
+    //         padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+    //         child: SizedBox(
+    //           height: 20,
+    //           child: Row(
+    //             crossAxisAlignment: CrossAxisAlignment.center,
+    //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //             children: [
+    //               const Text('Ví của tôi', style: TextStyle(fontSize: 16, color: Colors.black)),
+    //               GestureDetector(
+    //                 onTap: () {
+    //                   Navigator.pushNamed(context, AppRoutes.myWallet);
+    //                 },
+    //                 child: Text('Xem tất cả', style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor)),
+    //               )
+    //             ],
+    //           ),
+    //         ),
+    //       ),
+    //       const Padding(padding: EdgeInsets.only(bottom: 10.0), child: Divider(height: 1, color: Colors.grey)),
+    //       isNullOrEmpty(listWallet)
+    //           ? Container(
+    //               height: 60,
+    //               alignment: Alignment.center,
+    //               child: Text(
+    //                 'Bạn chưa có tài khoản/ví.\nVui lòng tạo mới tài khoản/ví.',
+    //                 textAlign: TextAlign.center,
+    //                 style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
+    //               ),
+    //             )
+    //           : SizedBox(
+    //               height: 60 * (listWallet.length).toDouble() + 15,
+    //               child: ListView.builder(
+    //                 padding: EdgeInsets.zero,
+    //                 physics: const NeverScrollableScrollPhysics(),
+    //                 itemCount: listWallet.length,
+    //                 itemBuilder: (context, index) {
+    //                   return _createItemWallet(context, listWallet[index],
+    //                       thisIndex: index, endIndex: listWallet.length);
+    //                 },
+    //               ),
+    //             ),
+    //     ],
+    //   ),
+    // );
+    final width = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Ví của tôi', style: TextStyle(fontSize: 16, color: Colors.black)),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.myWallet);
+                },
+                child: Text('Xem tất cả', style: TextStyle(fontSize: 14, color: Colors.blue.withValues(alpha: 0.8))),
+              )
+            ],
+          ),
+        ),
+        isNullOrEmpty(listWallet)
+            ? Container(
+                height: 60,
+                alignment: Alignment.center,
+                child: Text(
+                  'Bạn chưa có tài khoản/ví.\nVui lòng tạo mới tài khoản/ví.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
+                ),
+              )
+            : SizedBox(
+                width: width,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    spacing: 12,
+                    children: [
+                      ...listWallet.mapIndexed(
+                        (index, wallet) {
+                          final color = [
+                            Colors.blue[100]!,
+                            Colors.green[100]!,
+                            Colors.orange[100]!,
+                            Colors.purple[100]!,
+                            Colors.cyan[100]!,
+                            Colors.amber[100]!,
+                          ][index % 6];
+                          return Stack(
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                  minWidth: width * 0.5,
+                                  maxWidth: width * 0.6,
+                                  minHeight: 70,
+                                  maxHeight: 120,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: const [
+                                    BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 2)),
+                                  ],
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  spacing: 12,
+                                  children: [
+                                    Text(
+                                      '${wallet.name}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontSize: 22, color: Colors.black, fontWeight: FontWeight.w600),
+                                    ),
+                                    Text(
+                                      _isShowBalance
+                                          ? '${formatterDouble((wallet.accountBalance ?? 0).toDouble())} $currency'
+                                          : '****** $currency',
+                                      style: TextStyle(fontSize: 16, color: Colors.black.withValues(alpha: 0.5)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Positioned(
+                                right: 16,
+                                bottom: 16,
+                                child: Icon(
+                                  isNotNullOrEmpty(wallet.accountType)
+                                      ? getIconWallet(walletType: wallet.accountType ?? '')
+                                      : Icons.help_outline,
+                                  size: 36,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const Padding(padding: EdgeInsets.only(bottom: 10.0), child: Divider(height: 1, color: Colors.grey)),
-            isNullOrEmpty(listWallet)
-                ? Container(
-                    height: 60,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Bạn chưa có tài khoản/ví.\nVui lòng tạo mới tài khoản/ví.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
-                    ),
-                  )
-                : SizedBox(
-                    height: 60 * (listWallet.length).toDouble() + 15,
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: listWallet.length,
-                      itemBuilder: (context, index) {
-                        return _createItemWallet(context, listWallet[index],
-                            thisIndex: index, endIndex: listWallet.length);
-                      },
-                    ),
-                  ),
-          ],
-        ),
-      ),
+      ],
     );
   }
 
   Widget _balance(double balance) {
     return Container(
-      padding: const EdgeInsets.only(top: 40),
+      padding: const EdgeInsets.only(top: 28, bottom: 10, left: 16, right: 16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 5, offset: Offset(0, 2))],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Tổng số dư ', style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+          Text('Tổng số dư ', style: TextStyle(fontSize: 18, color: Colors.black45)),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-                      child: Text(
-                        _isShowBalance ? '${formatterDouble(balance)}  $currency' : '******  $currency',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: InkWell(
-                        onTap: () async {
-                          setState(() {
-                            _isShowBalance = !_isShowBalance;
-                          });
-                          await SharedPreferencesStorage().setHiddenAmount(_isShowBalance);
-                        },
-                        child: Icon(_isShowBalance ? Icons.visibility : Icons.visibility_off,
-                            size: 26, color: Colors.black),
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  _isShowBalance ? '${formatterDouble(balance)}  $currency' : '******  $currency',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: InkWell(
+                  onTap: () async {
+                    setState(() {
+                      _isShowBalance = !_isShowBalance;
+                    });
+                    await SharedPreferencesStorage().setHiddenAmount(_isShowBalance);
+                  },
+                  child: Icon(_isShowBalance ? Icons.visibility : Icons.visibility_off, size: 26, color: Colors.black),
                 ),
               ),
             ],
@@ -274,8 +400,10 @@ class _HomeViewState extends State<HomeView> {
   _pushToWalletDetails(BuildContext context, Wallet wallet) => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              BlocProvider(create: (context) => WalletDetailBloc(context), child: WalletDetail(wallet: wallet)),
+          builder: (context) => BlocProvider(
+            create: (context) => WalletDetailBloc(context),
+            child: WalletDetail(wallet: wallet),
+          ),
         ),
       );
 
@@ -342,31 +470,19 @@ class _HomeViewState extends State<HomeView> {
                 _showDetail = !_showDetail;
               });
             },
-            child: SizedBox(
-              height: 40,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Xem chi tiết',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
-                  Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
-                ],
-              ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Xem chi tiết',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+                ),
+                Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
+              ],
             ),
           ),
-          if (_showDetail)
-            SizedBox(
-              height: 40 * (listReport.length).toDouble(),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: listReport.length,
-                itemBuilder: (context, index) => details(listReport[index]),
-              ),
-            ),
+          if (_showDetail) ...listReport.map((report) => details(report)),
         ],
       ),
     );

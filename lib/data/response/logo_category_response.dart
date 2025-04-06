@@ -8,18 +8,12 @@ class ListLogoCategoryResponse extends BaseGetResponse {
 
   ListLogoCategoryResponse({
     this.listLogo,
-    int? pageNumber,
-    int? pageSize,
-    int? totalRecord,
-    int? status,
-    String? error,
-  }) : super(
-          pageNumber: pageNumber,
-          pageSize: pageSize,
-          totalRecord: totalRecord,
-          status: status,
-          error: error,
-        );
+    super.pageNumber,
+    super.pageSize,
+    super.totalRecord,
+    super.status,
+    super.error,
+  });
 
   factory ListLogoCategoryResponse.fromJson(Map<String, dynamic> json) {
     return ListLogoCategoryResponse(

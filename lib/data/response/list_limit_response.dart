@@ -5,19 +5,13 @@ class ListLimitResponse extends BaseGetResponse {
   final List<LimitModel>? listLimit;
 
   ListLimitResponse({
-    int? pageNumber,
-    int? pageSize,
-    int? totalRecord,
-    int? status,
-    String? error,
+    super.pageNumber,
+    super.pageSize,
+    super.totalRecord,
+    super.status,
+    super.error,
     this.listLimit,
-  }) : super(
-          pageNumber: pageNumber,
-          pageSize: pageSize,
-          totalRecord: totalRecord,
-          status: status,
-          error: error,
-        );
+  });
   factory ListLimitResponse.fromJson(Map<String, dynamic> json) {
     return ListLimitResponse(
       listLimit: json['content'] == null

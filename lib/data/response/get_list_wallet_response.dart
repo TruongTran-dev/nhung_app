@@ -6,20 +6,14 @@ class GetListWalletResponse extends BaseGetResponse {
   final List<Wallet> walletList;
 
   GetListWalletResponse({
-    int? pageNumber,
-    int? pageSize,
-    int? totalRecord,
-    int? status,
-    String? error,
+    super.pageNumber,
+    super.pageSize,
+    super.totalRecord,
+    super.status,
+    super.error,
     required this.moneyTotal,
     required this.walletList,
-  }) : super(
-          pageNumber: pageNumber,
-          pageSize: pageSize,
-          totalRecord: totalRecord,
-          status: status,
-          error: error,
-        );
+  });
   factory GetListWalletResponse.fromJson(Map<String, dynamic> json) {
     return GetListWalletResponse(
       moneyTotal: double.tryParse(json['moneyTotal'].toString()) ?? 0.0,

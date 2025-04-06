@@ -9,10 +9,10 @@ class DeleteCategoryResponse extends BaseResponse {
   DeleteCategoryResponse({
     this.isDelete = false,
     this.messages,
-    int? httpStatus,
+    super.httpStatus,
     String? message,
-    List<Errors>? errors,
-  }) : super(httpStatus: httpStatus, errors: errors);
+    super.errors,
+  });
 
   factory DeleteCategoryResponse.fromJson(Map<String, dynamic> json) {
     List<Errors> errors = [];

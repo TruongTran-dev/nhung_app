@@ -5,19 +5,13 @@ class RecurringResponse extends BaseGetResponse {
   final List<RecurringListModel>? listRecurring;
 
   RecurringResponse({
-    int? pageNumber,
-    int? pageSize,
-    int? totalRecord,
-    int? status,
-    String? error,
+    super.pageNumber,
+    super.pageSize,
+    super.totalRecord,
+    super.status,
+    super.error,
     this.listRecurring,
-  }) : super(
-          pageNumber: pageNumber,
-          pageSize: pageSize,
-          totalRecord: totalRecord,
-          status: status,
-          error: error,
-        );
+  });
   factory RecurringResponse.fromJson(Map<String, dynamic> json) {
     return RecurringResponse(
       listRecurring: json['content'] == null

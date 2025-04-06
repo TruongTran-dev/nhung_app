@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +13,7 @@ import 'package:expensive_management/utils/screen_utilities.dart';
 class OtpPage extends StatefulWidget {
   final String email;
 
-  const OtpPage({Key? key, required this.email}) : super(key: key);
+  const OtpPage({super.key, required this.email});
 
   @override
   State<OtpPage> createState() => _OtpPageState();
@@ -66,7 +66,8 @@ class _OtpPageState extends State<OtpPage> {
           onTap: () => Navigator.pop(context),
           child: const Icon(Icons.arrow_back_ios_new, size: 24, color: Colors.white),
         ),
-        title: const Text('Nhập mã OTP', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+        title:
+            const Text('Nhập mã OTP', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -162,7 +163,8 @@ class _OtpPageState extends State<OtpPage> {
                     child: Text(
                       (_timerCounter == 0) ? 'Gửi lại OTP' : '00:$_timerCounter',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor, decoration: TextDecoration.underline),
+                      style: TextStyle(
+                          fontSize: 14, color: Theme.of(context).primaryColor, decoration: TextDecoration.underline),
                     ),
                   ),
                 ),
@@ -204,8 +206,7 @@ class OtpBloc extends Bloc<OtpEvent, OtpState> {
       if (event is ResendOtp) {
         emit(LoadingState());
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(const FailureState(errorMessage: 'No Internet Connection'));
         }
         final response = await _authProvider.forgotPassword(email: event.email);
@@ -219,8 +220,7 @@ class OtpBloc extends Bloc<OtpEvent, OtpState> {
       if (event is SubmitOtp) {
         emit(LoadingState());
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(const FailureState(errorMessage: 'No Internet Connection'));
         }
         final response = await _authProvider.verifyOtp(email: event.email, otpCode: event.otpCode);

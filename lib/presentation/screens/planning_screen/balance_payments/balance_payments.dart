@@ -20,7 +20,7 @@ import 'year/year.dart';
 class BalancePayments extends StatefulWidget {
   final List<Wallet>? listWallet;
 
-  const BalancePayments({Key? key, this.listWallet}) : super(key: key);
+  const BalancePayments({super.key, this.listWallet});
 
   @override
   State<BalancePayments> createState() => _BalancePaymentsState();
@@ -88,13 +88,25 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
               children: [
                 _current(),
                 // _chartsMonth(),
-                _char(title: 'Month', childSelect: _selectYearTime(), child: MonthAnalytic(walletIDs: walletIDs, year: currentYear)),
+                _char(
+                    title: 'Month',
+                    childSelect: _selectYearTime(),
+                    child: MonthAnalytic(walletIDs: walletIDs, year: currentYear)),
                 // _chartsPrecious(),
-                _char(title: 'Precious', childSelect: _selectYearTime(), child: PreciousAnalytic(year: currentYear, walletIDs: walletIDs)),
+                _char(
+                    title: 'Precious',
+                    childSelect: _selectYearTime(),
+                    child: PreciousAnalytic(year: currentYear, walletIDs: walletIDs)),
                 // _chartsYear(),
-                _char(title: 'Year', childSelect: _selectYearToYear(), child: YearAnalytic(walletIDs: walletIDs, year: currentYear, toYear: toYear)),
+                _char(
+                    title: 'Year',
+                    childSelect: _selectYearToYear(),
+                    child: YearAnalytic(walletIDs: walletIDs, year: currentYear, toYear: toYear)),
                 // _chartsCustom(),
-                _char(title: 'Custom', childSelect: _selectDayTime(context), child: CustomAnalytic(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime)),
+                _char(
+                    title: 'Custom',
+                    childSelect: _selectDayTime(context),
+                    child: CustomAnalytic(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime)),
               ],
             ),
           ),
@@ -123,9 +135,13 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
 
           context.read<PreciousAnalyticBloc>().add(PreciousAnalyticEvent(walletIDs: walletIDs, year: currentYear));
 
-          context.read<YearAnalyticBlocB>().add(YearAnalyticEvent(walletIDs: walletIDs, year: currentYear, toYear: toYear));
+          context
+              .read<YearAnalyticBlocB>()
+              .add(YearAnalyticEvent(walletIDs: walletIDs, year: currentYear, toYear: toYear));
 
-          context.read<CustomAnalyticBloc>().add(CustomAnalyticEvent(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime));
+          context
+              .read<CustomAnalyticBloc>()
+              .add(CustomAnalyticEvent(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime));
         });
       },
       dense: false,
@@ -152,7 +168,12 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
               padding: EdgeInsets.only(left: 16, right: 20),
               child: Icon(Icons.calendar_month, size: 30, color: Colors.grey),
             ),
-            Expanded(child: Text('Năm hiện tại: ${DateTime.now().year}', style: const TextStyle(fontSize: 16, color: Colors.black))),
+            Expanded(
+              child: Text(
+                'Năm hiện tại: ${DateTime.now().year}',
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            ),
           ],
         ),
         child: CurrentAnalytic(walletIDs: walletIDs));
@@ -164,7 +185,11 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
       children: [
         Container(
           height: 40,
-          decoration: BoxDecoration(border: BorderDirectional(top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.3)))),
+          decoration: BoxDecoration(
+            border: BorderDirectional(
+              top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.3)),
+            ),
+          ),
           child: childSelect,
         ),
         Divider(height: 10, thickness: 10, color: Theme.of(context).colorScheme.background),
@@ -198,15 +223,22 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                         setState(() {
                           currentYear = valuer.year;
 
-                          this.context.read<MonthAnalyticBlocB>().add(MonthAnalyticEvent(walletIDs: walletIDs, year: currentYear));
+                          this
+                              .context
+                              .read<MonthAnalyticBlocB>()
+                              .add(MonthAnalyticEvent(walletIDs: walletIDs, year: currentYear));
 
-                          this.context.read<PreciousAnalyticBloc>().add(PreciousAnalyticEvent(year: currentYear, walletIDs: walletIDs));
+                          this
+                              .context
+                              .read<PreciousAnalyticBloc>()
+                              .add(PreciousAnalyticEvent(year: currentYear, walletIDs: walletIDs));
                         });
                         showLoading(context);
                         Future.delayed(const Duration(seconds: 2), () {
                           setState(() {});
-                          Navigator.pop(context);
-                          Navigator.pop(context);
+                          if (!mounted) return;
+                          Navigator.pop(this.context);
+                          Navigator.pop(this.context);
                         });
                       },
                     ),
@@ -264,7 +296,8 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                                 Future.delayed(const Duration(milliseconds: 1500), () {
                                   setState(() {});
                                   // Navigator.pop(context);
-                                  Navigator.pop(context);
+                                  if (!mounted) return;
+                                  Navigator.pop(this.context);
                                 });
                               },
                             ),
@@ -380,7 +413,8 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                         if (timePick == null) {
                           return;
                         } else if (timePick.isBefore(DateTime.parse(fromTime)) && context.mounted) {
-                          showMessage1OptionDialog(this.context, 'Vui lòng chọn thời gian kết thúc sau thời gian bắt đâu.');
+                          showMessage1OptionDialog(
+                              this.context, 'Vui lòng chọn thời gian kết thúc sau thời gian bắt đâu.');
                         } else {
                           toTime = DateFormat('yyyy-MM-dd').format(timePick);
                           if (!mounted) {

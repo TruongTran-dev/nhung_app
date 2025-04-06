@@ -16,7 +16,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   intl: any
   flutter_otp_text_field: ^1.1.1
-  syncfusion_flutter_charts: ^28.2.5+1
+  syncfusion_flutter_charts: ^29.1.35
   mat_month_picker_dialog: ^1.1.1
 
   flutter_datetime_picker_plus: ^2.1.0

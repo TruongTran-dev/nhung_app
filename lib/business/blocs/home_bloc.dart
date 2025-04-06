@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/provider/category_provider.dart';
@@ -20,8 +20,7 @@ class HomePageBloc extends Bloc<HomePageEvent, HomePageState> {
       if (event is InitializedEvent) {
         emit(LoadingState());
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(const FailureState(errorMessage: AppConstants.noInternetContent));
         } else {
           final response = await _walletRepository.getListWallet();
@@ -33,7 +32,8 @@ class HomePageBloc extends Bloc<HomePageEvent, HomePageState> {
               amount: response.moneyTotal,
               weekReport: weekResponse.data,
             ));
-          } else if ((response is ExpiredTokenGetResponse || weekResponse is ExpiredTokenGetResponse) && context.mounted) {
+          } else if ((response is ExpiredTokenGetResponse || weekResponse is ExpiredTokenGetResponse) &&
+              context.mounted) {
             logoutIfNeed(context);
           } else {
             emit(const FailureState(errorMessage: AppConstants.wrong));

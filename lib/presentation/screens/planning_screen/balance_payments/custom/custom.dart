@@ -10,11 +10,11 @@ class CustomAnalytic extends StatefulWidget {
   final List<int> walletIDs;
   final String fromTime, toTime;
   const CustomAnalytic({
-    Key? key,
+    super.key,
     required this.walletIDs,
     required this.fromTime,
     required this.toTime,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomAnalytic> createState() => _CustomAnalyticState();

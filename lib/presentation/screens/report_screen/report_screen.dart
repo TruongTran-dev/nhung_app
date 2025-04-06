@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/business/blocs/expenditure_report_bloc.dart';
 import 'package:expensive_management/business/blocs/revenue_report_bloc.dart';
@@ -51,7 +53,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
               textAlign: TextAlign.left,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              style: TextStyle(fontSize: 16, color: Colors.black.withValues(alpha: 0.7)),
             ),
             Expanded(
               child: Padding(
@@ -114,6 +116,7 @@ class _ReportScreenState extends State<ReportScreen> with SingleTickerProviderSt
                       Expanded(
                         child: TabBarView(
                           controller: _tabController,
+                          physics: const NeverScrollableScrollPhysics(),
                           children: [
                             BlocBuilder<ExpenditureReportBloc, e.ExpenditureReportState>(
                               builder: (context, state) {
@@ -201,6 +204,25 @@ class _ReportViewState extends State<ReportView> {
                   xValueMapper: (CategoryReportModel data, _) => data.categoryName,
                   yValueMapper: (CategoryReportModel data, _) => data.percent,
                   name: widget.isRevenue ? 'Thu' : 'Chi',
+                  explode: false,
+                  pointColorMapper: (CategoryReportModel data, index) {
+                    // Generate random color with good contrast
+                    if (index == 0) {
+                      return Color(0xfffbdcea);
+                    } else if (index == 1) {
+                      return Color(0xffdbd9ff);
+                    } else if (index == 2) {
+                      return Color(0xff7e9ae6);
+                    } else if (index == 3) {
+                      return Color(0xff73dce6);
+                    } else if (index == 4) {
+                      return Color(0xffcff5f4);
+                    } else {
+                      final random = Random();
+                      return Color.fromRGBO(random.nextInt(256), random.nextInt(256), random.nextInt(256), 1.0)
+                          .withValues(alpha: 0.4);
+                    }
+                  },
                 ),
               ],
             ),

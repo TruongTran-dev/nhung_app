@@ -20,7 +20,7 @@ mixin ProviderMixin {
       if (apiPath != null) {
         print("EXCEPTION OCCURRED: ${apiPath.toString()}");
       }
-      if (error is DioError) {
+      if (error is DioException) {
         print("\nEXCEPTION RESPONSE: ${error.response}");
       }
       print("\nEXCEPTION WITH: $error\nSTACKTRACE: $stacktrace");

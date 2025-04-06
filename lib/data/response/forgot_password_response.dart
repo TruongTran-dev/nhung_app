@@ -5,10 +5,10 @@ import 'error_response.dart';
 
 class ForgotPasswordResponse extends BaseResponse {
   ForgotPasswordResponse({
-    httpStatus,
-    String? message,
-    List<Errors>? errors,
-  }) : super(httpStatus: httpStatus, message: message, errors: errors);
+    super.httpStatus,
+    super.message,
+    super.errors,
+  });
 
   factory ForgotPasswordResponse.fromJson(Map<String, dynamic> json) {
     List<Errors> errors = [];

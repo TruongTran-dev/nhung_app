@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/models/recurring_post_model.dart';
@@ -25,8 +25,7 @@ class RecurringInfoBloc extends Bloc<RecurringInfoEvent, RecurringInfoState> {
       if (event is RecurringInfoEvent) {
         emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(isLoading: false, apiError: ApiError.noInternetConnection));
         } else {
           final response = await _categoryProvider.getAllListCategory(param: "EXPENSE");
@@ -53,8 +52,7 @@ class RecurringInfoBloc extends Bloc<RecurringInfoEvent, RecurringInfoState> {
       if (event is AddRecurringEvent) {
         emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(isLoading: false, apiError: ApiError.noInternetConnection));
         } else {
           final response = await _recurringRepository.addRecurring(event.data);

@@ -8,10 +8,10 @@ class SignInResponse extends BaseResponse {
 
   SignInResponse({
     this.data,
-    int? httpStatus,
+    super.httpStatus,
     String? message,
-    List<Errors>? errors,
-  }) : super(httpStatus: httpStatus, errors: errors);
+    super.errors,
+  });
 
   factory SignInResponse.fromJson(Map<String, dynamic> json) {
     List<Errors> errors = [];

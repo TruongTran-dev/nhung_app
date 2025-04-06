@@ -9,10 +9,10 @@ class CategoryReportResponse extends BaseResponse {
 
   CategoryReportResponse({
     required this.listReport,
-    int? httpStatus,
+    super.httpStatus,
     String? message,
-    List<Errors>? errors,
-  }) : super(httpStatus: httpStatus, errors: errors);
+    super.errors,
+  });
 
   factory CategoryReportResponse.fromJson(Map<String, dynamic> json) {
     List<Errors> errors = [];

@@ -9,10 +9,10 @@ class RefreshTokenResponse extends BaseResponse {
 
   RefreshTokenResponse({
     required this.data,
-    int? httpStatus,
+    super.httpStatus,
     String? message,
-    List<Errors>? errors,
-  }) : super(httpStatus: httpStatus, errors: errors);
+    super.errors,
+  });
 
   factory RefreshTokenResponse.fromJson(Map<String, dynamic> json) {
     List<Errors> errors = [];

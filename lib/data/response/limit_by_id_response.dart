@@ -9,10 +9,10 @@ class LimitByIDResponse extends BaseResponse {
 
   LimitByIDResponse({
     this.data,
-    int? httpStatus,
+    super.httpStatus,
     String? message,
-    List<Errors>? errors,
-  }) : super(httpStatus: httpStatus, errors: errors);
+    super.errors,
+  });
 
   factory LimitByIDResponse.fromJson(Map<String, dynamic> json) {
     List<Errors> errors = [];

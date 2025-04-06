@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/repository/wallet_repository.dart';
@@ -34,8 +34,7 @@ class MyWalletPageBloc extends Bloc<MyWalletPageEvent, MyWalletPageState> {
       }
       if (event is RemoveWalletEvent) {
         emit(state.copyWith(isLoading: true));
-        final networkStatus = await Connectivity().checkConnectivity();
-        if (networkStatus == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(isLoading: false, isNoInternet: true));
           return;
         }

@@ -1,4 +1,5 @@
 import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
+import 'package:expensive_management/utils/network_info.dart';
 
 class DayAnalyticBloc extends Bloc<DayAnalyticEvent, DayAnalyticState> {
   final BuildContext context;
@@ -7,14 +8,18 @@ class DayAnalyticBloc extends Bloc<DayAnalyticEvent, DayAnalyticState> {
       if (event is DayAnalyticEvent) {
         // emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(
             isLoading: false,
             apiError: ApiError.noInternetConnection,
           ));
         } else {
-          final Map<String, dynamic> query = {'fromTime': event.fromDate, 'timeType': 'DAY', 'toTime': event.toDate, 'type': event.type.name.toUpperCase()};
+          final Map<String, dynamic> query = {
+            'fromTime': event.fromDate,
+            'timeType': 'DAY',
+            'toTime': event.toDate,
+            'type': event.type.name.toUpperCase()
+          };
 
           final Map<String, dynamic> data = {
             if (event.walletIDs.isNotEmpty) 'walletIds': event.walletIDs,

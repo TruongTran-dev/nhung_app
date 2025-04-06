@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/business/blocs/login_bloc.dart';
@@ -16,7 +16,7 @@ import 'new_password_state.dart';
 
 class NewPasswordPage extends StatefulWidget {
   final String email;
-  const NewPasswordPage({Key? key, required this.email}) : super(key: key);
+  const NewPasswordPage({super.key, required this.email});
 
   @override
   State<NewPasswordPage> createState() => _NewPasswordPageState();
@@ -92,7 +92,8 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                 Navigator.pop(context);
               },
               child: const Icon(Icons.arrow_back_ios_new, size: 24, color: Colors.white)),
-          title: const Text('Mật khẩu mới', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+          title: const Text('Mật khẩu mới',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
         ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16, 50, 16, 0),
@@ -191,8 +192,8 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
         text: 'Thiết lập',
         onTap: () async {
           if (_formKey.currentState!.validate()) {
-            final connectivityResult = await Connectivity().checkConnectivity();
-            if (connectivityResult == ConnectivityResult.none && mounted) {
+            if (await NetworkInfo().isNotConnected) {
+              if (!mounted) return;
               showMessageNoInternetDialog(context);
             } else {
               _newPasswordBloc.add(DisplayLoading());
@@ -219,6 +220,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                 );
               } else {
                 _newPasswordBloc.add(OnFailure());
+                if (!mounted) return;
                 showMessage1OptionDialog(
                   context,
                   response.errors?.first.errorMessage,

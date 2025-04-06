@@ -40,7 +40,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+      onTap: () {
+        final FocusNode focusNode = FocusNode();
+        if (focusNode.hasFocus) {
+          focusNode.unfocus();
+        }
+      },
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is LoadingState) {
@@ -92,6 +97,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Input(
             textInputAction: TextInputAction.next,
             controller: _usernameController,
+            focusNode: FocusNode(),
             onChanged: (text) {},
             keyboardType: TextInputType.text,
             hint: 'Tên đăng nhập',
@@ -160,17 +166,20 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          PrimaryButton(
+            PrimaryButton(
             text: 'Đăng nhập',
             onTap: () {
+              // Unfocus current field if any has focus
+              FocusScope.of(context).unfocus();
+              
               if (_formKey.currentState!.validate()) {
-                BlocProvider.of<LoginBloc>(context).add(LoginSubmitted(
-                  username: _usernameController.text.trim(),
-                  password: _passwordController.text.trim(),
-                ));
+              BlocProvider.of<LoginBloc>(context).add(LoginSubmitted(
+                username: _usernameController.text.trim(),
+                password: _passwordController.text.trim(),
+              ));
               }
             },
-          ),
+            ),
           const SizedBox(height: 16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -180,13 +189,16 @@ class _LoginPageState extends State<LoginPage> {
               GestureDetector(
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) =>
-                              BlocProvider<SignUpBloc>(create: (_) => SignUpBloc(), child: const SignUpPage())));
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider<SignUpBloc>(create: (_) => SignUpBloc(), child: const SignUpPage()),
+                    ),
+                  );
                 },
-                child: Text(' Đăng ký ngay',
-                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 14, fontStyle: FontStyle.italic)),
+                child: Text(
+                  ' Đăng ký ngay',
+                  style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 14, fontStyle: FontStyle.italic),
+                ),
               ),
             ],
           )

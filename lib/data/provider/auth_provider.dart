@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:expensive_management/data/api/api_path.dart';
 import 'package:expensive_management/data/models/refresh_token_model.dart';
@@ -48,7 +50,7 @@ class AuthProvider with ProviderMixin {
       return SignUpResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.signup);
-      if (error is DioError) {
+      if (error is DioException) {
         return SignUpResponse.fromJson(error.response?.data);
       }
       return SignUpResponse();
@@ -64,11 +66,20 @@ class AuthProvider with ProviderMixin {
 
       final data = {'deviceToken': '', "password": password, "username": username};
 
-      final response = await dio.post(ApiPath.signIn, data: data, options: Options(receiveTimeout: const Duration(seconds: 10), sendTimeout: const Duration(seconds: 10)));
+      final response = await dio.post(
+        ApiPath.signIn,
+        data: data,
+        options: Options(
+          receiveTimeout: const Duration(seconds: 10),
+          sendTimeout: const Duration(seconds: 10),
+        ),
+      );
+
+      log("response: path: ${response.realUri}-  ${response.headers}");
       return SignInResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.signIn);
-      if (error is DioError) {
+      if (error is DioException) {
         return SignInResponse.fromJson(error.response?.data);
       }
       return SignInResponse();
@@ -101,7 +112,7 @@ class AuthProvider with ProviderMixin {
       );
       return ForgotPasswordResponse.fromJson(response.data);
     } catch (error) {
-      if (error is DioError) {
+      if (error is DioException) {
         return ForgotPasswordResponse.fromJson(error.response?.data);
       }
       return ForgotPasswordResponse();
@@ -123,7 +134,7 @@ class AuthProvider with ProviderMixin {
       return VerifyOtpResponse.fromJson(response.data);
     } catch (error) {
       //showErrorLog(error, stacktrace, ApiPath.sendOtp);
-      if (error is DioError) {
+      if (error is DioException) {
         return VerifyOtpResponse.fromJson(error.response?.data);
       }
       return VerifyOtpResponse();

@@ -1,18 +1,23 @@
 import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
+import 'package:expensive_management/utils/network_info.dart';
 
 class MonthAnalyticBloc extends Bloc<MonthAnalyticEvent, MonthAnalyticState> {
   final BuildContext context;
   MonthAnalyticBloc(this.context) : super(MonthAnalyticState()) {
     on((event, emit) async {
       if (event is MonthAnalyticEvent) {
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(
             isLoading: false,
             apiError: ApiError.noInternetConnection,
           ));
         } else {
-          final Map<String, dynamic> query = {'fromTime': event.fromMonth, 'timeType': 'MONTH', 'toTime': event.toMonth, 'type': event.type.name.toUpperCase()};
+          final Map<String, dynamic> query = {
+            'fromTime': event.fromMonth,
+            'timeType': 'MONTH',
+            'toTime': event.toMonth,
+            'type': event.type.name.toUpperCase()
+          };
 
           final Map<String, dynamic> data = {
             if (event.walletIDs.isNotEmpty) 'walletIds': event.walletIDs,

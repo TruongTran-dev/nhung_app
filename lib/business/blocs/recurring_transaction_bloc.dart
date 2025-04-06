@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/repository/recurring_repository.dart';
@@ -20,13 +20,15 @@ class RecurringTransactionBloc extends Bloc<RecurringTransactionEvent, Recurring
       if (event is RecurringInit) {
         emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(
             state.copyWith(isLoading: false, apiError: ApiError.noInternetConnection),
           );
         } else {
-          final Map<String, dynamic> query = {'type': TransactionType.expense.name.toUpperCase(), 'status': TransactionStatus.on_going.name.toUpperCase()};
+          final Map<String, dynamic> query = {
+            'type': TransactionType.expense.name.toUpperCase(),
+            'status': TransactionStatus.on_going.name.toUpperCase()
+          };
           final response = await _recurringRepository.getListRecurring(
             event.query ?? query,
           );

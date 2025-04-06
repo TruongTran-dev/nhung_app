@@ -2,7 +2,6 @@
 
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,8 +25,6 @@ class MainApp extends StatefulWidget {
 }
 
 class MainAppState extends State<MainApp> with WidgetsBindingObserver {
-  StreamSubscription<ConnectivityResult>? _networkSubscription;
-
   @override
   void initState() {
     super.initState();
@@ -35,9 +32,6 @@ class MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    if (_networkSubscription != null) {
-      _networkSubscription?.cancel();
-    }
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }

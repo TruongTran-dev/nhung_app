@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/provider/category_provider.dart';
@@ -16,8 +16,7 @@ class OptionCategoryBloc extends Bloc<OptionCategoryEvent, OptionCategoryState> 
       if (event is GetOptionCategoryEvent) {
         emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(isLoading: false, isNoInternet: true));
         } else {
           emit(state.copyWith(isLoading: true, isNoInternet: false));

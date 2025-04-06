@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/provider/auth_provider.dart';
 import 'package:expensive_management/presentation/screens/login_screen/login_event.dart';
@@ -15,8 +15,7 @@ class LoginBloc extends Bloc<SignInEvent, LoginState> {
       }
       if (event is LoginSubmitted) {
         emit(LoadingState());
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(const LoginFailed(errorMessage: 'No Networking'));
         } else {
           final response = await _authProvider.signIn(username: event.username, password: event.password);

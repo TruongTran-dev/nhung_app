@@ -2,13 +2,12 @@ import 'package:expensive_management/data/response/base_response.dart';
 import 'package:expensive_management/utils/utils.dart';
 
 import 'error_response.dart';
-
 class SignUpResponse extends BaseResponse {
   SignUpResponse({
-    httpStatus,
-    String? message,
-    List<Errors>? errors,
-  }) : super(httpStatus: httpStatus, message: message, errors: errors);
+    super.httpStatus,
+    super.message,
+    super.errors,
+  });
 
   factory SignUpResponse.fromJson(Map<String, dynamic> json) {
     List<Errors> errors = [];

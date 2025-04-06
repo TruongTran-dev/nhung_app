@@ -1,4 +1,5 @@
 import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
+import 'package:expensive_management/utils/network_info.dart';
 
 class YearAnalyticBloc extends Bloc<YearAnalyticEvent, YearAnalyticState> {
   final BuildContext context;
@@ -7,14 +8,18 @@ class YearAnalyticBloc extends Bloc<YearAnalyticEvent, YearAnalyticState> {
       if (event is YearAnalyticEvent) {
         // emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(
             isLoading: false,
             apiError: ApiError.noInternetConnection,
           ));
         } else {
-          final Map<String, dynamic> query = {'fromTime': event.fromYear, 'timeType': 'YEAR', 'toTime': event.toYear, 'type': event.type.name.toUpperCase()};
+          final Map<String, dynamic> query = {
+            'fromTime': event.fromYear,
+            'timeType': 'YEAR',
+            'toTime': event.toYear,
+            'type': event.type.name.toUpperCase()
+          };
 
           final Map<String, dynamic> data = {
             if (event.walletIDs.isNotEmpty) 'walletIds': event.walletIDs,

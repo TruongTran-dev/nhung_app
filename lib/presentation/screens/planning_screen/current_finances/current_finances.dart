@@ -64,7 +64,8 @@ class _CurrentFinancesState extends State<CurrentFinances> {
         backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
         automaticallyImplyLeading: true,
-        title: const Text('Tài chính hiện tại', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('Tài chính hiện tại',
+            style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
       ),
       body: state.isLoading
           ? const AnimationLoading()
@@ -91,7 +92,8 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Container(
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).colorScheme.background),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10), color: Theme.of(context).colorScheme.background),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Center(
@@ -106,10 +108,12 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                       );
                     }
                     if (state.listWallet != null) {
-                      return _createItemWallet(context, state.listWallet![index - 1], index: index - 1, endIndex: (state.listWallet?.length ?? 0) - 1);
+                      return _createItemWallet(context, state.listWallet![index - 1],
+                          index: index - 1, endIndex: (state.listWallet?.length ?? 0) - 1);
                     }
                     return Container(
-                      decoration: BoxDecoration(color: Theme.of(context).colorScheme.background, borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.background, borderRadius: BorderRadius.circular(10)),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Container(
@@ -154,7 +158,6 @@ class _CurrentFinancesState extends State<CurrentFinances> {
         );
       },
       child: Container(
-        height: 72,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.background,
           borderRadius: BorderRadius.only(
@@ -172,10 +175,10 @@ class _CurrentFinancesState extends State<CurrentFinances> {
               Padding(
                 padding: const EdgeInsets.only(right: 16.0),
                 child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey.withOpacity(0.2)),
-                  child: Icon(getIconWallet(walletType: wallet.accountType), size: 30, color: Theme.of(context).primaryColor),
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey.withOpacity(0.2)),
+                  child: Icon(getIconWallet(walletType: wallet.accountType),
+                      size: 30, color: Theme.of(context).primaryColor),
                 ),
               ),
               Expanded(
@@ -184,7 +187,8 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(wallet.name ?? '', style: const TextStyle(fontSize: 16, color: Colors.black)),
-                    Text('${formatterInt(wallet.accountBalance)} $currency', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text('${formatterInt(wallet.accountBalance)} $currency',
+                        style: const TextStyle(fontSize: 14, color: Colors.grey)),
                   ],
                 ),
               ),

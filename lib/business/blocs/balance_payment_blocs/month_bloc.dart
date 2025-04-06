@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensive_management/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/provider/analytic_provider.dart';
@@ -14,8 +14,7 @@ class MonthAnalyticBlocB extends Bloc<MonthAnalyticEvent, MonthAnalyticState> {
       if (event is MonthAnalyticEvent) {
         emit(state.copyWith(isLoading: true));
 
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult == ConnectivityResult.none) {
+        if (await NetworkInfo().isNotConnected) {
           emit(state.copyWith(
             isLoading: false,
             apiError: ApiError.noInternetConnection,
