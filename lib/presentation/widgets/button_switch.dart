@@ -9,13 +9,13 @@ class ButtonSwitch extends StatelessWidget {
   final Icon? inActiveIcon;
 
   const ButtonSwitch({
-    Key? key,
+    super.key,
     required this.title,
     required this.onToggle,
     this.value = false,
     this.activeIcon,
     this.inActiveIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,20 @@
+{
+  "@@locale": "vi",
+  "accept": "Chấp nhận",
+  "cancel": "Hủy",
+  "close": "Đóng",
+  "confirm": "Xác nhận",
+  "continue_": "Tiếp tục",
+  "done": "Hoàn tất",
+  "save": "Lưu",
+  "error": "Lỗi",
+  "next": "Tiếp theo",
+  "start": "Bắt đầu",
+  "complete": "Hoàn tất",
+  "skip": "Bỏ qua",
+  "back": "Quay lại",
+  "try_again": "Thử lại",
+  "back_to_home": "Trở về màn chính",
+  "home": "Trang chủ"
+  
+}

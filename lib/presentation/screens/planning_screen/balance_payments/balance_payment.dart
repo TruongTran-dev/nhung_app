@@ -1,6 +1,6 @@
 export 'package:expensive_management/business/blocs/api_result_state.dart';
 export 'package:expensive_management/data/models/report_expenditure_revenue_model.dart';
-export 'package:expensive_management/utils/enum/api_error_result.dart';
+export 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 
 export 'year/year_event.dart';
 export 'year/year_state.dart';
@@ -18,5 +18,5 @@ export 'current/current_event.dart';
 export 'current/current_state.dart';
 
 export 'package:expensive_management/presentation/widgets/animation_loading.dart';
-export 'package:expensive_management/utils/shared_preferences_storage.dart';
-export 'package:expensive_management/utils/utils.dart';
+export 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+export 'package:expensive_management/src/shared/utils/utils.dart';

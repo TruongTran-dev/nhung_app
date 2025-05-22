@@ -1,23 +1,16 @@
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:expensive_management/data/api/api_path.dart';
 import 'package:expensive_management/data/models/refresh_token_model.dart';
 import 'package:expensive_management/data/response/base_response.dart';
-import 'package:expensive_management/data/response/forgot_password_response.dart';
-import 'package:expensive_management/data/response/sign_in_response.dart';
-import 'package:expensive_management/data/response/sign_up_response.dart';
-import 'package:expensive_management/data/response/verify_otp_response.dart';
-import 'package:expensive_management/utils/app_constants.dart';
-import 'package:expensive_management/utils/secure_storage.dart';
-import 'package:expensive_management/utils/shared_preferences_storage.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/presentation/screens/planning_screen/balance_payments/balance_payment.dart';
+import 'package:expensive_management/src/core/di/injection_container.dart';
 
 import 'provider_mixin.dart';
 
 class AuthProvider with ProviderMixin {
-  final SecureStorage _secureStorage = SecureStorage();
-  final SharedPreferencesStorage _pref = SharedPreferencesStorage();
+  // final SecureStorage _secureStorage = SecureStorage();
+  final AppPrefStorage _pref = serviceLocator<AppPrefStorage>();
 
   Future<bool> checkAuthenticationStatus() async {
     String accessTokenExpired = _pref.getAccessTokenExpired();
@@ -29,9 +22,7 @@ class AuthProvider with ProviderMixin {
       String refreshTokenExpired = _pref.getRefreshTokenExpired();
 
       if (DateTime.parse(refreshTokenExpired).isAfter(DateTime.now())) {
-        String refreshToken = await _secureStorage.readSecureData(
-          AppConstants.refreshTokenKey,
-        );
+        String refreshToken = await _pref.getRefreshToken();
         final response = await AuthProvider().refreshToken(
           refreshToken: refreshToken,
         );
@@ -41,49 +32,6 @@ class AuthProvider with ProviderMixin {
       return false;
     }
     return true;
-  }
-
-  Future<SignUpResponse> signUp({required Map<String, dynamic> data}) async {
-    try {
-      final response = await dio.post(ApiPath.signup, data: data);
-
-      return SignUpResponse.fromJson(response.data);
-    } catch (error, stacktrace) {
-      showErrorLog(error, stacktrace, ApiPath.signup);
-      if (error is DioException) {
-        return SignUpResponse.fromJson(error.response?.data);
-      }
-      return SignUpResponse();
-    }
-  }
-
-  Future<SignInResponse> signIn({
-    required String username,
-    required String password,
-  }) async {
-    try {
-      // String fcmToken = await AwesomeNotification().requestFirebaseToken();
-
-      final data = {'deviceToken': '', "password": password, "username": username};
-
-      final response = await dio.post(
-        ApiPath.signIn,
-        data: data,
-        options: Options(
-          receiveTimeout: const Duration(seconds: 10),
-          sendTimeout: const Duration(seconds: 10),
-        ),
-      );
-
-      log("response: path: ${response.realUri}-  ${response.headers}");
-      return SignInResponse.fromJson(response.data);
-    } catch (error, stacktrace) {
-      showErrorLog(error, stacktrace, ApiPath.signIn);
-      if (error is DioException) {
-        return SignInResponse.fromJson(error.response?.data);
-      }
-      return SignInResponse();
-    }
   }
 
   Future<RefreshTokenModel?> refreshToken({
@@ -102,64 +50,6 @@ class AuthProvider with ProviderMixin {
     }
   }
 
-  Future<ForgotPasswordResponse> forgotPassword({
-    required String email,
-  }) async {
-    try {
-      final response = await dio.post(
-        ApiPath.forgotPassword,
-        data: {"email": email},
-      );
-      return ForgotPasswordResponse.fromJson(response.data);
-    } catch (error) {
-      if (error is DioException) {
-        return ForgotPasswordResponse.fromJson(error.response?.data);
-      }
-      return ForgotPasswordResponse();
-    }
-  }
-
-  Future<VerifyOtpResponse> verifyOtp({
-    required String email,
-    required String otpCode,
-  }) async {
-    try {
-      final data = {"email": email, "otp": otpCode};
-
-      final response = await dio.post(
-        ApiPath.sendOtp,
-        data: data,
-        //options: AppConstants.options,
-      );
-      return VerifyOtpResponse.fromJson(response.data);
-    } catch (error) {
-      //showErrorLog(error, stacktrace, ApiPath.sendOtp);
-      if (error is DioException) {
-        return VerifyOtpResponse.fromJson(error.response?.data);
-      }
-      return VerifyOtpResponse();
-    }
-  }
-
-  Future<BaseResponse> newPassword({
-    required String email,
-    required String password,
-    required String confirmPassword,
-  }) async {
-    try {
-      final data = {"confirm_password": confirmPassword, "email": email, "password": confirmPassword};
-
-      final response = await dio.post(
-        ApiPath.newPassword,
-        data: data,
-      );
-      return BaseResponse.fromJson(response.data);
-    } catch (error, stacktrace) {
-      showErrorLog(error, stacktrace, ApiPath.newPassword);
-      return BaseResponse();
-    }
-  }
-
   Future<BaseResponse> changePassword({
     required String oldPass,
     required String newPass,
@@ -171,9 +61,9 @@ class AuthProvider with ProviderMixin {
     }
     try {
       final response = await dio.post(
-        ApiPath.changePassword,
+        ApiPath.apiDomain + ApiPath.changePassword,
         data: data,
-        options: await defaultOptions(url: ApiPath.changePassword),
+        options: await defaultOptions(url: ApiPath.apiDomain + ApiPath.changePassword),
       );
       return BaseResponse.fromJson(response.data);
     } catch (error, stacktrace) {

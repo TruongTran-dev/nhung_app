@@ -1,4 +1,4 @@
-import 'package:expensive_management/utils/network_info.dart';
+import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/repository/recurring_repository.dart';
@@ -6,9 +6,9 @@ import 'package:expensive_management/data/response/base_get_response.dart';
 import 'package:expensive_management/data/response/recurring_response.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/recurring_transaction/recurring_transaction_event.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/recurring_transaction/recurring_transaction_state.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 class RecurringTransactionBloc extends Bloc<RecurringTransactionEvent, RecurringTransactionState> {
   final BuildContext context;

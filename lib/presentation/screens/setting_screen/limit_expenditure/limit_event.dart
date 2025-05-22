@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 
 abstract class LimitEvent extends Equatable {
   const LimitEvent();

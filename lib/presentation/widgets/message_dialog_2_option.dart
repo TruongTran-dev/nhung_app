@@ -9,14 +9,14 @@ class MessageDialog2Option extends StatelessWidget {
   final String? okLabel;
 
   const MessageDialog2Option({
-    Key? key,
+    super.key,
     this.title,
     this.content,
     this.onCancel,
     this.cancelLabel,
     this.onOk,
     this.okLabel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -10,14 +11,14 @@ class MonthAnalytic extends StatefulWidget {
   final List<int> walletIDs;
   final int year;
 
-  const MonthAnalytic({Key? key, required this.walletIDs, required this.year}) : super(key: key);
+  const MonthAnalytic({super.key, required this.walletIDs, required this.year});
 
   @override
   State<MonthAnalytic> createState() => _MonthAnalyticState();
 }
 
 class _MonthAnalyticState extends State<MonthAnalytic> {
-  final currency = SharedPreferencesStorage().getCurrency();
+  final currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   @override
   void initState() {
@@ -86,11 +87,11 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
-                  '${formatterDouble(data.incomeTotal)} $currency',
+                  '${formatterDouble(data.incomeTotal.toInt())} $currency',
                   style: const TextStyle(fontSize: 14, color: Colors.green),
                 ),
                 Text(
-                  '${formatterDouble(data.expenseTotal)} $currency',
+                  '${formatterDouble(data.expenseTotal.toInt())} $currency',
                   style: const TextStyle(fontSize: 14, color: Colors.red),
                 ),
                 Container(
@@ -99,7 +100,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
                     border: BorderDirectional(top: BorderSide(width: 0.5, color: Colors.grey)),
                   ),
                   child: Text(
-                    '${formatterDouble(data.remainTotal)} $currency',
+                    '${formatterDouble(data.remainTotal.toInt())} $currency',
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 )

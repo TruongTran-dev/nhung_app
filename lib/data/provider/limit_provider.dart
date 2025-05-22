@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:expensive_management/data/models/limit_expenditure_model.dart';
 import 'package:expensive_management/data/response/list_limit_response.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import '../api/api_path.dart';
 import '../response/base_get_response.dart';
 import '../response/base_response.dart';
@@ -16,9 +16,9 @@ class LimitProvider with ProviderMixin {
 
     try {
       final response = await dio.get(
-        ApiPath.expenseLimit,
+        ApiPath.apiDomain +  ApiPath.expenseLimit,
         queryParameters: {'status': status.name.toUpperCase()},
-        options: await defaultOptions(url: ApiPath.expenseLimit),
+        options: await defaultOptions(url: ApiPath.apiDomain +  ApiPath.expenseLimit),
       );
       return ListLimitResponse.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -30,7 +30,7 @@ class LimitProvider with ProviderMixin {
     if (await isExpiredToken()) {
       return ExpiredTokenResponse();
     }
-    final apiGetLimitByID = '${ApiPath.expenseLimit}/${limitID.toString()}';
+    final apiGetLimitByID =  ApiPath.apiDomain + '${ApiPath.expenseLimit}/${limitID.toString()}';
     try {
       final response = await dio.get(
         apiGetLimitByID,
@@ -48,18 +48,18 @@ class LimitProvider with ProviderMixin {
       return ExpiredTokenGetResponse();
     }
     try {
-      Options options = await defaultOptions(url: ApiPath.expenseLimit);
+      Options options = await defaultOptions(url: ApiPath.apiDomain +  ApiPath.expenseLimit);
 
-      final response = await dio.post(ApiPath.expenseLimit, data: data, options: options);
+      final response = await dio.post( ApiPath.apiDomain + ApiPath.expenseLimit, data: data, options: options);
 
       return LimitModel.fromJson(response.data);
     } catch (error, stacktrace) {
-      return errorGetResponse(error, stacktrace, ApiPath.getListWallet);
+      return errorGetResponse(error, stacktrace, ApiPath.wallet);
     }
   }
 
   Future<Object> editLimit({required int? limitId, required Object data}) async {
-    String apiUpdateWallet = '${ApiPath.expenseLimit}/$limitId';
+    String apiUpdateWallet =  ApiPath.apiDomain + '${ApiPath.expenseLimit}/$limitId';
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();
     }
@@ -75,7 +75,7 @@ class LimitProvider with ProviderMixin {
   }
 
   Future<Object> deleteLimit({required int limitId}) async {
-    String apiRemoveWallet = '${ApiPath.expenseLimit}/$limitId';
+    String apiRemoveWallet =  ApiPath.apiDomain + '${ApiPath.expenseLimit}/$limitId';
 
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();

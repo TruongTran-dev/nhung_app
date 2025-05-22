@@ -1,4 +1,4 @@
-import 'package:expensive_management/data/models/wallet.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
 import 'package:expensive_management/data/response/base_get_response.dart';
 
 class GetListWalletResponse extends BaseGetResponse {

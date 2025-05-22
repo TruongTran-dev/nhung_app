@@ -1,27 +1,28 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:intl/intl.dart';
-import 'package:expensive_management/business/blocs/option_category_bloc.dart';
 import 'package:expensive_management/business/blocs/recurring_info_bloc.dart';
 import 'package:expensive_management/data/models/frequency_model.dart';
 import 'package:expensive_management/data/models/recurring_list_model.dart';
 import 'package:expensive_management/data/models/recurring_post_model.dart';
-import 'package:expensive_management/data/models/wallet.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
 import 'package:expensive_management/data/repository/recurring_repository.dart';
 import 'package:expensive_management/data/response/base_get_response.dart';
-import 'package:expensive_management/presentation/screens/collection_screen/collection_screen.dart';
-import 'package:expensive_management/presentation/screens/option_category_screen/option_category.dart';
+import 'package:expensive_management/src/features/collection/presentation/collection_page.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/recurring_transaction/recurring_info/option_repeat_time.dart';
 import 'package:expensive_management/presentation/widgets/animation_loading.dart';
 import 'package:expensive_management/presentation/widgets/app_image.dart';
 import 'package:expensive_management/presentation/widgets/primary_button.dart';
-import 'package:expensive_management/utils/app_constants.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
-import 'package:expensive_management/utils/shared_preferences_storage.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/app_constants.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 import 'recurring_info_event.dart';
 import 'recurring_info_state.dart';
@@ -30,7 +31,7 @@ class RecurringInfo extends StatefulWidget {
   final bool isEdit;
   final RecurringListModel? recurringListModel;
 
-  const RecurringInfo({Key? key, this.isEdit = false, this.recurringListModel}) : super(key: key);
+  const RecurringInfo({super.key, this.isEdit = false, this.recurringListModel});
 
   @override
   State<RecurringInfo> createState() => _RecurringInfoState();
@@ -44,7 +45,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
 
   bool _showClearNote = false;
 
-  final String _currency = SharedPreferencesStorage().getCurrency();
+  final String _currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   late RecurringInfoBloc _recurringInfoBloc;
 
@@ -56,8 +57,8 @@ class _RecurringInfoState extends State<RecurringInfo> {
 
   String? optionTitle;
 
-  ItemCategory itemCategorySelected =
-      ItemCategory(categoryId: null, title: "Chọn hạng mục", iconLeading: '', type: TransactionType.expense);
+  ItemCategory? itemCategorySelected;
+  // =    ItemCategory(categoryId: null, title: "Chọn hạng mục", iconLeading: '', type: TransactionType.expense);
 
   List<DayOfWeek> listDay = [];
   FrequencyType frequencyType = FrequencyType.daily;
@@ -71,12 +72,12 @@ class _RecurringInfoState extends State<RecurringInfo> {
       time = widget.recurringListModel?.time ?? DateFormat('HH:mm').format(DateTime.now());
       fromDate = getDateTimeFormat(widget.recurringListModel?.fromDate ?? DateTime.now());
       toDate = isNotNullOrEmpty(toDate) ? getDateTimeFormat((widget.recurringListModel?.toDate)!) : null;
-      itemCategorySelected = ItemCategory(
-        categoryId: widget.recurringListModel?.categoryId,
-        title: widget.recurringListModel?.categoryName,
-        iconLeading: widget.recurringListModel?.categoryLogo,
-        type: widget.recurringListModel?.transactionType ?? TransactionType.expense,
-      );
+      // itemCategorySelected = ItemCategory(
+      //   categoryId: widget.recurringListModel?.categoryId,
+      //   title: widget.recurringListModel?.categoryName,
+      //   iconLeading: widget.recurringListModel?.categoryLogo,
+      //   type: widget.recurringListModel?.transactionType ?? TransactionType.expense,
+      // );
       walletId = widget.recurringListModel?.walletId;
       walletName = widget.recurringListModel?.walletName;
       walletType = 'wallet';
@@ -168,8 +169,8 @@ class _RecurringInfoState extends State<RecurringInfo> {
             _money(),
             _select(state),
             widget.isEdit
-                ? _buttonDeleteUpdate(context, walletId, itemCategorySelected.categoryId)
-                : _buttonSave(context, walletId, itemCategorySelected.categoryId),
+                ? _buttonDeleteUpdate(context, walletId, itemCategorySelected?.categoryId)
+                : _buttonSave(context, walletId, itemCategorySelected?.categoryId),
           ],
         ),
       ),
@@ -235,7 +236,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
                   "fromDate": fromDate,
                   "time": time,
                   "toDate": toDate,
-                  "transactionType": itemCategorySelected.type?.name.toUpperCase(),
+                  "transactionType": itemCategorySelected?.type.name.toUpperCase(),
                   "walletId": walletID!.toString()
                 };
                 if (widget.recurringListModel?.id != null) {
@@ -289,10 +290,9 @@ class _RecurringInfoState extends State<RecurringInfo> {
         "fromDate": fromDate,
         "time": time,
         "toDate": toDate,
-        "transactionType": itemCategorySelected.type?.name.toUpperCase(),
+        "transactionType": itemCategorySelected?.type.name.toUpperCase(),
         "walletId": walletID!.toString()
       };
-      // _recurringInfoBloc.add(AddRecurringEvent(data));
 
       final response = await _recurringRepository.addRecurring(data);
 
@@ -309,12 +309,12 @@ class _RecurringInfoState extends State<RecurringInfo> {
                 walletId = null;
                 walletName = '';
                 walletType = '';
-                itemCategorySelected = ItemCategory(
-                  categoryId: null,
-                  title: "Chọn hạng mục",
-                  iconLeading: '',
-                  type: TransactionType.expense,
-                );
+                // itemCategorySelected = ItemCategory(
+                //   categoryId: null,
+                //   title: "Chọn hạng mục",
+                //   iconLeading: '',
+                //   type: TransactionType.expense,
+                // );
               },
             );
           },
@@ -369,26 +369,26 @@ class _RecurringInfoState extends State<RecurringInfo> {
   Widget _selectCategory(BuildContext context) {
     return ListTile(
       onTap: () async {
-        final ItemCategory? itemCategory = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider(
-              create: (context) => OptionCategoryBloc(context),
-              child: OptionCategoryPage(
-                categoryIdSelected: itemCategorySelected.categoryId,
-                tabIndex: itemCategorySelected.type == TransactionType.expense ? 0 : 1,
-              ),
-            ),
-          ),
-        );
-        if (itemCategory != null) {
-          setState(() {
-            itemCategorySelected = itemCategory;
-          });
-        } else {
-          showMessage1OptionDialog(this.context, 'Vui lòng chọn hạng mục');
-          return;
-        }
+        // final ItemCategory? itemCategory = await Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => BlocProvider(
+        //       create: (context) => OptionCategoryBloc(context),
+        //       child: OptionCategoryPage(
+        //         categoryIdSelected: itemCategorySelected?.categoryId,
+        //         tabIndex: itemCategorySelected?.type == TransactionType.expense ? 0 : 1,
+        //       ),
+        //     ),
+        //   ),
+        // );
+        // if (itemCategory != null) {
+        //   setState(() {
+        //     itemCategorySelected = itemCategory;
+        //   });
+        // } else {
+        //   showMessage1OptionDialog(this.context, 'Vui lòng chọn hạng mục');
+        //   return;
+        // }
       },
       dense: false,
       horizontalTitleGap: 6,
@@ -397,7 +397,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
         width: 30,
         decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
         child: AppImage(
-          localPathOrUrl: itemCategorySelected.iconLeading,
+          localPathOrUrl: itemCategorySelected?.iconLeading,
           width: 30,
           height: 30,
           boxFit: BoxFit.cover,
@@ -406,8 +406,8 @@ class _RecurringInfoState extends State<RecurringInfo> {
         ),
       ),
       title: Text(
-        itemCategorySelected.title ?? 'Chọn hạng mục',
-        style: TextStyle(fontSize: 16, color: (itemCategorySelected.categoryId != null) ? Colors.black : Colors.grey),
+        itemCategorySelected?.title ?? 'Chọn hạng mục',
+        style: TextStyle(fontSize: 16, color: (itemCategorySelected?.categoryId != null) ? Colors.black : Colors.grey),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
@@ -670,7 +670,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Text(
-                                        listWallet[index].name ?? '',
+                                        listWallet[index].name,
                                         style: const TextStyle(fontSize: 16, color: Colors.black),
                                       ),
                                       Text(

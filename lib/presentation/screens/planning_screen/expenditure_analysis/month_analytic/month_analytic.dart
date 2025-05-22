@@ -1,12 +1,13 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/business/blocs/expenditure_analytic_blocs/month_analytic_bloc.dart';
 import 'package:expensive_management/data/models/analytic_model.dart';
 import 'package:expensive_management/presentation/widgets/animation_loading.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/shared_preferences_storage.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 import 'month_analytic_event.dart';
 import 'month_analytic_state.dart';
 
@@ -14,7 +15,13 @@ class MonthAnalytic extends StatefulWidget {
   final String fromMonth, toMonth;
   final List<int> walletIDs, categoryIDs;
   final TransactionType type;
-  const MonthAnalytic({Key? key, required this.fromMonth, required this.toMonth, required this.walletIDs, required this.categoryIDs, this.type = TransactionType.expense}) : super(key: key);
+  const MonthAnalytic(
+      {super.key,
+      required this.fromMonth,
+      required this.toMonth,
+      required this.walletIDs,
+      required this.categoryIDs,
+      this.type = TransactionType.expense});
 
   @override
   State<MonthAnalytic> createState() => _MonthAnalyticState();
@@ -23,7 +30,7 @@ class MonthAnalytic extends StatefulWidget {
 class _MonthAnalyticState extends State<MonthAnalytic> {
   bool _showDetail = false;
 
-  final currency = SharedPreferencesStorage().getCurrency();
+  final currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   @override
   void initState() {
@@ -75,7 +82,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
                         children: [
                           const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
-                            formatterDouble(state.data?.totalAmount),
+                            formatterDouble((state.data?.totalAmount ?? 0).toInt()),
                             style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                         ],
@@ -87,7 +94,8 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Trung bình chỉ/tháng', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                          Text(formatterDouble(state.data?.mediumAmount), style: const TextStyle(fontSize: 14, color: Colors.black)),
+                          Text(formatterDouble((state.data?.mediumAmount ?? 0).toInt()),
+                              style: const TextStyle(fontSize: 14, color: Colors.black)),
                         ],
                       ),
                     ),
@@ -117,7 +125,8 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Xem chi tiết', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+                  const Text('Xem chi tiết',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
                   Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
                 ],
               ),
@@ -157,7 +166,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
             Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             Row(
               children: [
-                Text('${formatterDouble(report.totalAmount)} $currency', style: const TextStyle(color: Colors.red)),
+                Text('${formatterDouble((report.totalAmount ).toInt())} $currency', style: const TextStyle(color: Colors.red)),
                 const Icon(Icons.keyboard_arrow_right_rounded, size: 20, color: Colors.grey),
               ],
             ),

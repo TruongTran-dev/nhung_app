@@ -1,15 +1,15 @@
-import 'package:expensive_management/utils/network_info.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/provider/category_provider.dart';
 import 'package:expensive_management/data/provider/wallet_provider.dart';
+import 'package:expensive_management/src/shared/utils/network_info.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/data/response/base_get_response.dart';
 import 'package:expensive_management/data/response/get_list_category_response.dart';
 import 'package:expensive_management/data/response/get_list_wallet_response.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/limit_expenditure/limit_info/limit_info_event.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/limit_expenditure/limit_info/limit_info_state.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 class LimitInfoBloc extends Bloc<LimitInfoEvent, LimitInfoState> {
   final BuildContext context;

@@ -12,9 +12,9 @@ class RecurringProvider with ProviderMixin {
     }
     try {
       final response = await dio.get(
-        ApiPath.recurring,
+       ApiPath.apiDomain +   ApiPath.recurring,
         queryParameters: query,
-        options: await defaultOptions(url: ApiPath.recurring),
+        options: await defaultOptions(url: ApiPath.apiDomain +  ApiPath.recurring),
       );
       return RecurringResponse.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -28,9 +28,9 @@ class RecurringProvider with ProviderMixin {
     }
     try {
       final response = await dio.post(
-        ApiPath.recurring,
+        ApiPath.apiDomain +  ApiPath.recurring,
         data: data,
-        options: await defaultOptions(url: ApiPath.recurring),
+        options: await defaultOptions(url: ApiPath.apiDomain +  ApiPath.recurring),
       );
       return RecurringPost.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -42,7 +42,7 @@ class RecurringProvider with ProviderMixin {
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();
     }
-    String apiUpdate = '${ApiPath.recurring}/${recurringID.toString()}';
+    String apiUpdate =  ApiPath.apiDomain + '${ApiPath.recurring}/${recurringID.toString()}';
     try {
       final response = await dio.put(
         apiUpdate,
@@ -60,7 +60,7 @@ class RecurringProvider with ProviderMixin {
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();
     }
-    String apiDelete = '${ApiPath.recurring}/${recurringID.toString()}';
+    String apiDelete = ApiPath.apiDomain +  '${ApiPath.recurring}/${recurringID.toString()}';
     try {
       final response = await dio.delete(apiDelete, options: await defaultOptions(url: apiDelete));
       return response;

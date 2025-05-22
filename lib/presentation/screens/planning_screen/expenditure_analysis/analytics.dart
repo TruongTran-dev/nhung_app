@@ -5,16 +5,15 @@ export 'month_analytic/month_analytic_state.dart';
 export 'year_analytic/year_analytic_event.dart';
 export 'year_analytic/year_analytic_state.dart';
 
-export 'package:expensive_management/utils/enum/api_error_result.dart';
+export 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 export 'package:expensive_management/business/blocs/api_result_state.dart';
 
 
-export 'package:expensive_management/utils/screen_utilities.dart';
+export 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 
 export 'package:expensive_management/data/models/analytic_model.dart';
 
-export 'package:expensive_management/data/provider/analytic_provider.dart';
 
 export 'package:connectivity_plus/connectivity_plus.dart';
 

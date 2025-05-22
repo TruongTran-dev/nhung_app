@@ -1,3 +1,4 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -21,7 +22,7 @@ class CustomAnalytic extends StatefulWidget {
 }
 
 class _CustomAnalyticState extends State<CustomAnalytic> {
-  final currency = SharedPreferencesStorage().getCurrency();
+  final currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   @override
   void initState() {
@@ -108,11 +109,11 @@ class _CustomAnalyticState extends State<CustomAnalytic> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
-                  '${formatterDouble(data.incomeTotal)} $currency',
+                  '${formatterDouble(data.incomeTotal.toInt())} $currency',
                   style: const TextStyle(fontSize: 14, color: Colors.green),
                 ),
                 Text(
-                  '${formatterDouble(data.expenseTotal)} $currency',
+                  '${formatterDouble(data.expenseTotal.toInt())} $currency',
                   style: const TextStyle(fontSize: 14, color: Colors.red),
                 ),
                 Container(
@@ -121,7 +122,7 @@ class _CustomAnalyticState extends State<CustomAnalytic> {
                     border: BorderDirectional(top: BorderSide(width: 0.5, color: Colors.grey)),
                   ),
                   child: Text(
-                    '${formatterDouble(data.remainTotal)} $currency',
+                    '${formatterDouble(data.remainTotal.toInt())} $currency',
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 )

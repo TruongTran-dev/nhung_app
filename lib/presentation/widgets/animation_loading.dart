@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class AnimationLoading extends StatelessWidget {
   const AnimationLoading({
-    Key? key,
+    super.key,
     this.size,
     this.strokeWidth,
     this.useMaterialWidget = true,
-  }) : super(key: key);
+  });
 
   final double? size;
   final double? strokeWidth;

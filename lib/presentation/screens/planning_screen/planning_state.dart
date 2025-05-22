@@ -1,7 +1,7 @@
 import 'package:expensive_management/business/blocs/api_result_state.dart';
-import 'package:expensive_management/data/models/category_model.dart';
-import 'package:expensive_management/data/models/wallet.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 
 class PlanningState implements ApiResultState {
   final bool isLoading;

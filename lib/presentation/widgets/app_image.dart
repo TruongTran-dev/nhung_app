@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 import 'animation_loading.dart';
 
 class AppImage extends StatelessWidget {
   const AppImage({
-    Key? key,
+    super.key,
     this.isOnline = true,
     required this.localPathOrUrl,
     this.width,
@@ -17,7 +17,7 @@ class AppImage extends StatelessWidget {
     this.errorWidget,
     this.placeholder,
     this.alignment,
-  }) : super(key: key);
+  });
 
   final bool isOnline;
 

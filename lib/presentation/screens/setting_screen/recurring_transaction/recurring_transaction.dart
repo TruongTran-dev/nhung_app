@@ -1,3 +1,4 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/business/blocs/recurring_info_bloc.dart';
@@ -6,11 +7,11 @@ import 'package:expensive_management/data/models/frequency_model.dart';
 import 'package:expensive_management/data/models/recurring_list_model.dart';
 import 'package:expensive_management/presentation/widgets/animation_loading.dart';
 import 'package:expensive_management/presentation/widgets/app_image.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
-import 'package:expensive_management/utils/shared_preferences_storage.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 import 'recurring_info/recurring_info.dart';
 import 'recurring_info/recurring_info_event.dart';
@@ -18,20 +19,22 @@ import 'recurring_transaction_event.dart';
 import 'recurring_transaction_state.dart';
 
 class RecurringPage extends StatefulWidget {
-  const RecurringPage({Key? key}) : super(key: key);
+  const RecurringPage({super.key});
 
   @override
   State<RecurringPage> createState() => _RecurringPageState();
 }
 
 class _RecurringPageState extends State<RecurringPage> {
-  final String currency = SharedPreferencesStorage().getCurrency();
+  final String currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   late RecurringTransactionBloc _recurringBloc;
 
-  TransactionDataType _transactionTypeSelected = TransactionDataType(name: 'Giao dịch chi', type: TransactionType.expense);
+  TransactionDataType _transactionTypeSelected =
+      TransactionDataType(name: 'Giao dịch chi', type: TransactionType.expense);
 
-  TransactionDataStatus _transactionStatusSelected = TransactionDataStatus(name: 'Đang diễn ra', status: TransactionStatus.on_going);
+  TransactionDataStatus _transactionStatusSelected =
+      TransactionDataStatus(name: 'Đang diễn ra', status: TransactionStatus.on_going);
 
   @override
   void initState() {
@@ -46,10 +49,14 @@ class _RecurringPageState extends State<RecurringPage> {
   }
 
   void _reloadPage() {
-    final Map<String, dynamic> query = {'type': _transactionTypeSelected.type.name.toUpperCase(), 'status': _transactionStatusSelected.status.name.toUpperCase()};
+    final Map<String, dynamic> query = {
+      'type': _transactionTypeSelected.type.name.toUpperCase(),
+      'status': _transactionStatusSelected.status.name.toUpperCase()
+    };
     _recurringBloc.add(RecurringInit(query: query));
     showLoading(context);
     Future.delayed(const Duration(milliseconds: 1500), () {
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
       setState(() {});
     });
@@ -129,7 +136,8 @@ class _RecurringPageState extends State<RecurringPage> {
   Widget _listView(BuildContext context, List<RecurringListModel>? listRecurring) {
     if (isNullOrEmpty(listRecurring)) {
       return Center(
-        child: Text('Không tìm thấy dữ liệu ghi chép', style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
+        child: Text('Không tìm thấy dữ liệu ghi chép',
+            style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor)),
       );
     }
 
@@ -142,7 +150,9 @@ class _RecurringPageState extends State<RecurringPage> {
   Widget _createItemRecurring(BuildContext context, RecurringListModel recurring) {
     Frequency frequency = getFrequencyByType(recurring.frequencyType ?? FrequencyType.daily);
     List<DayOfWeek> listDay = getDayOfWeekListFromStrings(recurring.dayInWeeks ?? []);
-    String timeFromTo = isNotNullOrEmpty(recurring.toDate) ? '${recurring.time} Từ ${getDateTimeFormat((recurring.fromDate)!)} Đến ${getDateTimeFormat((recurring.toDate)!)}' : '${recurring.time} Từ ${getDateTimeFormat((recurring.fromDate)!)}';
+    String timeFromTo = isNotNullOrEmpty(recurring.toDate)
+        ? '${recurring.time} Từ ${getDateTimeFormat((recurring.fromDate)!)} Đến ${getDateTimeFormat((recurring.toDate)!)}'
+        : '${recurring.time} Từ ${getDateTimeFormat((recurring.fromDate)!)}';
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -197,7 +207,8 @@ class _RecurringPageState extends State<RecurringPage> {
                   ),
                   Text(
                     "${recurring.amount.toString()} $currency",
-                    style: TextStyle(color: (recurring.transactionType == TransactionType.expense) ? Colors.red : Colors.green),
+                    style: TextStyle(
+                        color: (recurring.transactionType == TransactionType.expense) ? Colors.red : Colors.green),
                   ),
                 ],
               ),
@@ -337,7 +348,9 @@ class _RecurringPageState extends State<RecurringPage> {
                   _reloadPage();
                 },
                 title: Text(transactionType.name),
-                trailing: (_transactionTypeSelected.type == transactionType.type) ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor) : null,
+                trailing: (_transactionTypeSelected.type == transactionType.type)
+                    ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor)
+                    : null,
               ),
             );
           }).toList(),
@@ -377,7 +390,9 @@ class _RecurringPageState extends State<RecurringPage> {
                   _reloadPage();
                 },
                 title: Text(transactionStatus.name),
-                trailing: (_transactionStatusSelected.status == transactionStatus.status) ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor) : null,
+                trailing: (_transactionStatusSelected.status == transactionStatus.status)
+                    ? Icon(Icons.check, size: 16, color: Theme.of(context).primaryColor)
+                    : null,
               ),
             );
           }).toList(),

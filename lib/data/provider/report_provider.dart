@@ -1,4 +1,4 @@
-import 'package:expensive_management/data/models/wallet_report_model.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/wallet_report_model.dart';
 
 import '../api/api_path.dart';
 import '../response/base_get_response.dart';
@@ -13,11 +13,11 @@ class ReportProvider with ProviderMixin {
     }
     try {
       final response = await dio.get(
-        ApiPath.getReportByWalletId,
+        ApiPath.apiDomain + ApiPath.getReportByWalletId,
         queryParameters: queryParam,
-        options: await defaultOptions(url: ApiPath.getReportByWalletId),
+        options: await defaultOptions(url: ApiPath.apiDomain +  ApiPath.getReportByWalletId),
       );
-      return WalletReport.fromJson(response.data);
+      return WalletReportData.fromJson(response.data);
     } catch (error, stacktrace) {
       return errorGetResponse(error, stacktrace, ApiPath.getReportByWalletId);
     }

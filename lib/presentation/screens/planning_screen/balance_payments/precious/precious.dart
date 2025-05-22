@@ -1,3 +1,4 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -11,17 +12,17 @@ class PreciousAnalytic extends StatefulWidget {
   final List<int> walletIDs;
 
   const PreciousAnalytic({
-    Key? key,
+    super.key,
     required this.year,
     required this.walletIDs,
-  }) : super(key: key);
+  });
 
   @override
   State<PreciousAnalytic> createState() => _PreciousAnalyticState();
 }
 
 class _PreciousAnalyticState extends State<PreciousAnalytic> {
-  final currency = SharedPreferencesStorage().getCurrency();
+  final currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   @override
   void initState() {
@@ -95,18 +96,19 @@ class _PreciousAnalyticState extends State<PreciousAnalytic> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
-                  '${formatterDouble(data.incomeTotal)} $currency',
+                  '${formatterDouble(data.incomeTotal.toInt())} $currency',
                   style: const TextStyle(fontSize: 14, color: Colors.green),
                 ),
                 Text(
-                  '${formatterDouble(data.expenseTotal)} $currency',
+                  '${formatterDouble(data.expenseTotal.toInt())} $currency',
                   style: const TextStyle(fontSize: 14, color: Colors.red),
                 ),
                 Container(
                   padding: const EdgeInsets.only(top: 10),
-                  decoration: const BoxDecoration(border: BorderDirectional(top: BorderSide(width: 0.5, color: Colors.grey))),
+                  decoration:
+                      const BoxDecoration(border: BorderDirectional(top: BorderSide(width: 0.5, color: Colors.grey))),
                   child: Text(
-                    '${formatterDouble(data.remainTotal)} $currency',
+                    '${formatterDouble(data.remainTotal.toInt())} $currency',
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                   ),
                 )
@@ -124,7 +126,8 @@ class _PreciousAnalyticState extends State<PreciousAnalytic> {
       children: [
         const Padding(
           padding: EdgeInsets.only(left: 4, top: 10.0, bottom: 4),
-          child: Text('(Đơn vị: triệu VNĐ)', style: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w400)),
+          child: Text('(Đơn vị: triệu VNĐ)',
+              style: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w400)),
         ),
         SfCartesianChart(
           primaryXAxis: CategoryAxis(),

@@ -1,5 +1,5 @@
-import 'package:expensive_management/data/models/category_model.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 import 'base_get_response.dart';
 

@@ -1,4 +1,4 @@
-import 'package:expensive_management/data/models/collection_model.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/collection_model.dart';
 
 import 'base_get_response.dart';
 

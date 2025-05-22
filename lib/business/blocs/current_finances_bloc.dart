@@ -5,8 +5,8 @@ import 'package:expensive_management/data/response/base_get_response.dart';
 import 'package:expensive_management/data/response/get_list_wallet_response.dart';
 import 'package:expensive_management/presentation/screens/planning_screen/current_finances/current_finances_event.dart';
 import 'package:expensive_management/presentation/screens/planning_screen/current_finances/current_finances_state.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 class CurrentFinancesBloc extends Bloc<CurrentFinancesEvent, CurrentFinancesState> {
   final _walletRepository = WalletRepository();

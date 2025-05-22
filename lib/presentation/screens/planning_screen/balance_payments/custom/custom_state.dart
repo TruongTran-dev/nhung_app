@@ -1,6 +1,6 @@
 import 'package:expensive_management/business/blocs/api_result_state.dart';
 import 'package:expensive_management/data/models/report_expenditure_revenue_model.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 
 
 class CustomAnalyticState implements ApiResultState {

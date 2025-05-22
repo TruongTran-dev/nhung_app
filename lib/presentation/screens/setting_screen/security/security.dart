@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:expensive_management/presentation/screens/password_screen/change_password/change_password.dart';
+import 'package:expensive_management/src/features/auth/presentation/change_password.dart';
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});

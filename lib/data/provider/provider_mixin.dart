@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:expensive_management/src/core/di/injection_container.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:expensive_management/utils/app_constants.dart';
-import 'package:expensive_management/utils/secure_storage.dart';
 import '../response/base_get_response.dart';
 import '../response/base_response.dart';
 import 'auth_provider.dart';
@@ -33,8 +33,8 @@ mixin ProviderMixin {
 
     return BaseResponse.withHttpError(
       message: error.toString(),
-      httpStatus: error.response?.statusCode ,
-      errors:  error.response?.data,
+      httpStatus: error.response?.statusCode,
+      errors: error.response?.data,
     );
   }
 
@@ -50,7 +50,7 @@ mixin ProviderMixin {
   }
 
   Future<Options> defaultOptions({String? url, String? contentType, String? accept}) async {
-    String token = await SecureStorage().readSecureData(AppConstants.accessTokenKey);
+    String token = serviceLocator<AppPrefStorage>().getAccessToken();
     //
     // if (kDebugMode) {
     //   if (isNotNullOrEmpty(url)) {

@@ -1,11 +1,11 @@
-import 'package:expensive_management/utils/network_info.dart';
+import 'package:expensive_management/data/provider/analytic_provider.dart';
+import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/data/provider/analytic_provider.dart';
 import 'package:expensive_management/data/response/base_response.dart';
 import 'package:expensive_management/data/response/report_expenditure_revenue_response.dart';
 import 'package:expensive_management/presentation/screens/planning_screen/balance_payments/balance_payment.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 class CurrentAnalyticBloc extends Bloc<CurrentAnalyticEvent, CurrentAnalyticState> {
   final BuildContext context;

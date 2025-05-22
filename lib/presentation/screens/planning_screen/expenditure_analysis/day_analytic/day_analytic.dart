@@ -1,3 +1,4 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -5,9 +6,9 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/business/blocs/expenditure_analytic_blocs/day_analytic_bloc.dart';
 import 'package:expensive_management/data/models/analytic_model.dart';
 import 'package:expensive_management/presentation/widgets/animation_loading.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/shared_preferences_storage.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 import 'day_analytic_event.dart';
 import 'day_analytic_state.dart';
 
@@ -16,20 +17,20 @@ class DayAnalytic extends StatefulWidget {
   final List<int> walletIDs, categoryIDs;
   final TransactionType type;
   const DayAnalytic({
-    Key? key,
+    super.key,
     required this.fromDate,
     required this.toDate,
     required this.walletIDs,
     required this.categoryIDs,
     this.type = TransactionType.expense,
-  }) : super(key: key);
+  });
 
   @override
   State<DayAnalytic> createState() => _DayAnalyticState();
 }
 
 class _DayAnalyticState extends State<DayAnalytic> {
-  final currency = SharedPreferencesStorage().getCurrency();
+  final currency = serviceLocator<AppPrefStorage>().getCurrency();
   bool _showDetail = false;
 
   @override
@@ -60,8 +61,7 @@ class _DayAnalyticState extends State<DayAnalytic> {
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(bottom: 8.0),
-                      child: Text('(Đơn vị: nghìn VNĐ)',
-                          style: TextStyle(fontSize: 12, color: Colors.black)),
+                      child: Text('(Đơn vị: nghìn VNĐ)', style: TextStyle(fontSize: 12, color: Colors.black)),
                     ),
                     SfCartesianChart(
                       primaryXAxis: CategoryAxis(),
@@ -70,10 +70,8 @@ class _DayAnalyticState extends State<DayAnalytic> {
                         LineSeries<CategoryReport, String>(
                           dataSource: listReport,
                           xValueMapper: (CategoryReport data, _) =>
-                              DateFormat('dd/MM')
-                                  .format(DateTime.parse(data.time)),
-                          yValueMapper: (CategoryReport data, _) =>
-                              (data.totalAmount / 1000),
+                              DateFormat('dd/MM').format(DateTime.parse(data.time)),
+                          yValueMapper: (CategoryReport data, _) => (data.totalAmount / 1000),
                           name: 'Chi tiêu ngày',
                           color: Colors.lightBlueAccent,
                         ),
@@ -84,13 +82,10 @@ class _DayAnalyticState extends State<DayAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Tổng chi tiêu',
-                              style:
-                                  TextStyle(fontSize: 14, color: Colors.grey)),
+                          const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
-                            '${formatterDouble(state.data?.totalAmount)} $currency',
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black),
+                            '${formatterDouble((state.data?.totalAmount ?? 0).toInt())} $currency',
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           )
                         ],
                       ),
@@ -100,21 +95,15 @@ class _DayAnalyticState extends State<DayAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Trung bình chỉ/ngày',
-                              style:
-                                  TextStyle(fontSize: 14, color: Colors.grey)),
+                          const Text('Trung bình chỉ/ngày', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
-                            '${formatterDouble(state.data?.mediumAmount)} $currency',
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.black),
+                            '${formatterDouble((state.data?.mediumAmount ?? 0).toInt())} $currency',
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                         ],
                       ),
                     ),
-                    Divider(
-                        color: Colors.grey.withOpacity(0.2),
-                        height: 10,
-                        thickness: 10),
+                    Divider(color: Colors.grey.withOpacity(0.2), height: 10, thickness: 10),
                     listFilter(listReport),
                   ],
                 ),
@@ -141,16 +130,8 @@ class _DayAnalyticState extends State<DayAnalytic> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Xem chi tiết',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black)),
-                  Icon(
-                      _showDetail
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      size: 20,
-                      color: Colors.grey),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+                  Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
                 ],
               ),
             ),
@@ -184,12 +165,10 @@ class _DayAnalyticState extends State<DayAnalytic> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(report.time,
-              style:
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+          Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
           Expanded(
             child: Text(
-              '${formatterDouble(report.totalAmount)} $currency ',
+              '${formatterDouble(report.totalAmount.toInt())} $currency ',
               textAlign: TextAlign.right,
               style: const TextStyle(color: Colors.red),
             ),

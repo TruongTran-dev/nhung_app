@@ -17,7 +17,7 @@ class InputPasswordField extends StatelessWidget {
   final String? Function(String?)? validator;
 
   const InputPasswordField({
-    Key? key,
+    super.key,
     this.focusNode,
     this.onFieldSubmitted,
     this.textInputAction,
@@ -31,7 +31,7 @@ class InputPasswordField extends StatelessWidget {
     this.initText,
     this.onTapSuffixIcon,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

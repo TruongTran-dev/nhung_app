@@ -1,44 +1,44 @@
 class ApiPath {
-  //Change ip 192.168.1.206 to your ipv4 with command ipconfig in cmd (macOs), ipconfig/all in cmd (window)
-  static const String apiDomain = 'http://192.168.1.177:8081';
+  //Change ip your ipv4 with command ipconfig in cmd (macOs), ipconfig/all in cmd (window)
+  static const String apiDomain = 'http://192.168.1.83:8081';
 
-  static const String signup = '$apiDomain/api/auth/sign-up';
+  static const String signup = '/api/auth/sign-up';
 
-  static const String signIn = '$apiDomain/api/auth/sign-in';
+  static const String signIn = '/api/auth/sign-in';
 
-  static const String changePassword = '$apiDomain/api/auth/change-password';
+  static const String changePassword = '/api/auth/change-password';
 
-  static const String forgotPassword = '$apiDomain/api/auth/forgot-password';
+  static const String forgotPassword = '/api/auth/forgot-password';
 
-  static const String newPassword = '$apiDomain/api/auth/new-password';
+  static const String newPassword = '/api/auth/new-password';
 
-  static const String refreshToken = '$apiDomain/api/auth/refresh-token';
+  static const String refreshToken = '/api/auth/refresh-token';
 
-  static const String sendOtp = '$apiDomain/api/auth/send-otp';
+  static const String sendOtp = '/api/auth/send-otp';
 
-  static const String getAllListCategory = '$apiDomain/api/v1/category/all';
+  static const String getAllListCategory = '/api/v1/category/all';
 
-  static const String apiCategory = '$apiDomain/api/v1/category';
+  static const String apiCategory = '/api/v1/category';
 
-  static const String apiLogoCategory = '$apiDomain/api/v1/category-logo';
+  static const String apiLogoCategory = '/api/v1/category-logo';
 
-  static const String categoryReport = '$apiDomain/api/v1/report/category-report';
+  static const String categoryReport = '/api/v1/report/category-report';
 
-  static const String weekReport = '$apiDomain/api/v1/report/week-report';
+  static const String weekReport = '/api/v1/report/week-report';
 
-  static const String getListWallet = '$apiDomain/api/v1/wallet';
+  static const String wallet = '/api/v1/wallet';
 
-  static const String transaction = '$apiDomain/api/v1/transaction';
+  static const String transaction = '/api/v1/transaction';
 
-  static const String getReportByWalletId = '$apiDomain/api/v1/report/';
+  static const String getReportByWalletId = '/api/v1/report/?fromDate={fromDate}&toDate={toDate}&walletId={walletId}';
 
-  static const String getReport = '$apiDomain/api/v1/report';
+  static const String getReport = '/api/v1/report';
 
-  static const String expenseLimit = '$apiDomain/api/v1/expense-limit';
+  static const String expenseLimit = '/api/v1/expense-limit';
 
-  static const String recurring = '$apiDomain/api/v1/recurring-transaction';
+  static const String recurring = '/api/v1/recurring-transaction';
 
-  static const String exportData = '$apiDomain/api/v1/export';
+  static const String exportData = '/api/v1/export';
 
-  static const String analyticReport = '$apiDomain/api/v1/report/statistic';
+  static const String analyticReport = '/api/v1/report/statistic';
 }

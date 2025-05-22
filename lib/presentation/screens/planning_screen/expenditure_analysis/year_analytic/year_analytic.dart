@@ -1,12 +1,13 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/business/blocs/expenditure_analytic_blocs/year_analytic_bloc.dart';
 import 'package:expensive_management/data/models/analytic_model.dart';
 import 'package:expensive_management/presentation/widgets/animation_loading.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/shared_preferences_storage.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 import 'year_analytic_event.dart';
 import 'year_analytic_state.dart';
@@ -17,20 +18,20 @@ class YearAnalytic extends StatefulWidget {
   final TransactionType type;
 
   const YearAnalytic({
-    Key? key,
+    super.key,
     required this.fromYear,
     required this.toYear,
     required this.walletIDs,
     required this.categoryIDs,
     this.type = TransactionType.expense,
-  }) : super(key: key);
+  });
 
   @override
   State<YearAnalytic> createState() => _YearAnalyticState();
 }
 
 class _YearAnalyticState extends State<YearAnalytic> {
-  final currency = SharedPreferencesStorage().getCurrency();
+  final currency = serviceLocator<AppPrefStorage>().getCurrency();
   bool _showDetail = false;
 
   @override
@@ -83,7 +84,7 @@ class _YearAnalyticState extends State<YearAnalytic> {
                         children: [
                           const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
-                            '${formatterDouble(state.data?.totalAmount)} $currency',
+                            '${formatterDouble((state.data?.totalAmount ?? 0).toInt())} $currency',
                             style: const TextStyle(fontSize: 14, color: Colors.black),
                           )
                         ],
@@ -96,7 +97,7 @@ class _YearAnalyticState extends State<YearAnalytic> {
                         children: [
                           const Text('Trung bình chỉ/năm', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
-                            '${formatterDouble(state.data?.mediumAmount)} $currency',
+                            '${formatterDouble((state.data?.mediumAmount ?? 0).toInt())} $currency',
                             style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                         ],
@@ -169,7 +170,7 @@ class _YearAnalyticState extends State<YearAnalytic> {
             Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             Row(
               children: [
-                Text('${formatterDouble(report.totalAmount)} $currency ', style: const TextStyle(color: Colors.red)),
+                Text('${formatterDouble(report.totalAmount.toInt())} $currency ', style: const TextStyle(color: Colors.red)),
                 const Icon(Icons.keyboard_arrow_right_rounded, size: 20, color: Colors.grey),
               ],
             ),

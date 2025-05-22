@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 import 'error_response.dart';
 

@@ -15,11 +15,11 @@ class AnalyticProvider with ProviderMixin {
     }
     try {
       final response = await dio.put(
-        ApiPath.analyticReport,
+        ApiPath.apiDomain + ApiPath.analyticReport,
         data: data,
         queryParameters: query,
         options: await defaultOptions(
-          url: ApiPath.analyticReport,
+          url: ApiPath.apiDomain + ApiPath.analyticReport,
           contentType: 'application/json',
         ),
       );
@@ -38,11 +38,11 @@ class AnalyticProvider with ProviderMixin {
     }
     try {
       final response = await dio.put(
-        ApiPath.getReport,
+        ApiPath.apiDomain + ApiPath.getReport,
         data: data,
         queryParameters: query,
         options: await defaultOptions(
-          url: ApiPath.getReport,
+          url: ApiPath.apiDomain + ApiPath.getReport,
           contentType: 'application/json',
         ),
       );

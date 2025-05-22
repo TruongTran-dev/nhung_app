@@ -7,12 +7,11 @@ class SearchBox extends StatefulWidget {
   final String? hinText;
 
   const SearchBox(
-      {Key? key,
+      {super.key,
       required this.controller,
       this.onChanged,
       this.showClear = false,
-      this.hinText})
-      : super(key: key);
+      this.hinText});
 
   @override
   State<SearchBox> createState() => _SearchBoxState();

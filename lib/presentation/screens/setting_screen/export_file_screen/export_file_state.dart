@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:expensive_management/data/models/wallet.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
 
 abstract class ExportState extends Equatable {
   @override

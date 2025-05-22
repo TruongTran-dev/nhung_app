@@ -1,7 +1,7 @@
 import 'package:expensive_management/data/models/sign_in_model.dart';
 import 'package:expensive_management/data/response/base_response.dart';
 import 'package:expensive_management/data/response/error_response.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 class SignInResponse extends BaseResponse {
   final SignInModel? data;

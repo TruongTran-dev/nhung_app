@@ -6,9 +6,8 @@ import 'package:expensive_management/business/blocs/balance_payment_blocs/custom
 import 'package:expensive_management/business/blocs/balance_payment_blocs/month_bloc.dart';
 import 'package:expensive_management/business/blocs/balance_payment_blocs/precious_bloc.dart';
 import 'package:expensive_management/business/blocs/balance_payment_blocs/year_bloc.dart';
-import 'package:expensive_management/data/models/wallet.dart';
-import 'package:expensive_management/presentation/screens/setting_screen/limit_expenditure/limit_info/select_wallets.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 import 'balance_payment.dart';
 import 'current/current.dart';
@@ -34,7 +33,7 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
 
   List<int> initWallet(List<Wallet> wallets) {
     return List.generate(wallets.length, (index) {
-      return listWalletSelected[index].id!;
+      return listWalletSelected[index].id;
     });
   }
 
@@ -116,17 +115,34 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
   }
 
   Widget _selectWallet() {
-    List<String> titles = listWalletSelected.map((wallet) => wallet.name ?? '').toList();
+    List<String> titles = listWalletSelected.map((wallet) => wallet.name).toList();
     String walletsName = titles.join(', ');
 
     return ListTile(
       onTap: () async {
-        final List<Wallet>? result = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SelectWalletsPage(listWallet: widget.listWallet)),
+        // final List<Wallet>? result = await Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => SelectWalletsPage(listWallet: widget.listWallet)),
+        // );
+        final wallet = await showModalBottomSheet<List<Wallet>>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          isDismissible: false,
+          enableDrag: false,
+          builder: (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            // child: SelectWallets(wallets: listWalletSelected),
+          ),
         );
+
+        if (wallet != null) {
+          setState(() {
+            listWalletSelected = wallet;
+          });
+        }
         setState(() {
-          listWalletSelected = result ?? [];
+          listWalletSelected = wallet ?? [];
           walletIDs = initWallet(listWalletSelected);
 
           context.read<CurrentAnalyticBloc>().add(CurrentAnalyticEvent(walletIDs: walletIDs));
@@ -341,8 +357,9 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                                   });
                                   // showLoading(context);
                                   Future.delayed(const Duration(milliseconds: 1500), () {
+                                    if (!mounted) return;
                                     setState(() {});
-                                    Navigator.pop(context);
+                                    Navigator.pop(this.context);
                                     // Navigator.pop(context);
                                   });
                                 }
@@ -413,13 +430,14 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                         if (timePick == null) {
                           return;
                         } else if (timePick.isBefore(DateTime.parse(fromTime)) && context.mounted) {
+                          if (!mounted) return;
+
                           showMessage1OptionDialog(
                               this.context, 'Vui lòng chọn thời gian kết thúc sau thời gian bắt đâu.');
                         } else {
                           toTime = DateFormat('yyyy-MM-dd').format(timePick);
-                          if (!mounted) {
-                            return;
-                          }
+                          if (!mounted) return;
+
                           this.context.read<CustomAnalyticBloc>().add(
                                 CustomAnalyticEvent(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime),
                               );

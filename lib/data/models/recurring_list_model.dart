@@ -1,4 +1,4 @@
-import 'package:expensive_management/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 
 class RecurringListModel {
   final int? id;

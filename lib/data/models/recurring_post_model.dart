@@ -1,6 +1,6 @@
 import 'package:expensive_management/data/models/recurring_list_model.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 import 'frequency_model.dart';
 

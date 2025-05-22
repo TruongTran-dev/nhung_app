@@ -1,13 +1,13 @@
-import 'package:expensive_management/utils/network_info.dart';
+import 'package:expensive_management/data/provider/limit_provider.dart';
+import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/data/provider/limit_provider.dart';
 import 'package:expensive_management/data/response/base_get_response.dart';
 import 'package:expensive_management/data/response/list_limit_response.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/limit_expenditure/limit_event.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/limit_expenditure/limit_state.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 class LimitBloc extends Bloc<LimitEvent, LimitState> {
   final BuildContext context;

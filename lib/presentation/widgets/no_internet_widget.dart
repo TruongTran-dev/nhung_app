@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:expensive_management/utils/app_constants.dart';
+import 'package:expensive_management/src/shared/utils/app_constants.dart';
 
 class NoInternetWidget extends StatelessWidget {
-  const NoInternetWidget({Key? key}) : super(key: key);
+  const NoInternetWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

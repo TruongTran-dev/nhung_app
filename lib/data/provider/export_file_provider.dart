@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:expensive_management/data/api/api_path.dart';
-import 'package:expensive_management/utils/app_constants.dart';
-import 'package:expensive_management/utils/secure_storage.dart';
 import '../response/base_response.dart';
 import 'provider_mixin.dart';
 
@@ -14,11 +12,11 @@ class ExportProvider with ProviderMixin {
     }
     try {
       final response = await dio.get(
-        ApiPath.exportData,
+        ApiPath.apiDomain +  ApiPath.exportData,
         queryParameters: query,
         options: Options(
           headers: {
-            'Authorization': await SecureStorage().readSecureData(AppConstants.accessTokenKey),
+            // 'Authorization': await SecureStorage().readSecureData(AppConstants.accessTokenKey),
           },
           responseType: ResponseType.bytes,
           followRedirects: false,

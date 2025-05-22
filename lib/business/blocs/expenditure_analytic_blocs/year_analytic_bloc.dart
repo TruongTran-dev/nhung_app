@@ -1,5 +1,6 @@
+import 'package:expensive_management/data/provider/analytic_provider.dart';
 import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
-import 'package:expensive_management/utils/network_info.dart';
+import 'package:expensive_management/src/shared/utils/network_info.dart';
 
 class YearAnalyticBloc extends Bloc<YearAnalyticEvent, YearAnalyticState> {
   final BuildContext context;

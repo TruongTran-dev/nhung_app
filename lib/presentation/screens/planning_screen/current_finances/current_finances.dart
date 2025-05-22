@@ -1,22 +1,21 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
+import 'package:expensive_management/src/shared/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/app/app_routes.dart';
 import 'package:expensive_management/business/blocs/current_finances_bloc.dart';
-import 'package:expensive_management/data/models/wallet.dart';
-import 'package:expensive_management/presentation/screens/wallet_detail_screen/wallet_detail.dart';
-import 'package:expensive_management/business/blocs/wallet_details_bloc.dart';
-import 'package:expensive_management/presentation/screens/wallet_detail_screen/wallet_details_event.dart';
+import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
 import 'package:expensive_management/presentation/widgets/animation_loading.dart';
-import 'package:expensive_management/utils/enum/api_error_result.dart';
-import 'package:expensive_management/utils/screen_utilities.dart';
-import 'package:expensive_management/utils/shared_preferences_storage.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
+import 'package:go_router/go_router.dart';
 
 import 'current_finances_event.dart';
 import 'current_finances_state.dart';
 
 class CurrentFinances extends StatefulWidget {
-  const CurrentFinances({Key? key}) : super(key: key);
+  const CurrentFinances({super.key});
 
   @override
   State<CurrentFinances> createState() => _CurrentFinancesState();
@@ -25,11 +24,11 @@ class CurrentFinances extends StatefulWidget {
 class _CurrentFinancesState extends State<CurrentFinances> {
   late CurrentFinancesBloc _currentFinancesBloc;
 
-  final String currency = SharedPreferencesStorage().getCurrency();
+  final String currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   @override
   void initState() {
-    _currentFinancesBloc = BlocProvider.of<CurrentFinancesBloc>(context)..add(CurrentFinancesInitEvent());
+    _currentFinancesBloc = CurrentFinancesBloc(context)..add(CurrentFinancesInitEvent());
     super.initState();
   }
 
@@ -42,6 +41,7 @@ class _CurrentFinancesState extends State<CurrentFinances> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CurrentFinancesBloc, CurrentFinancesState>(
+      bloc: _currentFinancesBloc,
       listenWhen: (preState, curState) {
         return curState.apiError != ApiError.noError;
       },
@@ -63,9 +63,17 @@ class _CurrentFinancesState extends State<CurrentFinances> {
         elevation: 0,
         backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
-        automaticallyImplyLeading: true,
-        title: const Text('Tài chính hiện tại',
-            style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            context.pop();
+          },
+        ),
+        title: const Text(
+          'Tài chính hiện tại',
+          style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: state.isLoading
           ? const AnimationLoading()
@@ -80,7 +88,7 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                       return const SizedBox.shrink();
                     }
                     return Container(
-                      color: Theme.of(context).colorScheme.background,
+                      color: Colors.white,
                       child: const Padding(
                         padding: EdgeInsets.only(left: 70),
                         child: Divider(height: 0.5, color: Colors.grey),
@@ -93,7 +101,9 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Container(
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10), color: Theme.of(context).colorScheme.background),
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Center(
@@ -108,12 +118,15 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                       );
                     }
                     if (state.listWallet != null) {
-                      return _createItemWallet(context, state.listWallet![index - 1],
-                          index: index - 1, endIndex: (state.listWallet?.length ?? 0) - 1);
+                      return _createItemWallet(
+                        context,
+                        state.listWallet![index - 1],
+                        index: index - 1,
+                        endIndex: (state.listWallet?.length ?? 0) - 1,
+                      );
                     }
                     return Container(
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.background, borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Container(
@@ -125,7 +138,7 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: InkWell(
                               onTap: () {
-                                Navigator.pushNamed(context, AppRoutes.addWallet);
+                                context.push(AppRoutes.addWallet);
                               },
                               child: Text(
                                 'Chưa có tài khoản/ví, vui lòng thêm tài khoản/ví',
@@ -147,19 +160,11 @@ class _CurrentFinancesState extends State<CurrentFinances> {
   Widget _createItemWallet(BuildContext context, Wallet wallet, {int? index, int? endIndex}) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider(
-              create: (context) => WalletDetailBloc(context)..add(WalletDetailInit(walletId: wallet.id)),
-              child: WalletDetail(wallet: wallet),
-            ),
-          ),
-        );
+        context.push(AppRoutes.walletDetail, extra: wallet);
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(index == 0 ? 10 : 0),
             topRight: Radius.circular(index == 0 ? 10 : 0),
@@ -186,7 +191,7 @@ class _CurrentFinancesState extends State<CurrentFinances> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(wallet.name ?? '', style: const TextStyle(fontSize: 16, color: Colors.black)),
+                    Text(wallet.name, style: const TextStyle(fontSize: 16, color: Colors.black)),
                     Text('${formatterInt(wallet.accountBalance)} $currency',
                         style: const TextStyle(fontSize: 14, color: Colors.grey)),
                   ],

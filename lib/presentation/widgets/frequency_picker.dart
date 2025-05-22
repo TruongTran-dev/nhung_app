@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:expensive_management/data/models/frequency_model.dart';
-import 'package:expensive_management/utils/enum/enum.dart';
-import 'package:expensive_management/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/enum/enum.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 class FrequencyPickerScreen extends StatefulWidget {
   final Frequency? frequency;
