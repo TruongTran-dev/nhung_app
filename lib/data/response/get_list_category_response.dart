@@ -1,7 +1,7 @@
 import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 
-import 'base_get_response.dart';
+import 'package:expensive_management/data/response/base_get_response.dart';
 
 class GetCategoryResponse extends BaseGetResponse {
   List<CategoryModel>? listCategory;

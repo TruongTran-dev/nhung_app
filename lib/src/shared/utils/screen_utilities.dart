@@ -2,9 +2,9 @@ import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expensive_management/src/features/auth/presentation/login_page.dart';
-import 'package:expensive_management/presentation/widgets/message_dialog.dart';
-import 'package:expensive_management/presentation/widgets/message_dialog_2_option.dart';
-import 'package:expensive_management/presentation/widgets/primary_button.dart';
+import 'package:expensive_management/src/shared/widgets/message_dialog.dart';
+import 'package:expensive_management/src/shared/widgets/message_dialog_2_option.dart';
+import 'package:expensive_management/src/shared/widgets/primary_button.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 
 import 'app_constants.dart';

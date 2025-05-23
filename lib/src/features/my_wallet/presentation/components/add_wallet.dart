@@ -5,7 +5,7 @@ import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/features/my_wallet/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
-import 'package:expensive_management/presentation/widgets/primary_button.dart';
+import 'package:expensive_management/src/shared/widgets/primary_button.dart';
 import 'package:expensive_management/src/shared/utils/enum/wallet_type.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:flutter/material.dart';

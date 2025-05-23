@@ -1,25 +1,13 @@
 import 'package:expensive_management/src/shared/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/business/blocs/planning_bloc.dart';
-import 'package:expensive_management/presentation/widgets/animation_loading.dart';
+import 'package:expensive_management/src/features/planning/presentation/bloc/planning_bloc.dart';
+import 'package:expensive_management/src/shared/widgets/animation_loading.dart';
 import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../presentation/screens/planning_screen/balance_payments/balance_payments.dart';
-import '../../../../business/blocs/balance_payment_blocs/current_bloc.dart';
-import '../../../../business/blocs/balance_payment_blocs/custom_bloc.dart';
-import '../../../../business/blocs/balance_payment_blocs/month_bloc.dart';
-import '../../../../business/blocs/balance_payment_blocs/precious_bloc.dart';
-import '../../../../business/blocs/balance_payment_blocs/year_bloc.dart';
-import '../../../../business/blocs/expenditure_analytic_blocs/day_analytic_bloc.dart';
-import '../../../../presentation/screens/planning_screen/expenditure_analysis/expenditure_analysis.dart';
-import '../../../../business/blocs/expenditure_analytic_blocs/month_analytic_bloc.dart';
-import '../../../../business/blocs/expenditure_analytic_blocs/year_analytic_bloc.dart';
-import '../../../../presentation/screens/planning_screen/planning_event.dart';
-import '../../../../presentation/screens/planning_screen/planning_state.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/expenditure_analysis.dart';
 
 class PlanningPage extends StatefulWidget {
   const PlanningPage({super.key});
@@ -62,215 +50,101 @@ class _PlanningPageState extends State<PlanningPage> {
         builder: (context, state) {
           return state.isLoading
               ? const AnimationLoading()
-              : Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Column(
+                    spacing: 16,
+                    children: [
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        spacing: 16,
                         children: [
-                          InkWell(
+                          _buildItemOption(
+                            title: 'Tài chính hiện tại',
+                            image: 'images/ic_finances.png',
                             onTap: () => context.push(AppRoutes.reportFinances),
-                            child: Container(
-                              width: 170,
-                              height: 150,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.horizontal(left: Radius.circular(10), right: Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'images/ic_finances.png',
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 10.0),
-                                    child: Text('Tài chính hiện tại', textAlign: TextAlign.center),
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MultiBlocProvider(
-                                    providers: [
-                                      BlocProvider<CurrentAnalyticBloc>(
-                                        create: (BuildContext context) => CurrentAnalyticBloc(context),
-                                      ),
-                                      BlocProvider<MonthAnalyticBlocB>(
-                                        create: (BuildContext context) => MonthAnalyticBlocB(context),
-                                      ),
-                                      BlocProvider<PreciousAnalyticBloc>(
-                                        create: (BuildContext context) => PreciousAnalyticBloc(context),
-                                      ),
-                                      BlocProvider<YearAnalyticBlocB>(
-                                        create: (BuildContext context) => YearAnalyticBlocB(context),
-                                      ),
-                                      BlocProvider<CustomAnalyticBloc>(
-                                        create: (BuildContext context) => CustomAnalyticBloc(context),
-                                      ),
-                                    ],
-                                    child: BalancePayments(listWallet: state.listWallet),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 170,
-                              height: 150,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.horizontal(left: Radius.circular(10), right: Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'images/ic_balance_payment.png',
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 10.0),
-                                    child: Text('Tình hình thu chi', textAlign: TextAlign.center),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          _buildItemOption(
+                            title: 'Tình hình thu chi',
+                            image: 'images/ic_balance_payment.png',
+                            onTap: () => context.push(AppRoutes.balancePayments, extra: state.listWallet),
                           ),
                         ],
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        spacing: 16,
                         children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MultiBlocProvider(
-                                    providers: [
-                                      BlocProvider<DayAnalyticBloc>(
-                                          create: (BuildContext context) => DayAnalyticBloc(context)),
-                                      BlocProvider<MonthAnalyticBloc>(
-                                          create: (BuildContext context) => MonthAnalyticBloc(context)),
-                                      BlocProvider<YearAnalyticBloc>(
-                                          create: (BuildContext context) => YearAnalyticBloc(context)),
-                                    ],
-                                    child: Expenditure(
-                                      listWallet: state.listWallet,
-                                      listCategory: state.listExCategory,
-                                      type: TransactionType.expense,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 170,
-                              height: 150,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.horizontal(left: Radius.circular(10), right: Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'images/ic_expenditure.png',
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 10.0),
-                                    child: Text('Phân tích chi tiêu', textAlign: TextAlign.center),
-                                  ),
-                                ],
+                          _buildItemOption(
+                            title: 'Phân tích chi tiêu',
+                            image: 'images/ic_expenditure.png',
+                            onTap: () => context.push(
+                              AppRoutes.expenditure,
+                              extra: ExpenditureProps(
+                                listWallet: state.listWallet ?? [],
+                                listCategory: state.listExCategory ?? [],
+                                type: TransactionType.expense,
                               ),
                             ),
                           ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MultiBlocProvider(
-                                    providers: [
-                                      BlocProvider<DayAnalyticBloc>(
-                                          create: (BuildContext context) => DayAnalyticBloc(context)),
-                                      BlocProvider<MonthAnalyticBloc>(
-                                          create: (BuildContext context) => MonthAnalyticBloc(context)),
-                                      BlocProvider<YearAnalyticBloc>(
-                                          create: (BuildContext context) => YearAnalyticBloc(context)),
-                                    ],
-                                    child: Expenditure(
-                                      listWallet: state.listWallet,
-                                      listCategory: state.listCoCategory,
-                                      type: TransactionType.income,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 170,
-                              height: 150,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.horizontal(left: Radius.circular(10), right: Radius.circular(10)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'images/ic_revenue.png',
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 10.0),
-                                    child: Text('Phân tích thu', textAlign: TextAlign.center),
-                                  ),
-                                ],
+                          _buildItemOption(
+                            title: 'Phân tích thu',
+                            image: 'images/ic_revenue.png',
+                            onTap: () => context.push(
+                              AppRoutes.expenditure,
+                              extra: ExpenditureProps(
+                                listWallet: state.listWallet ?? [],
+                                listCategory: state.listExCategory ?? [],
+                                type: TransactionType.income,
                               ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
         },
+      ),
+    );
+  }
+
+  Widget _buildItemOption({
+    required String title,
+    required String image,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          alignment: Alignment.center,
+          constraints: BoxConstraints(maxHeight: 150),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.horizontal(
+              left: Radius.circular(10),
+              right: Radius.circular(10),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                image,
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+                color: Theme.of(context).primaryColor,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: Text(title, textAlign: TextAlign.center),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

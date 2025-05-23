@@ -3,7 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:expensive_management/data/api/api_path.dart';
 import 'package:expensive_management/data/models/refresh_token_model.dart';
 import 'package:expensive_management/data/response/base_response.dart';
-import 'package:expensive_management/presentation/screens/planning_screen/balance_payments/balance_payment.dart';
+import 'package:expensive_management/src/core/common/extensions.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 
 import 'provider_mixin.dart';
@@ -14,7 +15,7 @@ class AuthProvider with ProviderMixin {
 
   Future<bool> checkAuthenticationStatus() async {
     String accessTokenExpired = _pref.getAccessTokenExpired();
-    if (isNullOrEmpty(accessTokenExpired)) {
+    if (accessTokenExpired.isNullOrEmpty) {
       return false;
     }
 

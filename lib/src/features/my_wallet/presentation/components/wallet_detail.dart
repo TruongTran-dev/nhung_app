@@ -15,7 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/day_transaction_model.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
-import 'package:expensive_management/presentation/widgets/app_image.dart';
+import 'package:expensive_management/src/shared/widgets/app_image.dart';
 import 'package:expensive_management/src/shared/utils/enum/date_time_picker.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';

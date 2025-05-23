@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/data/api/api_path.dart';
-import 'package:expensive_management/presentation/widgets/animation_loading.dart';
+import 'package:expensive_management/src/shared/widgets/animation_loading.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/features/collection/presentation/collection_page.dart';
@@ -11,7 +11,7 @@ import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
-import 'package:expensive_management/presentation/widgets/app_image.dart';
+import 'package:expensive_management/src/shared/widgets/app_image.dart';
 import 'package:http/http.dart' as http;
 
 class OptionCategoryProp extends Equatable {

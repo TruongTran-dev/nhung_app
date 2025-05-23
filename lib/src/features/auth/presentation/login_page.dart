@@ -1,10 +1,10 @@
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/features/auth/presentation/bloc/bloc.dart';
-import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
-import 'package:expensive_management/presentation/widgets/input_field.dart';
-import 'package:expensive_management/presentation/widgets/input_password_field.dart';
-import 'package:expensive_management/presentation/widgets/primary_button.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
+import 'package:expensive_management/src/shared/widgets/input_field.dart';
+import 'package:expensive_management/src/shared/widgets/input_password_field.dart';
+import 'package:expensive_management/src/shared/widgets/primary_button.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';

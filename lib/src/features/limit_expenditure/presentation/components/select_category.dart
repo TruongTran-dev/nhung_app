@@ -3,7 +3,7 @@ import 'package:expensive_management/src/features/categories/presentation/bloc/b
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
-import 'package:expensive_management/presentation/widgets/app_image.dart';
+import 'package:expensive_management/src/shared/widgets/app_image.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/data/models/limit_expenditure_model.dart';
-import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +11,7 @@ import 'package:expensive_management/src/features/limit_expenditure/presentation
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
-import 'package:expensive_management/presentation/widgets/primary_button.dart';
+import 'package:expensive_management/src/shared/widgets/primary_button.dart';
 import 'package:expensive_management/src/shared/utils/enum/date_time_picker.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
@@ -118,13 +118,13 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
               AppUtils.showSnackBar(context, 'Thêm hạn mức thành công');
               Navigator.of(context).pop(true);
             }
-            // if (state is UpdateLimitErrorState) {
-            //   showMessage1OptionDialog(context, state.message);
-            // }
-            // if (state is UpdateLimitSuccessState) {
-            //   AppUtils.showSnackBar(context, 'Cập nhật hạn mức thành công');
-            //   Navigator.of(context).pop(true);
-            // }
+            if (state is UpdateLimitErrorState) {
+              showMessage1OptionDialog(context, state.message);
+            }
+            if (state is UpdateLimitSuccessState) {
+              AppUtils.showSnackBar(context, 'Cập nhật hạn mức thành công');
+              Navigator.of(context).pop(true);
+            }
             if (state is DeleteLimitErrorState) {
               showMessage1OptionDialog(context, state.message);
             }

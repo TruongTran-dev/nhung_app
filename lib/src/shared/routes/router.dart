@@ -1,4 +1,15 @@
-import 'package:expensive_management/presentation/screens/planning_screen/current_finances/current_finances.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/day_analytic_bloc.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/month_analytic_bloc.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/year_analytic_bloc.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/expenditure_analysis.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/current_bloc.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/custom_bloc.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/month_bloc.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/precious_bloc.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/year_bloc.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/presentation/balance_payments/balance_payments.dart';
+import 'package:expensive_management/src/features/planning/presentation/components/current_finances.dart';
+import 'package:expensive_management/src/features/recurring_transaction/page.dart';
 import 'package:expensive_management/src/features/categories/presentation/categories_page.dart';
 import 'package:expensive_management/src/features/categories/presentation/components/category_info.dart';
 import 'package:expensive_management/src/features/collection/presentation/components/option_category.dart';
@@ -22,6 +33,7 @@ import 'package:expensive_management/src/features/main/presentation/main_app.dar
 import 'package:expensive_management/src/features/started/presentation/page.dart';
 import 'package:expensive_management/src/shared/widgets/error_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -265,6 +277,58 @@ class AppRouter {
           return LimitInfoPage(props: limit);
         },
       ),
+
+      // Recurring route
+      GoRoute(
+        path: AppRoutes.recurring,
+        builder: (context, state) {
+          return const RecurringPage();
+        },
+      ),
+
+      // Balance Payments route
+      GoRoute(
+        path: AppRoutes.balancePayments,
+        builder: (context, state) {
+          final extra = state.extra;
+          final listWallet = extra is List<Wallet> ? extra : null;
+          if (listWallet == null) {
+            return ErrorNotFoundPage(error: 'Wallet for Balance Payments not found');
+          }
+
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<CurrentAnalyticBloc>(create: (_) => CurrentAnalyticBloc(context)),
+              BlocProvider<MonthAnalyticBlocB>(create: (_) => MonthAnalyticBlocB(context)),
+              BlocProvider<PreciousAnalyticBloc>(create: (_) => PreciousAnalyticBloc(context)),
+              BlocProvider<YearAnalyticBlocB>(create: (_) => YearAnalyticBlocB(context)),
+              BlocProvider<CustomAnalyticBloc>(create: (_) => CustomAnalyticBloc(context)),
+            ],
+            child: BalancePayments(listWallet: listWallet),
+          );
+        },
+      ),
+
+      // expenditure planning route
+      GoRoute(
+        path: AppRoutes.expenditure,
+        builder: (context, state) {
+          final extra = state.extra;
+          final props = extra is ExpenditureProps ? extra : null;
+          if (props == null) {
+            return ErrorNotFoundPage(error: 'Expenditure options not found');
+          }
+
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<DayAnalyticBloc>(create: (_) => DayAnalyticBloc(context)),
+              BlocProvider<MonthAnalyticBloc>(create: (_) => MonthAnalyticBloc(context)),
+              BlocProvider<YearAnalyticBloc>(create: (_) => YearAnalyticBloc(context)),
+            ],
+            child: Expenditure(props: props),
+          );
+        },
+      ),
     ],
   );
 }
@@ -301,7 +365,12 @@ class AppRoutes {
   //report
   static const String reportFinances = '/reportFinances';
 
+  //planning
+  static const String balancePayments = '/balance_payments';
+  static const String expenditure = '/expenditure';
+
   //setting
   static const String limitExpense = '/limit_expense';
   static const String limitInfor = '/limit_infor';
+  static const String recurring = '/recurring';
 }

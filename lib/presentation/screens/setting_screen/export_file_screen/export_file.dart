@@ -9,17 +9,15 @@ import 'package:expensive_management/data/response/base_response.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:expensive_management/business/blocs/export_file_bloc.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
-import 'package:expensive_management/presentation/widgets/animation_loading.dart';
-import 'package:expensive_management/presentation/widgets/primary_button.dart';
+import 'package:expensive_management/src/shared/widgets/animation_loading.dart';
+import 'package:expensive_management/src/shared/widgets/primary_button.dart';
 import 'package:expensive_management/src/shared/utils/enum/date_time_picker.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
-import 'export_file_event.dart';
 import 'export_file_state.dart';
 
 class ExportPage extends StatefulWidget {
@@ -30,7 +28,7 @@ class ExportPage extends StatefulWidget {
 }
 
 class _ExportPageState extends State<ExportPage> {
-  late ExportBloc _exportBloc;
+  // late ExportBloc _exportBloc;
 
   late RenderBox box;
 
@@ -41,14 +39,14 @@ class _ExportPageState extends State<ExportPage> {
 
   @override
   void initState() {
-    _exportBloc = BlocProvider.of<ExportBloc>(context)..add(Initial());
+    // _exportBloc = BlocProvider.of<ExportBloc>(context)..add(Initial());
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _exportBloc.close();
+    // _exportBloc.close();
   }
 
   @override
@@ -66,20 +64,20 @@ class _ExportPageState extends State<ExportPage> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
         ),
       ),
-      body: BlocConsumer<ExportBloc, ExportState>(
-        listener: (context, state) {
-          if (state is ErrorServerState) {
-            showMessage1OptionDialog(context, 'Error!', content: 'Internal_server_error');
-          }
-        },
-        builder: (context, state) {
-          if (state is LoadingState) {
-            return const AnimationLoading();
-          } else {
-            return _body(context, state);
-          }
-        },
-      ),
+      // body: BlocConsumer<ExportBloc, ExportState>(
+      //   listener: (context, state) {
+      //     if (state is ErrorServerState) {
+      //       showMessage1OptionDialog(context, 'Error!', content: 'Internal_server_error');
+      //     }
+      //   },
+      //   builder: (context, state) {
+      //     if (state is LoadingState) {
+      //       return const AnimationLoading();
+      //     } else {
+      //       return _body(context, state);
+      //     }
+      //   },
+      // ),
     );
   }
 

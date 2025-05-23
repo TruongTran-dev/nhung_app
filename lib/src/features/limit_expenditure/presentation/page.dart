@@ -1,12 +1,12 @@
-import 'dart:developer';
 
-import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:expensive_management/data/models/limit_expenditure_model.dart';
@@ -14,7 +14,7 @@ import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 
-import '../../../../presentation/screens/setting_screen/recurring_transaction/recurring_transaction.dart';
+import '../../recurring_transaction/page.dart';
 import 'components/limit_info.dart';
 
 class LimitExpenditurePage extends StatefulWidget {
@@ -32,19 +32,6 @@ class _LimitExpenditurePageState extends State<LimitExpenditurePage> {
     status: TransactionStatus.on_going,
   );
 
-  void _reloadPage() {
-    // showLoading(context);
-    // // _limitBloc.add(GetListLimitEvent(status: _statusSelected.status));
-    // // setState(() {});
-    // Future.delayed(
-    //   const Duration(seconds: 1),
-    //   () {
-    //     // ignore: use_build_context_synchronously
-    //     Navigator.pop(context);
-    //     setState(() {});
-    //   },
-    // );
-  }
   late LimitExpenditureBloc _limitBloc;
   final List<LimitModel> _listLimit = [];
 
@@ -95,7 +82,7 @@ class _LimitExpenditurePageState extends State<LimitExpenditurePage> {
           ),
         ],
       ),
-      body: BlocConsumer(
+      body: BlocConsumer<LimitExpenditureBloc, LimitExpenditureState>(
         bloc: _limitBloc,
         listener: (context, state) {
           if (state is GetLimitsErrorState) {
@@ -229,7 +216,6 @@ class _LimitExpenditurePageState extends State<LimitExpenditurePage> {
       padding: const EdgeInsets.only(bottom: 16.0),
       child: InkWell(
         onTap: () async {
-          if (limit.id == null) return;
           final bool? result = await context.push(
             AppRoutes.limitInfor,
             extra: LimitInfoProps(isEdit: true, limitData: limit),
@@ -256,7 +242,7 @@ class _LimitExpenditurePageState extends State<LimitExpenditurePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            limit.limitName ?? '',
+                            limit.limitName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontSize: 18, color: Colors.black),

@@ -1,7 +1,7 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
-import 'package:expensive_management/presentation/screens/planning_screen/expenditure_analysis/analytics.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
 import 'package:expensive_management/src/core/common/dio_provider.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/common/use_case_base.dart';

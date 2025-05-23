@@ -4,8 +4,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
-import 'package:expensive_management/presentation/widgets/input_password_field.dart';
-import 'package:expensive_management/presentation/widgets/primary_button.dart';
+import 'package:expensive_management/src/shared/widgets/input_password_field.dart';
+import 'package:expensive_management/src/shared/widgets/primary_button.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});

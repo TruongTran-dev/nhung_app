@@ -12,7 +12,7 @@ import 'package:expensive_management/src/features/categories/domain/models/categ
 import 'package:expensive_management/src/shared/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:expensive_management/presentation/widgets/app_image.dart';
+import 'package:expensive_management/src/shared/widgets/app_image.dart';
 
 import 'components/category_info.dart';
 
