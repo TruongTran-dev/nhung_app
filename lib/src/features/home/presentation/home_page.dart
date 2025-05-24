@@ -133,7 +133,7 @@ class _HomeViewState extends State<HomePage> {
       future: _getWeekReport(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Center(child: Text('No data available'));
+          return const SizedBox.shrink();
         } else {
           final report = snapshot.data!;
           return Padding(
@@ -234,7 +234,7 @@ class _HomeViewState extends State<HomePage> {
         final report = WeekReportModel.fromJson(reportData);
         return report;
       } else {
-        log("Error: ${response.statusCode}");
+        log("Error fetching week report: ${response.statusCode}");
         return null;
       }
     } catch (e) {

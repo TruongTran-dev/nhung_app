@@ -1,3 +1,5 @@
+import 'package:expensive_management/src/features/group_wallet/presentation/components/group_wallet_detail.dart';
+import 'package:expensive_management/src/features/group_wallet/presentation/page.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/day_analytic_bloc.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/month_analytic_bloc.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/year_analytic_bloc.dart';
@@ -329,6 +331,27 @@ class AppRouter {
           );
         },
       ),
+
+      // Group Wallet route
+      GoRoute(
+        path: AppRoutes.groupWallet,
+        builder: (context, state) {
+          return const GroupWalletPage();
+        },
+      ),
+
+      // Group Wallet Detail route
+      GoRoute(
+        path: AppRoutes.groupWalletDetail,
+        builder: (context, state) {
+          final extra = state.extra;
+          final props = extra is GroupWalletDetailProps ? extra : null;
+          if (props == null) {
+            return ErrorNotFoundPage(error: 'Group wallet detail not found');
+          }
+          return GroupWalletDetailPage(props: props);
+        },
+      ),
     ],
   );
 }
@@ -370,7 +393,11 @@ class AppRoutes {
   static const String expenditure = '/expenditure';
 
   //setting
+  static const String groupWallet = '/group_wallet';
   static const String limitExpense = '/limit_expense';
   static const String limitInfor = '/limit_infor';
   static const String recurring = '/recurring';
+
+  //group wallet
+  static const String groupWalletDetail = '/group_wallet_detail';
 }

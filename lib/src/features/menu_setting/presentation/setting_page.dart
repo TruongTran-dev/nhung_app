@@ -83,6 +83,7 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  _navToGroupWalletScreen() => context.push(AppRoutes.groupWallet);
   _navToLimitScreen() => context.push(AppRoutes.limitExpense);
   _navToCategoryScreen() => context.push(AppRoutes.category);
   _navToRecurringScreen()  => context.push(AppRoutes.recurring);
@@ -104,6 +105,11 @@ class _SettingPageState extends State<SettingPage> {
                 'Tính năng',
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
+            ),
+             _itemOption(
+              title: 'Ví hội nhóm',
+              imagePath: 'images/ic_spending_limit.png',
+              onTap: () => _navToGroupWalletScreen(),
             ),
             _itemOption(
               title: 'Hạn mức chi',
