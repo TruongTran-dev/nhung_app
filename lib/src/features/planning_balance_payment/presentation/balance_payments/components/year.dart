@@ -12,11 +12,13 @@ import 'package:expensive_management/data/models/data_sfcartesian_char_model.dar
 class YearAnalytic extends StatefulWidget {
   final List<int> walletIDs;
   final int year, toYear;
+  final int? groupId;
   const YearAnalytic({
     super.key,
     required this.walletIDs,
     required this.year,
     required this.toYear,
+    this.groupId,
   });
 
   @override
@@ -32,6 +34,7 @@ class _YearAnalyticState extends State<YearAnalytic> {
       walletIDs: widget.walletIDs,
       year: widget.year,
       toYear: widget.toYear,
+      groupId: widget.groupId,
     ));
     super.initState();
   }

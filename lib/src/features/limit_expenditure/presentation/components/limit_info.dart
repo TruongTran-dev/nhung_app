@@ -68,10 +68,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     _nameLimitController.addListener(() => setState(() => _showIconClear = _nameLimitController.text.isNotEmpty));
     if (widget.props.isEdit && widget.props.limitData != null) {
       final limitData = widget.props.limitData!;
-      _moneyController.text = limitData.amount
-          .toInt()
-          .toString()
-          .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+      _moneyController.text = limitData.amount.toInt().currencyFormat();
       _nameLimitController.text = limitData.limitName;
       dateStart = DateFormat('yyyy-MM-dd').format(limitData.fromDate ?? DateTime.now());
       dateEnd = (limitData.toDate == null) ? null : DateFormat('yyyy-MM-dd').format((limitData.toDate)!);
@@ -595,9 +592,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                             if (digitsOnly.isNotEmpty) {
                               try {
                                 int number = int.parse(digitsOnly);
-                                String formatted = number
-                                    .toString()
-                                    .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+                                String formatted = number.currencyFormat();
 
                                 // Update controller without triggering another onChanged
                                 if (formatted != value) {

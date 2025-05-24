@@ -41,7 +41,6 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
 
   final _sharedPref = serviceLocator<AppPrefStorage>();
 
-
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
@@ -182,12 +181,21 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No data found'));
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.category_outlined, size: 48, color: Colors.grey),
+                SizedBox(height: 16),
+                Text(
+                  'Chưa có hạng mục nào, vui lòng thêm hạng mục mới',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
         } else {
           final listExCategory = snapshot.data;
-          if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No data found'));
-          }
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(10, 16, 10, 0),
@@ -308,12 +316,21 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No data found'));
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.category_outlined, size: 48, color: Colors.grey),
+                SizedBox(height: 16),
+                Text(
+                  'Chưa có hạng mục nào, vui lòng thêm hạng mục mới',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
         } else {
           final listCoCategory = snapshot.data;
-          if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No data found'));
-          }
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(10, 16, 10, 0),
@@ -448,7 +465,6 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
         parentId: parentId,
       ),
     );
-   
   }
 
   Widget _itemSearch({

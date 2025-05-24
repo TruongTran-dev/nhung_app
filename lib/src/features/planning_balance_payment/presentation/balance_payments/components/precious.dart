@@ -13,11 +13,13 @@ import 'package:expensive_management/data/models/data_sfcartesian_char_model.dar
 class PreciousAnalytic extends StatefulWidget {
   final int year;
   final List<int> walletIDs;
+  final int? groupId;
 
   const PreciousAnalytic({
     super.key,
     required this.year,
     required this.walletIDs,
+    this.groupId,
   });
 
   @override
@@ -32,6 +34,7 @@ class _PreciousAnalyticState extends State<PreciousAnalytic> {
     BlocProvider.of<PreciousAnalyticBloc>(context).add(PreciousAnalyticEvent(
       year: widget.year,
       walletIDs: widget.walletIDs,
+      groupId: widget.groupId,
     ));
     super.initState();
   }

@@ -28,6 +28,7 @@ class CurrentAnalyticBloc extends Bloc<CurrentAnalyticEvent, CurrentAnalyticStat
         } else {
           final Map<String, dynamic> query = {
             'type': 'CURRENT',
+            if(event.groupId!= null) 'groupId': event.groupId,
           };
 
           final Map<String, dynamic> data = {

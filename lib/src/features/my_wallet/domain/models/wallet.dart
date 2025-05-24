@@ -9,6 +9,9 @@ class Wallet extends Equatable {
   final String? description;
   final String? createdAt;
   final int? createdBy;
+
+  final int? groupId;
+  final String groupName;
   final bool report;
 
   final bool isChecked;
@@ -22,6 +25,8 @@ class Wallet extends Equatable {
     this.description,
     this.createdAt,
     this.createdBy,
+    this.groupId,
+    this.groupName = '',
     this.report = false,
     this.isChecked = false,
   });
@@ -44,6 +49,12 @@ class Wallet extends Equatable {
       description: json['description'],
       createdAt: json['createdAt'],
       createdBy: json['createdBy'],
+      groupId: json['groupId'] != null
+          ? json['groupId'] is int
+              ? json['groupId']
+              : (json['groupId'] as num).toInt()
+          : null,
+      groupName: json['groupName'] ?? '',
       report: json['report'] ?? false,
     );
   }
@@ -58,6 +69,8 @@ class Wallet extends Equatable {
         description,
         createdAt,
         createdBy,
+        groupId,
+        groupName,
         report,
         isChecked,
       ];
@@ -74,6 +87,8 @@ class Wallet extends Equatable {
     String? description,
     String? createdAt,
     int? createdBy,
+    int? groupId,
+    String? groupName,
     bool? report,
     bool? isChecked,
   }) {
@@ -86,13 +101,10 @@ class Wallet extends Equatable {
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      groupId: groupId ?? this.groupId,
+      groupName: groupName ?? this.groupName,
       report: report ?? this.report,
       isChecked: isChecked ?? this.isChecked,
     );
-  }
-
-  @override
-  String toString() {
-    return 'Wallet{id: $id, accountBalance: $accountBalance, name: $name, accountType: $accountType, currency: $currency, description: $description, createdAt: $createdAt, createdBy: $createdBy, report: $report, isChecked: $isChecked}';
   }
 }

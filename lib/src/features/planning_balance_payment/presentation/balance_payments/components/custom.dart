@@ -12,11 +12,13 @@ import 'package:expensive_management/data/models/data_sfcartesian_char_model.dar
 class CustomAnalytic extends StatefulWidget {
   final List<int> walletIDs;
   final String fromTime, toTime;
+  final int? groupId;
   const CustomAnalytic({
     super.key,
     required this.walletIDs,
     required this.fromTime,
     required this.toTime,
+    this.groupId,
   });
 
   @override
@@ -32,6 +34,7 @@ class _CustomAnalyticState extends State<CustomAnalytic> {
       walletIDs: widget.walletIDs,
       fromTime: widget.fromTime,
       toTime: widget.toTime,
+      groupId: widget.groupId,
     ));
     super.initState();
   }

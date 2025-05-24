@@ -74,6 +74,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
 
   String? imageUrl;
   bool isOnline = true;
+  int? groupId;
 
   final _walletBloc = serviceLocator<WalletBloc>();
   final _collectionBloc = serviceLocator<CollectionBloc>();
@@ -88,9 +89,8 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
         datePicker = formatToLocaleVietnam(DateTime.tryParse(collection.ariseDate ?? '') ?? DateTime.now());
         timePicker = DateFormat.Hms().format(DateTime.tryParse(collection.ariseDate ?? '') ?? DateTime.now());
         _noteController.text = collection.description ?? '';
-        _moneyController.text = ((collection.amount ?? 0).toInt())
-            .toString()
-            .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+        _moneyController.text = ((collection.amount ?? 0).toInt()).currencyFormat();
+
         walletId = collection.walletId;
         walletName = collection.walletName;
         walletType = collection.walletType;
@@ -131,7 +131,6 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       child: BlocConsumer<CollectionBloc, CollectionState>(
         bloc: _collectionBloc,
         listener: (context, state) {
-          log('state: ${state.runtimeType}');
           if (state is AddNewCollectionSuccessState) {
             AppUtils.showSnackBar(context, 'Thêm giao dịch thành công');
             reloadPage();
@@ -379,8 +378,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
           children: [
             const Text('Các thông tin thay đổi:'),
             if (newAmount != oldAmount)
-              Text(
-                  '• Số tiền: ${oldAmount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} → ${newAmount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}'),
+              Text('• Số tiền: ${oldAmount.currencyFormat()} → ${newAmount.currencyFormat()}'),
             if (newTransactionType != oldTransactionType)
               Text(
                   '• Loại giao dịch: ${oldTransactionType == 'EXPENSE' ? 'Chi tiền' : 'Thu tiền'} → ${newTransactionType == 'EXPENSE' ? 'Chi tiền' : 'Thu tiền'}'),
@@ -407,6 +405,8 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                 'transactionType': newTransactionType,
                 'walletId': newWalletId,
                 "addToReport": true,
+                "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
+                if (groupId != null) "groupId": groupId,
                 // if (!imageUrlUpload.isNullOrEmpty && imageUrl.isNullOrEmpty) 'imageUrl': imageUrlUpload,
               };
 
@@ -435,8 +435,13 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       'transactionType': (itemOption.itemId == 0) ? 'EXPENSE' : 'INCOME',
       'walletId': walletId!,
       "addToReport": true,
+      "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
+      if (groupId != null) "groupId": groupId,
+
       // if (!imageUrlUpload.isNullOrEmpty && imageUrl.isNullOrEmpty) 'imageUrl': imageUrlUpload,
     };
+    log("Send data new collection: $data");
+
     //TODO: recheck late for image upload
 
     // if (!imageUrl.isNullOrEmpty) {
@@ -832,7 +837,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
               if (state is WalletLoadingState) {
                 return const Center(child: CircularProgressIndicator());
               }
-              final listWallet = state is GetListWalletSuccessState ? state.wallets : [];
+              List<Wallet> listWallet = state is GetListWalletSuccessState ? state.wallets : [];
 
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -855,6 +860,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                                   walletName = item.name;
                                   walletType = item.accountType;
                                   _currency = item.currency;
+                                  groupId = item.groupId;
                                 });
                                 Navigator.pop(context);
                               },
@@ -888,7 +894,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                                             style: const TextStyle(fontSize: 16, color: Colors.black),
                                           ),
                                           Text(
-                                            '${listWallet[index].accountBalance} ${listWallet[index].currency}',
+                                            '${listWallet[index].accountBalance.currencyFormat} ${listWallet[index].currency}',
                                             style: const TextStyle(fontSize: 14, color: Colors.grey),
                                           ),
                                         ],
@@ -957,9 +963,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                             if (digitsOnly.isNotEmpty) {
                               try {
                                 int number = int.parse(digitsOnly);
-                                String formatted = number
-                                    .toString()
-                                    .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+                                String formatted = number.currencyFormat();
 
                                 // Update controller without triggering another onChanged
                                 if (formatted != value) {

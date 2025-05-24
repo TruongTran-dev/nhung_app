@@ -2,6 +2,7 @@ import 'package:expensive_management/app/app_colors.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
+import 'package:expensive_management/src/features/group_wallet/domain/models/group_wallet_datamodel.dart';
 import 'package:expensive_management/src/features/my_wallet/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
@@ -11,6 +12,8 @@ import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
+import 'select_group_bottom_sheet.dart';
 
 class AddNewWalletPage extends StatefulWidget {
   const AddNewWalletPage({super.key});
@@ -28,6 +31,10 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
   bool _showIconClearNote = false;
   WalletType itemSelected = listWalletType[0];
   String currency = serviceLocator<AppPrefStorage>().getCurrency();
+
+  bool isShowOnReport = true;
+  bool isGroup = false;
+  GroupWallet? _selectedGroup;
 
   late final WalletBloc _walletBloc;
 
@@ -70,7 +77,7 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
         ),
         centerTitle: true,
         title: const Text(
-          'Thêm tài khoản',
+          'Thêm tài khoản ví',
           style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
@@ -102,6 +109,46 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
                       children: <Widget>[
                         _money(),
                         _walletInfo(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Có ghi chép thu/chi từ ví này vào báo cáo?',
+                              style: TextStyle(fontSize: 14, color: Colors.black),
+                            ),
+                            Transform.scale(
+                              scale: 0.8,
+                              child: Switch(
+                                value: isShowOnReport,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isShowOnReport = value;
+                                  });
+                                },
+                                activeColor: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Là tài khoản nhóm?', style: TextStyle(fontSize: 14, color: Colors.black)),
+                            Transform.scale(
+                              scale: 0.8,
+                              child: Switch(
+                                value: isGroup,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isGroup = value;
+                                  });
+                                },
+                                activeColor: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (isGroup) _buildSelectGroup(),
                         _buttonSave(),
                       ],
                     ),
@@ -124,6 +171,54 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
         onTap: () async {
           await handleButtonSave();
         },
+      ),
+    );
+  }
+
+  Widget _buildSelectGroup() {
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Chọn nhóm sử dụng tài khoản này'),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              final newGroupSelected = await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                constraints: BoxConstraints(maxHeight: context.screenSize.height * 0.6),
+                builder: (_) => SelectGroupBottomSheet(selectedGroup: _selectedGroup),
+              );
+              setState(() {
+                _selectedGroup = newGroupSelected;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.group, size: 30, color: context.theme.primaryColor.withValues(alpha: 0.6)),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      _selectedGroup?.name ?? 'Chọn nhóm tài khoản',
+                      style: TextStyle(fontSize: 16, color: _selectedGroup != null ? Colors.black : Colors.grey),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios_outlined, size: 16, color: Colors.grey),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -303,9 +398,7 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
                             if (digitsOnly.isNotEmpty) {
                               try {
                                 int number = int.parse(digitsOnly);
-                                String formatted = number
-                                    .toString()
-                                    .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+                                String formatted = number.currencyFormat();
 
                                 // Update controller without triggering another onChanged
                                 if (formatted != value) {
@@ -418,13 +511,14 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
 
   Future<void> handleButtonSave() async {
     if (_nameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tên tài khoản không được trống', style: TextStyle(fontSize: 16))),
-      );
+      AppUtils.showSnackBar(context, 'Tên tài khoản không được trống');
+      return;
     } else if (_moneyController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Số dư ban đầu phải lớn hơn 0', style: TextStyle(fontSize: 16))),
-      );
+      AppUtils.showSnackBar(context, 'Số dư ban đầu phải lớn hơn 0');
+      return;
+    } else if (isGroup && _selectedGroup == null) {
+      AppUtils.showSnackBar(context, 'Vui lòng chọn nhóm sử dụng tài khoản này');
+      return;
     } else {
       WalletAccountType walletType(IconData type) {
         if (type == Icons.wallet) {
@@ -444,29 +538,9 @@ class _AddNewWalletPageState extends State<AddNewWalletPage> {
         "currency": currency,
         "description": _noteController.text.trim(),
         "name": _nameController.text.trim(),
-        "report": true,
+        if (isGroup && _selectedGroup != null) "groupId": _selectedGroup!.id,
+        "report": isShowOnReport,
       }));
-
-      //todo: move to bloc
-      // ConnectivityResult networkStatus = await Connectivity().checkConnectivity();
-      // if (networkStatus == ConnectivityResult.none && mounted) {
-      //   await showDialog(context: context, builder: (context) => const NoInternetWidget());
-      // } else {
-      //send request create wallet
-      // await _walletRepository.createNewWallet(
-      //   accountBalance: int.parse(_moneyController.text.trim().replaceAll(',', '')),
-      //   accountType: walletType(itemSelected.walletTypeIcon).name,
-      //   currency: currency,
-      //   description: _noteController.text.trim(),
-      //   name: _nameController.text.trim(),
-      //   // report: _showOnReport,
-      // );
-      // if (mounted) {
-      //   showMessage1OptionDialog(context, 'Tạo tài khoản thành công', onClose: () {
-      //     // backToHome(context);
-      //     Navigator.pushNamed(context, AppRoutes.myWallet);
-      //   });
-      // }
     }
   }
 }

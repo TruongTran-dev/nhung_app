@@ -39,6 +39,21 @@ extension GoRouterExt on GoRouter {
   }
 }
 
+extension IntExtensions on int? {
+  String toCurrencyString({String currencySymbol = '₫'}) {
+    return '$currencySymbol${((this ?? 0 )/ 1000000).toStringAsFixed(2)}M';
+  }
+
+  String toDateString() {
+    final date = DateTime.fromMillisecondsSinceEpoch(this ?? 0);
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String currencyFormat() {
+    return (this ?? 0).toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+  }
+}
+
 extension StringExtensions on String? {
   bool get isNotEmpty => this?.isNotEmpty ?? false;
   bool get isEmpty => this?.isEmpty ?? true;
@@ -81,4 +96,3 @@ abstract class GlobalExtensions {
     return List.generate(length, (_) => chars[random.nextInt(chars.length)]).join();
   }
 }
-

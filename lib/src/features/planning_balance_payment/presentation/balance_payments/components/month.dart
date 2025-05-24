@@ -9,12 +9,12 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/month_bloc.dart';
 import 'package:expensive_management/data/models/data_sfcartesian_char_model.dart';
 
-
 class MonthAnalytic extends StatefulWidget {
   final List<int> walletIDs;
   final int year;
+  final int? groupId;
 
-  const MonthAnalytic({super.key, required this.walletIDs, required this.year});
+  const MonthAnalytic({super.key, required this.walletIDs, required this.year, this.groupId});
 
   @override
   State<MonthAnalytic> createState() => _MonthAnalyticState();
@@ -26,7 +26,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
   @override
   void initState() {
     BlocProvider.of<MonthAnalyticBlocB>(context)
-        .add(MonthAnalyticEvent(walletIDs: widget.walletIDs, year: widget.year));
+        .add(MonthAnalyticEvent(walletIDs: widget.walletIDs, year: widget.year, groupId: widget.groupId));
     super.initState();
   }
 

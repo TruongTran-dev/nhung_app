@@ -29,6 +29,7 @@ class MonthAnalyticBlocB extends Bloc<MonthAnalyticEvent, MonthAnalyticState> {
           final Map<String, dynamic> query = {
             'type': 'MONTH',
             'year': event.year,
+            if (event.groupId != null) 'groupId': event.groupId,
           };
 
           final Map<String, dynamic> data = {

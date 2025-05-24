@@ -30,6 +30,7 @@ class CustomAnalyticBloc extends Bloc<CustomAnalyticEvent, CustomAnalyticState> 
             'type': 'CUSTOM',
             'fromTime': event.fromTime,
             'toTime': event.toTime,
+            if (event.groupId != null) 'groupId': event.groupId,
           };
 
           final Map<String, dynamic> data = {

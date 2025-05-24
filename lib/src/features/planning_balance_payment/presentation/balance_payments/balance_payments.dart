@@ -46,8 +46,8 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
   @override
   void initState() {
     _tabController = TabController(length: 5, vsync: this);
-    listWalletSelected = widget.listWallet ?? [];
-    walletIDs = initWallet(widget.listWallet ?? []);
+    listWalletSelected = widget.listWallet?.where((wallet) => wallet.groupId == null).toList() ?? [];
+    walletIDs = initWallet(listWalletSelected);
     super.initState();
   }
 
@@ -84,7 +84,6 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 10),
           _selectWallet(),
           Expanded(
             child: TabBarView(
@@ -93,24 +92,46 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                 _current(),
                 // _chartsMonth(),
                 _char(
-                    title: 'Month',
-                    childSelect: _selectYearTime(),
-                    child: MonthAnalytic(walletIDs: walletIDs, year: currentYear)),
+                  title: 'Month',
+                  childSelect: _selectYearTime(),
+                  child: MonthAnalytic(
+                    walletIDs: walletIDs,
+                    year: currentYear,
+                    groupId: listWalletSelected.first.groupId,
+                  ),
+                ),
                 // _chartsPrecious(),
                 _char(
-                    title: 'Precious',
-                    childSelect: _selectYearTime(),
-                    child: PreciousAnalytic(year: currentYear, walletIDs: walletIDs)),
+                  title: 'Precious',
+                  childSelect: _selectYearTime(),
+                  child: PreciousAnalytic(
+                    year: currentYear,
+                    walletIDs: walletIDs,
+                    groupId: listWalletSelected.first.groupId,
+                  ),
+                ),
                 // _chartsYear(),
                 _char(
-                    title: 'Year',
-                    childSelect: _selectYearToYear(),
-                    child: YearAnalytic(walletIDs: walletIDs, year: currentYear, toYear: toYear)),
+                  title: 'Year',
+                  childSelect: _selectYearToYear(),
+                  child: YearAnalytic(
+                    walletIDs: walletIDs,
+                    year: currentYear,
+                    toYear: toYear,
+                    groupId: listWalletSelected.first.groupId,
+                  ),
+                ),
                 // _chartsCustom(),
                 _char(
-                    title: 'Custom',
-                    childSelect: _selectDayTime(context),
-                    child: CustomAnalytic(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime)),
+                  title: 'Custom',
+                  childSelect: _selectDayTime(context),
+                  child: CustomAnalytic(
+                    walletIDs: walletIDs,
+                    fromTime: fromTime,
+                    toTime: toTime,
+                    groupId: listWalletSelected.first.groupId,
+                  ),
+                ),
               ],
             ),
           ),
@@ -123,12 +144,21 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
     List<String> titles = listWalletSelected.map((wallet) => wallet.name).toList();
     String walletsName = titles.join(', ');
 
-    return ListTile(
+    String text;
+    if (listWalletSelected.isEmpty) {
+      text = 'Chọn tài khoản';
+    } else if (listWalletSelected.length == widget.listWallet?.where((wallet) => wallet.groupId == null).length &&
+        listWalletSelected.any((wallet) => wallet.groupId == null)) {
+      text = 'Tất cả tài khoản cá nhân';
+    } else if (listWalletSelected.length == widget.listWallet?.where((wallet) => wallet.groupId != null).length &&
+        listWalletSelected.any((wallet) => wallet.groupId != null)) {
+      text = 'Tất cả tài khoản nhóm (${listWalletSelected.first.groupName})';
+    } else {
+      text = walletsName;
+    }
+
+    return InkWell(
       onTap: () async {
-        // final List<Wallet>? result = await Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => SelectWalletsPage(listWallet: widget.listWallet)),
-        // );
         final wallet = await showModalBottomSheet<List<Wallet>>(
           context: context,
           isScrollControlled: true,
@@ -137,7 +167,10 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
           enableDrag: false,
           builder: (context) => SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
-            child: SelectWallets(wallets: listWalletSelected),
+            child: SelectWallets(
+              wallets: listWalletSelected,
+              isMultiSelect: true,
+            ),
           ),
         );
 
@@ -150,33 +183,50 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
           listWalletSelected = wallet ?? [];
           walletIDs = initWallet(listWalletSelected);
 
-          context.read<CurrentAnalyticBloc>().add(CurrentAnalyticEvent(walletIDs: walletIDs));
-
-          context.read<MonthAnalyticBlocB>().add(MonthAnalyticEvent(walletIDs: walletIDs, year: currentYear));
-
-          context.read<PreciousAnalyticBloc>().add(PreciousAnalyticEvent(walletIDs: walletIDs, year: currentYear));
-
-          context
-              .read<YearAnalyticBlocB>()
-              .add(YearAnalyticEvent(walletIDs: walletIDs, year: currentYear, toYear: toYear));
-
-          context
-              .read<CustomAnalyticBloc>()
-              .add(CustomAnalyticEvent(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime));
+          context.read<CurrentAnalyticBloc>().add(CurrentAnalyticEvent(
+                walletIDs: walletIDs,
+                groupId: listWalletSelected.first.groupId,
+              ));
+          context.read<MonthAnalyticBlocB>().add(MonthAnalyticEvent(
+                walletIDs: walletIDs,
+                year: currentYear,
+                groupId: listWalletSelected.first.groupId,
+              ));
+          context.read<PreciousAnalyticBloc>().add(PreciousAnalyticEvent(
+                walletIDs: walletIDs,
+                year: currentYear,
+                groupId: listWalletSelected.first.groupId,
+              ));
+          context.read<YearAnalyticBlocB>().add(YearAnalyticEvent(
+                walletIDs: walletIDs,
+                year: currentYear,
+                toYear: toYear,
+                groupId: listWalletSelected.first.groupId,
+              ));
+          context.read<CustomAnalyticBloc>().add(CustomAnalyticEvent(
+                walletIDs: walletIDs,
+                fromTime: fromTime,
+                toTime: toTime,
+                groupId: listWalletSelected.first.groupId,
+              ));
         });
       },
-      dense: false,
-      horizontalTitleGap: 10,
-      leading: const Icon(Icons.wallet, size: 30, color: Colors.grey),
-      title: Text(
-        listWalletSelected.isEmpty
-            ? 'Chọn tài khoản'
-            : listWalletSelected.length == widget.listWallet?.length
-                ? 'Tất cả tài khoản'
-                : walletsName,
-        style: TextStyle(fontSize: 16, color: listWalletSelected.isEmpty ? Colors.grey : Colors.black),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Row(
+          spacing: 16,
+          children: [
+            Icon(Icons.wallet, size: 30, color: Colors.grey),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 16, color: listWalletSelected.isEmpty ? Colors.grey : Colors.black),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
@@ -197,7 +247,7 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
           ),
         ],
       ),
-      child: CurrentAnalytic(walletIDs: walletIDs),
+      child: CurrentAnalytic(walletIDs: walletIDs, groupId: listWalletSelected.first.groupId),
     );
   }
 
@@ -246,15 +296,17 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                         setState(() {
                           currentYear = valuer.year;
 
-                          this
-                              .context
-                              .read<MonthAnalyticBlocB>()
-                              .add(MonthAnalyticEvent(walletIDs: walletIDs, year: currentYear));
+                          this.context.read<MonthAnalyticBlocB>().add(MonthAnalyticEvent(
+                                walletIDs: walletIDs,
+                                year: currentYear,
+                                groupId: listWalletSelected.first.groupId,
+                              ));
 
-                          this
-                              .context
-                              .read<PreciousAnalyticBloc>()
-                              .add(PreciousAnalyticEvent(year: currentYear, walletIDs: walletIDs));
+                          this.context.read<PreciousAnalyticBloc>().add(PreciousAnalyticEvent(
+                                year: currentYear,
+                                walletIDs: walletIDs,
+                                groupId: listWalletSelected.first.groupId,
+                              ));
                         });
                         Navigator.pop(this.context);
                         showLoading(context);
@@ -312,7 +364,12 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                                   currentYear = valuer.year;
 
                                   this.context.read<YearAnalyticBlocB>().add(
-                                        YearAnalyticEvent(walletIDs: walletIDs, year: currentYear, toYear: toYear),
+                                        YearAnalyticEvent(
+                                          walletIDs: walletIDs,
+                                          year: currentYear,
+                                          toYear: toYear,
+                                          groupId: listWalletSelected.first.groupId,
+                                        ),
                                       );
                                 });
 
@@ -361,7 +418,12 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                                     toYear = valuer.year;
 
                                     this.context.read<YearAnalyticBlocB>().add(
-                                          YearAnalyticEvent(walletIDs: walletIDs, year: currentYear, toYear: toYear),
+                                          YearAnalyticEvent(
+                                            walletIDs: walletIDs,
+                                            year: currentYear,
+                                            toYear: toYear,
+                                            groupId: listWalletSelected.first.groupId,
+                                          ),
                                         );
                                   });
                                   // showLoading(context);
@@ -419,7 +481,12 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                             return;
                           }
                           this.context.read<CustomAnalyticBloc>().add(
-                                CustomAnalyticEvent(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime),
+                                CustomAnalyticEvent(
+                                  walletIDs: walletIDs,
+                                  fromTime: fromTime,
+                                  toTime: toTime,
+                                  groupId: listWalletSelected.first.groupId,
+                                ),
                               );
                           // showLoading(context);
                           Future.delayed(const Duration(milliseconds: 1500), () {
@@ -448,7 +515,12 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
                           if (!mounted) return;
 
                           this.context.read<CustomAnalyticBloc>().add(
-                                CustomAnalyticEvent(walletIDs: walletIDs, fromTime: fromTime, toTime: toTime),
+                                CustomAnalyticEvent(
+                                  walletIDs: walletIDs,
+                                  fromTime: fromTime,
+                                  toTime: toTime,
+                                  groupId: listWalletSelected.first.groupId,
+                                ),
                               );
                           // showLoading(context);
                           Future.delayed(const Duration(milliseconds: 1500), () {

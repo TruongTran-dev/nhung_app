@@ -28,6 +28,7 @@ class PreciousAnalyticBloc extends Bloc<PreciousAnalyticEvent, PreciousAnalyticS
         } else {
           final Map<String, dynamic> query = {
             'type': 'QUARTER',
+            if (event.groupId != null) 'groupId': event.groupId,
           };
 
           final Map<String, dynamic> data = {

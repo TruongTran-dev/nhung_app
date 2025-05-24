@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/current_bloc.dart';
 
-
 class CurrentAnalytic extends StatefulWidget {
   final List<int> walletIDs;
-  const CurrentAnalytic({super.key, required this.walletIDs});
+  final int? groupId;
+  const CurrentAnalytic({super.key, required this.walletIDs, this.groupId});
 
   @override
   State<CurrentAnalytic> createState() => _CurrentAnalyticState();
@@ -21,7 +21,8 @@ class _CurrentAnalyticState extends State<CurrentAnalytic> {
 
   @override
   void initState() {
-    BlocProvider.of<CurrentAnalyticBloc>(context).add(CurrentAnalyticEvent(walletIDs: widget.walletIDs));
+    BlocProvider.of<CurrentAnalyticBloc>(context)
+        .add(CurrentAnalyticEvent(walletIDs: widget.walletIDs, groupId: widget.groupId));
     super.initState();
   }
 
