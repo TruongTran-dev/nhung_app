@@ -20,6 +20,7 @@ class AppPrefStorage {
 
   ///save user info
   Future<void> setSaveUserInfo(UserModel data) async {
+    print("====save user info: ${data.toJson()}");
     log("====token: ${data.accessToken}");
     await pref.setString(AppConstants.accessTokenKey, data.accessToken);
     await pref.setString(AppConstants.refreshTokenKey, data.refreshToken);
@@ -30,6 +31,7 @@ class AppPrefStorage {
 
     await pref.setString(AppConstants.usernameKey, data.username);
     await pref.setString(AppConstants.emailKey, data.email);
+    await pref.setString(AppConstants.userIdKey, data.id.toString());
   }
 
   Future<void> saveUserInfoRefresh({required RefreshTokenModel? data}) async {
@@ -48,6 +50,8 @@ class AppPrefStorage {
 
   ///*****User
   String getUserName() => pref.getString(AppConstants.usernameKey) ?? '';
+
+  String getUserId() => pref.getString(AppConstants.userIdKey) ?? '';
 
   String getUserEmail() => pref.getString(AppConstants.emailKey) ?? '';
 

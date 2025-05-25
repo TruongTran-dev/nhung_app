@@ -9,6 +9,13 @@ extension IterableExtensions<E> on Iterable<E> {
     var i = 0;
     return map((e) => f(i++, e));
   }
+
+  E? firstWhereOrNull(bool Function(E) test) {
+    for (final element in this) {
+      if (test(element)) return element;
+    }
+    return null;
+  }
 }
 
 extension BuildContextExtensions on BuildContext {
@@ -41,7 +48,7 @@ extension GoRouterExt on GoRouter {
 
 extension IntExtensions on int? {
   String toCurrencyString({String currencySymbol = '₫'}) {
-    return '$currencySymbol${((this ?? 0 )/ 1000000).toStringAsFixed(2)}M';
+    return '$currencySymbol${((this ?? 0) / 1000000).toStringAsFixed(2)}M';
   }
 
   String toDateString() {
@@ -59,6 +66,8 @@ extension StringExtensions on String? {
   bool get isEmpty => this?.isEmpty ?? true;
 
   bool get isNullOrEmpty => this == null || this!.isEmpty;
+
+  String get orEmpty => this ?? '';
 }
 
 abstract class GlobalExtensions {

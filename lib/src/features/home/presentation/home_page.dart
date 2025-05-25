@@ -115,7 +115,7 @@ class _HomeViewState extends State<HomePage> {
                       const SizedBox(height: 24),
                       _myWallet(_listWallet),
                       _weekReport(),
-                      ReportPage(preContext: context),
+                      ReportPage(),
                       const SizedBox(height: 50),
                     ],
                   ),
@@ -184,19 +184,7 @@ class _HomeViewState extends State<HomePage> {
                                   xValueMapper: (data, _) => data.title,
                                   yValueMapper: (data, _) => data.value / 1000000,
                                   name: 'Báo cáo tuần',
-                                  pointColorMapper: (data, index) {
-                                    // Define a list of colors
-                                    final colors = [
-                                      Colors.blue,
-                                      Colors.green,
-                                      Colors.red,
-                                      Colors.orange,
-                                      Colors.purple,
-                                      Colors.teal,
-                                    ];
-                                    // Use index to pick a color from the list
-                                    return colors[index % colors.length];
-                                  },
+                                  pointColorMapper: (data, index) => AppColors.secondary,
                                   borderRadius: const BorderRadius.only(
                                     topRight: Radius.circular(5),
                                     topLeft: Radius.circular(5),
@@ -245,6 +233,7 @@ class _HomeViewState extends State<HomePage> {
 
   Widget _myWallet(List<Wallet> listWallet) {
     final width = context.screenSize.width;
+
     return Column(
       children: [
         Padding(
@@ -326,15 +315,22 @@ class _HomeViewState extends State<HomePage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    spacing: 12,
                                     children: [
                                       Text(
                                         wallet.name,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                            fontSize: 22, color: Colors.black, fontWeight: FontWeight.w600),
+                                          fontSize: 22,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
+                                      if (wallet.groupId != null)
+                                        Text(
+                                          'Ví nhóm: ${wallet.groupName}',
+                                          style: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.5)),
+                                        ),
                                       Text(
                                         _isShowBalance
                                             ? '${formatterDouble(wallet.accountBalance)} $currency'
@@ -418,7 +414,7 @@ class _HomeViewState extends State<HomePage> {
 
   Widget listDetails(List<DataSf> listReport) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Column(
         children: [
           InkWell(

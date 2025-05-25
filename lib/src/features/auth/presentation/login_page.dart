@@ -2,6 +2,7 @@ import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/features/auth/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
+import 'package:expensive_management/src/shared/services/notification_service.dart';
 import 'package:expensive_management/src/shared/widgets/input_field.dart';
 import 'package:expensive_management/src/shared/widgets/input_password_field.dart';
 import 'package:expensive_management/src/shared/widgets/primary_button.dart';
@@ -23,12 +24,14 @@ class _LoginPageState extends State<LoginPage> {
 
   final _formKey = GlobalKey<FormState>();
   late final AuthBloc _authBloc;
+  String? _deviceToken;
 
   @override
   void initState() {
     _authBloc = serviceLocator<AuthBloc>();
     _usernameController.text = 'test';
     _passwordController.text = '123456';
+    _deviceToken = serviceLocator<NotificationService>().token;
     super.initState();
   }
 
@@ -77,6 +80,12 @@ class _LoginPageState extends State<LoginPage> {
                 Form(
                   key: _formKey,
                   child: _loginForm(context),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: _logInButton(),
                 ),
                 isLoading ? Positioned.fill(child: const LoadingWidget()) : const SizedBox.shrink(),
               ],
@@ -156,8 +165,6 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
-        const Spacer(),
-        _logInButton(),
       ],
     );
   }
@@ -180,6 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                   SubmitLoginEvent(
                     username: _usernameController.text,
                     password: _passwordController.text,
+                    deviceToken: _deviceToken,
                   ),
                 );
               }

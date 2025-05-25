@@ -24,6 +24,7 @@ import 'package:expensive_management/src/shared/utils/enum/date_time_picker.dart
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'components/option_category.dart';
+import 'components/select_wallet_collection.dart';
 
 class CollectionPage extends StatelessWidget {
   const CollectionPage({super.key});
@@ -67,6 +68,8 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
   DateTime? _datePicked = DateTime.now();
   DateTime? _timePicked = DateTime.now();
 
+  Wallet? selectedWallet;
+
   int? walletId;
   String? walletName;
   String? walletType;
@@ -76,12 +79,13 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
   bool isOnline = true;
   int? groupId;
 
-  final _walletBloc = serviceLocator<WalletBloc>();
   final _collectionBloc = serviceLocator<CollectionBloc>();
+  final _walletBloc = serviceLocator<WalletBloc>();
 
   void initCollectionEdit() {
     final collection = widget.props.collection;
     if (collection != null) {
+      log('Edit collection: ${collection}');
       setState(() {
         itemOption = (collection.transactionType == 'EXPENSE')
             ? ItemOption(itemId: 0, title: 'Chi tiền', icon: Icons.remove)
@@ -91,15 +95,23 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
         _noteController.text = collection.description ?? '';
         _moneyController.text = ((collection.amount ?? 0).toInt()).currencyFormat();
 
-        walletId = collection.walletId;
-        walletName = collection.walletName;
-        walletType = collection.walletType;
+        // walletId = collection.walletId;
+        // walletName = collection.walletName;
+        // walletType = collection.walletType;
+        selectedWallet = Wallet(
+          id: collection.walletId ?? -1,
+          name: collection.walletName ?? '',
+          accountType: collection.walletType ?? '',
+          accountBalance: (collection.amount ?? 0).toInt(),
+          currency: _currency,
+        );
         itemCategorySelected = ItemCategory(
           categoryId: collection.categoryId ?? -1,
           title: collection.categoryName ?? '',
           iconLeading: collection.categoryLogo ?? '',
         );
         imageUrl = collection.imageUrl ?? '';
+        // groupId = collection.w;
       });
     }
   }
@@ -134,6 +146,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
           if (state is AddNewCollectionSuccessState) {
             AppUtils.showSnackBar(context, 'Thêm giao dịch thành công');
             reloadPage();
+            _walletBloc.add(GetWalletsEvent());
           }
           if (state is AddNewCollectionFailureState) {
             showMessage1OptionDialog(
@@ -147,6 +160,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
           }
           if (state is UpdateCollectionSuccessState) {
             AppUtils.showSnackBar(context, 'Cập nhật giao dịch thành công');
+            _walletBloc.add(GetWalletsEvent());
             context.pop();
           }
           if (state is UpdateCollectionFailureState) {
@@ -161,6 +175,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
           }
           if (state is DeleteCollectionSuccessState) {
             AppUtils.showSnackBar(context, 'Xóa giao dịch thành công');
+            _walletBloc.add(GetWalletsEvent());
             context.pop();
           }
           if (state is DeleteCollectionFailureState) {
@@ -321,7 +336,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                   showMessage1OptionDialog(context, 'Vui lòng nhập số tiền');
                 } else if (itemCategorySelected == null) {
                   showMessage1OptionDialog(context, 'Vui lòng chọn danh mục thu/chi');
-                } else if (walletId == null) {
+                } else if (selectedWallet == null) {
                   showMessage1OptionDialog(context, 'Vui lòng chọn ví');
                 } else if (currentWalletAmount < int.parse(_moneyController.text.trim().replaceAll(',', '')) &&
                     itemOption.itemId == 0) {
@@ -405,10 +420,11 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                 'transactionType': newTransactionType,
                 'walletId': newWalletId,
                 "addToReport": true,
-                "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
+                // "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
                 if (groupId != null) "groupId": groupId,
                 // if (!imageUrlUpload.isNullOrEmpty && imageUrl.isNullOrEmpty) 'imageUrl': imageUrlUpload,
               };
+              print("Send data update collection: $data");
 
               _collectionBloc.add(UpdateCollectionEvent(id: widget.props.collection!.id!, data: data));
             },
@@ -433,9 +449,9 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       'categoryId': itemCategorySelected?.categoryId ?? -1,
       'description': _noteController.text.trim(),
       'transactionType': (itemOption.itemId == 0) ? 'EXPENSE' : 'INCOME',
-      'walletId': walletId!,
+      'walletId': selectedWallet!.id,
       "addToReport": true,
-      "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
+      // "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
       if (groupId != null) "groupId": groupId,
 
       // if (!imageUrlUpload.isNullOrEmpty && imageUrl.isNullOrEmpty) 'imageUrl': imageUrlUpload,
@@ -456,9 +472,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
 
     _moneyController.clear();
     _noteController.clear();
-    walletId = null;
-    walletName = null;
-    walletType = null;
+    selectedWallet = null;
     itemCategorySelected = null;
     itemOption = ItemOption(itemId: 0, title: 'Chi tiền', icon: Icons.remove);
     datePicker = formatToLocaleVietnam(DateTime.now());
@@ -644,7 +658,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      constraints: BoxConstraints(maxHeight: context.screenSize.height * 0.8),
+      constraints: BoxConstraints(maxHeight: context.screenSize.height * 0.6),
       builder: (context) => OptionCategoryPage(
         props: OptionCategoryProp(
           categoryIdSelected: itemCategorySelected?.categoryId,
@@ -652,7 +666,6 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
         ),
       ),
     );
-    log('itemSelected: ${itemSelected?.categoryId} - ${itemSelected?.title}');
 
     if (itemSelected == null) return;
 
@@ -790,139 +803,30 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
         color: Colors.grey,
       ),
       title: Text(
-        walletName ?? 'Chọn tài khoản/ ví',
-        style: TextStyle(fontSize: 16, color: isNotNullOrEmpty(walletName) ? Colors.black : Colors.grey),
+        selectedWallet?.name ?? 'Chọn tài khoản/ ví',
+        style: TextStyle(fontSize: 16, color: selectedWallet != null ? Colors.black : Colors.grey),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
   Future<void> _showDiaLogSelectWallet() async {
-    _walletBloc.add(GetWalletsEvent());
-    await showModalBottomSheet(
+    final result = await showModalBottomSheet<Wallet?>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => SizedBox(
         height: MediaQuery.of(context).size.height * 0.6,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: context.theme.primaryColor,
-            elevation: 0,
-            leading: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
-            ),
-            centerTitle: true,
-            title: const Text(
-              'Chọn tài khoản',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          body: BlocConsumer(
-            bloc: _walletBloc,
-            listener: (context, state) {
-              if (state is GetListWalletErrorState) {
-                AppUtils.showSnackBar(context, 'Có lỗi xảy ra khi lấy danh sách ví');
-                Navigator.pop(context);
-              }
-            },
-            builder: (context, state) {
-              if (state is WalletLoadingState) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              List<Wallet> listWallet = state is GetListWalletSuccessState ? state.wallets : [];
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: listWallet.isEmpty
-                    ? Text(
-                        'Không có dữ liệu tài khoản, vui lòng thêm tài khoản mới.',
-                        style: TextStyle(fontSize: 16, color: context.theme.primaryColor),
-                      )
-                    : ListView.builder(
-                        itemCount: listWallet.length,
-                        itemBuilder: (context, index) {
-                          final Wallet item = listWallet[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  walletId = item.id;
-                                  currentWalletAmount = item.accountBalance;
-                                  walletName = item.name;
-                                  walletType = item.accountType;
-                                  _currency = item.currency;
-                                  groupId = item.groupId;
-                                });
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                alignment: Alignment.center,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                                      child: Icon(
-                                        isNotNullOrEmpty(listWallet[index].accountType)
-                                            ? getIconWallet(walletType: listWallet[index].accountType)
-                                            : Icons.help,
-                                        size: 30,
-                                        color: Colors.grey.withOpacity(0.6),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Text(
-                                            listWallet[index].name,
-                                            style: const TextStyle(fontSize: 16, color: Colors.black),
-                                          ),
-                                          Text(
-                                            '${listWallet[index].accountBalance.currencyFormat} ${listWallet[index].currency}',
-                                            style: const TextStyle(fontSize: 14, color: Colors.grey),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    if (walletId == listWallet[index].id)
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                                        child: Icon(
-                                          Icons.check_circle_outline,
-                                          color: context.theme.primaryColor,
-                                          size: 24,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-              );
-            },
-          ),
+        child: SelectWalletCollection(
+          selectedWallet: selectedWallet,
         ),
       ),
-    ).whenComplete(() {
-      setState(() {});
+    );
+
+    setState(() {
+      selectedWallet = result;
+      currentWalletAmount = selectedWallet?.accountBalance ?? 0;
+      groupId = selectedWallet?.groupId;
     });
   }
 
@@ -995,9 +899,9 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: Text(_currency, style: TextStyle(fontSize: 20, color: context.theme.primaryColor)),
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),

@@ -24,19 +24,16 @@ class MainAppState extends State<MainApp> with WidgetsBindingObserver {
       onWillPop: _onWillPop,
       child: Scaffold(
         body: widget.navigationShell,
-        bottomNavigationBar: SizedBox(
-          height: 94, // You can adjust this height value as needed
-          child: BottomNavigationBar(
-            currentIndex: widget.navigationShell.currentIndex,
-            selectedItemColor: AppColors.iconInfo,
-            unselectedItemColor: AppColors.iconDisabled,
-            backgroundColor: Colors.white,
-            type: BottomNavigationBarType.fixed,
-            showSelectedLabels: true,
-            showUnselectedLabels: false,
-            onTap: _onTap,
-            items: _items,
-          ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: widget.navigationShell.currentIndex,
+          selectedItemColor: AppColors.iconInfo,
+          unselectedItemColor: AppColors.iconDisabled,
+          backgroundColor: Colors.white,
+          type: BottomNavigationBarType.fixed,
+          showSelectedLabels: true,
+          showUnselectedLabels: false,
+          onTap: _onTap,
+          items: _items,
         ),
         floatingActionButton: BouncingWidget(
           scale: 0.95,
@@ -122,7 +119,6 @@ class MainAppState extends State<MainApp> with WidgetsBindingObserver {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(true);
-                  Navigator.of(context).pop();
                 },
                 child: const Text('Thoát', style: TextStyle(color: Color(0xffCA0000))),
               ),

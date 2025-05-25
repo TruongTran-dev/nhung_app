@@ -86,9 +86,9 @@ class _SettingPageState extends State<SettingPage> {
   _navToGroupWalletScreen() => context.push(AppRoutes.groupWallet);
   _navToLimitScreen() => context.push(AppRoutes.limitExpense);
   _navToCategoryScreen() => context.push(AppRoutes.category);
-  _navToRecurringScreen()  => context.push(AppRoutes.recurring);
+  _navToRecurringScreen() => context.push(AppRoutes.recurring);
   _navToExportScreen() {} //=> context.push(AppRoutes.exportFile);
-  _navToSecurityScreen() {} // => context.push(AppRoutes.security);
+  _navToSecurityScreen() => context.push(AppRoutes.security);
 
   Widget _featureOption() {
     return Container(
@@ -106,8 +106,8 @@ class _SettingPageState extends State<SettingPage> {
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
-             _itemOption(
-              title: 'Ví hội nhóm',
+            _itemOption(
+              title: 'Nhóm chi tiêu chung',
               imagePath: 'images/ic_spending_limit.png',
               onTap: () => _navToGroupWalletScreen(),
             ),

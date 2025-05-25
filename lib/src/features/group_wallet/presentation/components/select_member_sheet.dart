@@ -43,7 +43,7 @@ class _SelectMemberSheetState extends State<SelectMemberSheet> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredMembers = _allMembers.where((member) {
-        return member.fullName.toLowerCase().contains(query) ||
+        return member.fullName.orEmpty.toLowerCase().contains(query) ||
             member.email.toLowerCase().contains(query) ||
             member.username.toLowerCase().contains(query);
       }).toList();
@@ -99,7 +99,7 @@ class _SelectMemberSheetState extends State<SelectMemberSheet> {
                   child: Column(
                     children: _filteredMembers
                         .map((member) => CheckboxListTile(
-                              title: Text(member.fullName),
+                              title: Text(member.fullName ?? member.username),
                               subtitle: Text(member.email),
                               value: member.isSelected,
                               activeColor: Colors.green,

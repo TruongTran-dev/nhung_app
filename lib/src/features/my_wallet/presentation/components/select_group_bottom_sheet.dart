@@ -162,7 +162,7 @@ class _SelectGroupBottomSheetState extends State<SelectGroupBottomSheet> {
       }
 
       final response = await http.get(
-        Uri.parse('${ApiPath.apiDomain}/api/v1/group'),
+        Uri.parse(ApiPath.apiDomain + ApiPath.group),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token,
@@ -171,7 +171,6 @@ class _SelectGroupBottomSheetState extends State<SelectGroupBottomSheet> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        log("Group wallet response data: $responseData");
         final List<GroupWallet> wallets = GroupWalletResponse.fromJson(responseData).content;
         return wallets;
       } else {

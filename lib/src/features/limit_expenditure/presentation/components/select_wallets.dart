@@ -283,7 +283,7 @@ class _SelectWalletsState extends State<SelectWallets> {
   }
 
   Widget _buildGroupWalletsSelection(List<Wallet> groupWallets) {
-    Map<int, List<Wallet>> _listGroup = _groupWalletsByGroupId(groupWallets);
+    Map<int, List<Wallet>> listGroup = _groupWalletsByGroupId(groupWallets);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
@@ -299,7 +299,7 @@ class _SelectWalletsState extends State<SelectWallets> {
             'Tài khoản nhóm (chỉ chọn một nhóm)',
             style: TextStyle(fontSize: 16, color: context.theme.primaryColor),
           ),
-          ..._listGroup.entries.map((entry) {
+          ...listGroup.entries.map((entry) {
             final groupId = entry.key;
             final groupName = entry.value.first.groupName;
             final walletsInGroup = entry.value;
@@ -315,7 +315,7 @@ class _SelectWalletsState extends State<SelectWallets> {
                     border: Border(top: BorderSide(color: context.theme.primaryColor, width: 1)),
                   ),
                   child: Text(
-                    'Nhóm "${groupName}"',
+                    'Nhóm "$groupName"',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

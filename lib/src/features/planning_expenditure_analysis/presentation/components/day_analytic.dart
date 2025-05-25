@@ -14,6 +14,7 @@ class DayAnalytic extends StatefulWidget {
   final String fromDate, toDate;
   final List<int> walletIDs, categoryIDs;
   final TransactionType type;
+  final int? groupId;
   const DayAnalytic({
     super.key,
     required this.fromDate,
@@ -21,6 +22,7 @@ class DayAnalytic extends StatefulWidget {
     required this.walletIDs,
     required this.categoryIDs,
     this.type = TransactionType.expense,
+    this.groupId,
   });
 
   @override
@@ -39,6 +41,7 @@ class _DayAnalyticState extends State<DayAnalytic> {
       fromDate: widget.fromDate,
       toDate: widget.toDate,
       type: widget.type,
+      groupId: widget.groupId,
     ));
     super.initState();
   }

@@ -13,13 +13,16 @@ class MonthAnalytic extends StatefulWidget {
   final String fromMonth, toMonth;
   final List<int> walletIDs, categoryIDs;
   final TransactionType type;
-  const MonthAnalytic(
-      {super.key,
-      required this.fromMonth,
-      required this.toMonth,
-      required this.walletIDs,
-      required this.categoryIDs,
-      this.type = TransactionType.expense});
+  final int? groupId;
+  const MonthAnalytic({
+    super.key,
+    required this.fromMonth,
+    required this.toMonth,
+    required this.walletIDs,
+    required this.categoryIDs,
+    this.type = TransactionType.expense,
+    this.groupId,
+  });
 
   @override
   State<MonthAnalytic> createState() => _MonthAnalyticState();
@@ -38,6 +41,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
       fromMonth: widget.fromMonth,
       toMonth: widget.toMonth,
       type: widget.type,
+      groupId: widget.groupId,
     ));
     super.initState();
   }
@@ -164,7 +168,8 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
             Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
             Row(
               children: [
-                Text('${formatterDouble((report.totalAmount ).toInt())} $currency', style: const TextStyle(color: Colors.red)),
+                Text('${formatterDouble((report.totalAmount).toInt())} $currency',
+                    style: const TextStyle(color: Colors.red)),
                 const Icon(Icons.keyboard_arrow_right_rounded, size: 20, color: Colors.grey),
               ],
             ),

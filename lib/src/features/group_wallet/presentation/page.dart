@@ -37,7 +37,7 @@ class _GroupWalletPageState extends State<GroupWalletPage> {
       }
 
       final response = await http.get(
-        Uri.parse('${ApiPath.apiDomain}/api/v1/group'),
+        Uri.parse(ApiPath.apiDomain + ApiPath.group),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token,
@@ -46,7 +46,6 @@ class _GroupWalletPageState extends State<GroupWalletPage> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        log("Group wallet response data: $responseData");
         final List<GroupWallet> wallets = GroupWalletResponse.fromJson(responseData).content;
         return wallets;
       } else {
@@ -93,7 +92,7 @@ class _GroupWalletPageState extends State<GroupWalletPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: context.theme.primaryColor,
-        title: const Text('Ví hội nhóm', style: TextStyle(color: Colors.white)),
+        title: const Text('Nhóm chi tiêu chung', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
@@ -120,12 +119,12 @@ class _GroupWalletPageState extends State<GroupWalletPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Không có ví nhóm nào',
+                    'Không có nhóm nào',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Tạo ví nhóm để quản lý chi tiêu cùng bạn bè, gia đình',
+                    'Tạo nhóm để quản lý chi tiêu cùng bạn bè, gia đình',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey),
                   ),
@@ -137,7 +136,7 @@ class _GroupWalletPageState extends State<GroupWalletPage> {
                       backgroundColor: Theme.of(context).primaryColor,
                     ),
                     child: const Text(
-                      'Tạo ví nhóm mới',
+                      'Tạo nhóm mới',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

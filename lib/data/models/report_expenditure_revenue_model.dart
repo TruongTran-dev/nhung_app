@@ -1,4 +1,4 @@
-import '../../src/shared/utils/utils.dart';
+import 'package:expensive_management/src/shared/utils/utils.dart';
 
 class ReportData {
   final String name;

@@ -13,8 +13,9 @@ import 'package:expensive_management/data/models/category_report_model.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
 
 class ReportPage extends StatefulWidget {
-  final BuildContext preContext;
-  const ReportPage({super.key, required this.preContext});
+  const ReportPage({
+    super.key,
+  });
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -52,7 +53,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
     _tabController.dispose();
   }
 
-  Future<List<CategoryReportModel>> _getExpenditureRevenueDataReport({
+  Future<WeeklyReportModel?> _getExpenditureRevenueDataReport({
     required TransactionType type,
   }) async {
     try {
@@ -67,24 +68,21 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
         'Accept': 'application/json',
       };
       final url = Uri.parse("${ApiPath.apiDomain}${ApiPath.weekReport}?type=${type.name.toUpperCase()}");
+      print("Fetching week report from: $url with headers: $headers");
       final response = await http.get(url, headers: headers).timeout(Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         final reportData = data['data'];
-        // print("Report data: $reportData");
-        if (reportData != null && reportData is List) {
-          return reportData.map((e) => CategoryReportModel.fromJson(e)).toList();
-        } else {
-          return [];
-        }
+        final weeklyReport = WeeklyReportModel.fromJson(reportData);
+        return weeklyReport;
       } else {
-        print("Error: ${response.statusCode}");
-        return [];
+        print("Error fetching week report: ${response.statusCode}");
+        return null;
       }
     } catch (e) {
       print("Error fetching week report: $e");
-      return [];
+      return null;
     }
   }
 
@@ -177,31 +175,39 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
                         controller: _tabController,
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
-                          FutureBuilder<List<CategoryReportModel>>(
+                          FutureBuilder<WeeklyReportModel?>(
                             future: _getExpenditureRevenueDataReport(type: TransactionType.expense),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const Center(child: CircularProgressIndicator.adaptive());
                               } else if (snapshot.hasError) {
                                 return Center(child: Text('Error: ${snapshot.error}'));
-                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              } else if (!snapshot.hasData || snapshot.data!.detailReport.isEmpty) {
                                 return const Center(child: Text('Chưa có dữ liệu báo cáo hạng mục chi'));
                               } else {
-                                return ReportView(reports: snapshot.data!, isRevenue: false);
+                                return ReportView(
+                                  reports: snapshot.data!.detailReport,
+                                  isRevenue: false,
+                                  total: snapshot.data!.total,
+                                );
                               }
                             },
                           ),
-                          FutureBuilder<List<CategoryReportModel>>(
+                          FutureBuilder<WeeklyReportModel?>(
                             future: _getExpenditureRevenueDataReport(type: TransactionType.income),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const Center(child: CircularProgressIndicator.adaptive());
                               } else if (snapshot.hasError) {
                                 return Center(child: Text('Error: ${snapshot.error}'));
-                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              } else if (!snapshot.hasData || snapshot.data!.detailReport.isEmpty) {
                                 return const Center(child: Text('Chưa có dữ liệu báo cáo hạng mục thu'));
                               } else {
-                                return ReportView(reports: snapshot.data!, isRevenue: true);
+                                return ReportView(
+                                  reports: snapshot.data!.detailReport,
+                                  isRevenue: true,
+                                  total: snapshot.data!.total,
+                                );
                               }
                             },
                           ),
@@ -220,10 +226,16 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
 }
 
 class ReportView extends StatefulWidget {
-  final List<CategoryReportModel> reports;
+  final List<DailyReportModel> reports;
   final bool isRevenue;
+  final double total;
 
-  const ReportView({super.key, required this.reports, this.isRevenue = false});
+  const ReportView({
+    super.key,
+    required this.reports,
+    this.isRevenue = false,
+    required this.total,
+  });
 
   @override
   State<ReportView> createState() => _ReportViewState();
@@ -250,13 +262,13 @@ class _ReportViewState extends State<ReportView> {
             child: SfCircularChart(
               tooltipBehavior: _tooltip,
               series: <CircularSeries>[
-                PieSeries<CategoryReportModel, String>(
+                PieSeries<DailyReportModel, String>(
                   dataSource: widget.reports,
-                  xValueMapper: (CategoryReportModel data, _) => data.categoryName,
-                  yValueMapper: (CategoryReportModel data, _) => data.percent,
+                  xValueMapper: (DailyReportModel data, _) => data.time,
+                  yValueMapper: (DailyReportModel data, _) => data.totalAmount / widget.total * 100,
                   name: widget.isRevenue ? 'Thu' : 'Chi',
                   explode: false,
-                  pointColorMapper: (CategoryReportModel data, index) {
+                  pointColorMapper: (DailyReportModel data, index) {
                     // Generate random color with good contrast
                     if (index == 0) {
                       return Color(0xfffbdcea);
@@ -284,7 +296,7 @@ class _ReportViewState extends State<ReportView> {
     );
   }
 
-  Widget listDetails(List<CategoryReportModel> listReport) {
+  Widget listDetails(List<DailyReportModel> listReport) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -301,9 +313,15 @@ class _ReportViewState extends State<ReportView> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Xem chi tiết',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
-                  Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
+                  const Text(
+                    'Xem chi tiết',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+                  ),
+                  Icon(
+                    _showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    size: 20,
+                    color: Colors.grey,
+                  ),
                 ],
               ),
             ),
@@ -325,7 +343,7 @@ class _ReportViewState extends State<ReportView> {
     );
   }
 
-  Widget details(CategoryReportModel report) {
+  Widget details(DailyReportModel report) {
     return InkWell(
       onTap: () {},
       child: Container(
@@ -339,8 +357,8 @@ class _ReportViewState extends State<ReportView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(report.categoryName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-            Text('${formatterDouble(report.percent.toInt())} %', style: const TextStyle(color: Colors.black)),
+            Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+            Text('${formatterDouble(report.totalAmount.toInt())} %', style: const TextStyle(color: Colors.black)),
           ],
         ),
       ),

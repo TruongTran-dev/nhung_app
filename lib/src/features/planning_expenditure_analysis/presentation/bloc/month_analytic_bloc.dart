@@ -28,7 +28,8 @@ class MonthAnalyticBloc extends Bloc<MonthAnalyticEvent, MonthAnalyticState> {
             'fromTime': event.fromMonth,
             'timeType': 'MONTH',
             'toTime': event.toMonth,
-            'type': event.type.name.toUpperCase()
+            'type': event.type.name.toUpperCase(),
+            if (event.groupId != null) 'groupId': event.groupId,
           };
 
           final Map<String, dynamic> data = {

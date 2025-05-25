@@ -13,11 +13,16 @@ class ReValidateFormEvent extends AuthEvent {}
 class SubmitLoginEvent extends AuthEvent {
   final String username;
   final String password;
+  final String? deviceToken;
 
-  const SubmitLoginEvent({required this.username, required this.password});
+  const SubmitLoginEvent({
+    required this.username,
+    required this.password,
+    this.deviceToken,
+  });
 
   @override
-  List<Object> get props => [username, password];
+  List<Object> get props => [username, password , deviceToken ?? ''];
 
   @override
   bool get stringify => true;

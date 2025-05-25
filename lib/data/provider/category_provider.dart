@@ -30,19 +30,5 @@ class CategoryProvider with ProviderMixin {
     }
   }
 
-  // Future<BaseResponse> getWeekReport() async {
-  //   if (await isExpiredToken()) {
-  //     return ExpiredTokenResponse();
-  //   }
-  //   try {
-  //     final response = await dio.get(
-  //       ApiPath.apiDomain + ApiPath.weekReport,
-  //       options: await defaultOptions(url: ApiPath.apiDomain + ApiPath.weekReport),
-  //     );
-  //     log("response: ${response.data}");
-  //     return WeekReportResponse.fromJson(response.data);
-  //   } catch (error, stacktrace) {
-  //     return errorResponse(error, stacktrace, ApiPath.weekReport);
-  //   }
-  // }
+  
 }

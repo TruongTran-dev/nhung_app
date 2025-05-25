@@ -74,4 +74,17 @@ class UserModel extends Equatable {
       expiredRefreshToken: expiredRefreshToken ?? this.expiredRefreshToken,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
+      'id': id,
+      'username': username,
+      'email': email,
+      'roles': roles,
+      'expiredAccessDate': expiredAccessToken,
+      'expiredRefreshDate': expiredRefreshToken,
+    };
+  }
 }

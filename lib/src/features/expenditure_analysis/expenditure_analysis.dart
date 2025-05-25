@@ -2,6 +2,7 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
+import 'package:expensive_management/src/features/limit_expenditure/presentation/components/select_wallets.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/components/day_analytic.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/components/month_analytic.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/components/year_analytic.dart';
@@ -83,6 +84,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   List<Wallet> listWalletSelected = [];
   List<int> listCategoryId = [];
   List<int> walletIDs = [];
+  int? groupId;
 
   @override
   void initState() {
@@ -160,6 +162,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
               fromDate: firstDayOfMonth,
               toDate: lastDayOfMonth,
               type: widget.props.type,
+              groupId: groupId,
             ),
           ],
         ),
@@ -186,6 +189,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
               fromMonth: fromMonth,
               toMonth: endMonth,
               type: widget.props.type,
+              groupId: groupId,
             ),
           ],
         ),
@@ -212,6 +216,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
               fromYear: fromYear,
               toYear: endYear,
               type: widget.props.type,
+              groupId: groupId,
             ),
           ],
         ),
@@ -270,6 +275,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                                     fromDate: firstDayOfMonth,
                                     toDate: lastDayOfMonth,
                                     type: widget.props.type,
+                                    groupId: groupId,
                                   ),
                                 );
                           });
@@ -309,6 +315,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                                     fromDate: firstDayOfMonth,
                                     toDate: lastDayOfMonth,
                                     type: widget.props.type,
+                                    groupId: groupId,
                                   ),
                                 );
                           });
@@ -370,6 +377,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                                   fromMonth: fromMonth,
                                   toMonth: endMonth,
                                   type: widget.props.type,
+                                  groupId: groupId,
                                 ),
                               );
                           showLoading(context);
@@ -407,6 +415,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                                   fromMonth: fromMonth,
                                   toMonth: endMonth,
                                   type: widget.props.type,
+                                  groupId: groupId,
                                 ),
                               );
                           showLoading(context);
@@ -471,6 +480,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                                           fromYear: fromYear,
                                           toYear: endYear,
                                           type: widget.props.type,
+                                          groupId: groupId,
                                         ),
                                       );
                                 });
@@ -514,6 +524,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                                           fromYear: fromYear,
                                           toYear: endYear,
                                           type: widget.props.type,
+                                          groupId: groupId,
                                         ),
                                       );
                                 });
@@ -545,18 +556,6 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   }
 
   Widget _selectCategory() {
-    // List<CategoryModel> listCate = widget.props.listCategory;
-    // listCate.forEach(updateCheckedStatusCategory);
-    // List<int> listCateIDs = [];
-    // for (CategoryModel category in widget.props.listCategory) {
-    //   if (category.childCategory != null) {
-    //     for (CategoryModel childCategory in category.childCategory!) {
-    //       listCateIDs.add(childCategory.id!);
-    //     }
-    //   }
-    //   listCateIDs.add(category.id!);
-    // }
-
     return ListTile(
       onTap: () async {
         final itemSelected = await showModalBottomSheet<List<CategoryModel>>(
@@ -570,25 +569,8 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
             type: widget.props.type,
             listCategory: listCateSelected,
           ),
-          // builder: (context) => OptionCategoryPage(
-          //   props: OptionCategoryProp(
-          //     // categoryIdSelected: itemCategorySelected?.categoryId,
-          //     tabIndex: 0,
-          //     listCategorySelected: [],
-          //     isMultiSelect: true,
-          //   ),
-          // ),
         );
 
-        // final List<int>? result = await Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => SelectCategory(
-        //       listCategory: listCate,
-        //       type: widget.props.type,
-        //     ),
-        //   ),
-        // );
         if (itemSelected != null) {
           setState(() {
             listCateSelected = itemSelected;
@@ -599,6 +581,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                     fromDate: firstDayOfMonth,
                     toDate: lastDayOfMonth,
                     type: widget.props.type,
+                    groupId: groupId,
                   ),
                 );
             context.read<MonthAnalyticBloc>().add(
@@ -608,6 +591,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                     fromMonth: fromMonth,
                     toMonth: endMonth,
                     type: widget.props.type,
+                    groupId: groupId,
                   ),
                 );
             context.read<YearAnalyticBloc>().add(
@@ -617,6 +601,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                     fromYear: fromYear,
                     toYear: endYear,
                     type: widget.props.type,
+                    groupId: groupId,
                   ),
                 );
           });
@@ -659,13 +644,18 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
           enableDrag: false,
           builder: (context) => SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
-            // child: SelectWallets(wallets: listWalletSelected),
+            child: SelectWallets(
+              wallets: listWalletSelected,
+              isMultiSelect: true,
+            ),
           ),
         );
 
         setState(() {
           listWalletSelected = wallet ?? [];
           walletIDs = initWallet(listWalletSelected);
+          groupId = listWalletSelected.first.groupId;
+
           context.read<DayAnalyticBloc>().add(
                 DayAnalyticEvent(
                   walletIDs: walletIDs,
@@ -673,6 +663,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                   fromDate: firstDayOfMonth,
                   toDate: lastDayOfMonth,
                   type: widget.props.type,
+                  groupId: groupId,
                 ),
               );
           context.read<MonthAnalyticBloc>().add(
@@ -682,6 +673,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                   fromMonth: fromMonth,
                   toMonth: endMonth,
                   type: widget.props.type,
+                  groupId: groupId,
                 ),
               );
           context.read<YearAnalyticBloc>().add(
@@ -691,6 +683,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                   fromYear: fromYear,
                   toYear: endYear,
                   type: widget.props.type,
+                  groupId: groupId,
                 ),
               );
         });

@@ -14,6 +14,7 @@ class YearAnalytic extends StatefulWidget {
   final String fromYear, toYear;
   final List<int> walletIDs, categoryIDs;
   final TransactionType type;
+  final int? groupId;
 
   const YearAnalytic({
     super.key,
@@ -22,6 +23,7 @@ class YearAnalytic extends StatefulWidget {
     required this.walletIDs,
     required this.categoryIDs,
     this.type = TransactionType.expense,
+    this.groupId,
   });
 
   @override
@@ -40,6 +42,7 @@ class _YearAnalyticState extends State<YearAnalytic> {
       fromYear: widget.fromYear,
       toYear: widget.toYear,
       type: widget.type,
+      groupId: widget.groupId,
     ));
     super.initState();
   }

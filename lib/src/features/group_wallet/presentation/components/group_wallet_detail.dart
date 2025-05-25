@@ -82,6 +82,12 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
     }
   }
 
+  String? _getWalletMemberRole(UserMemberData member) {
+    final groupMembers = widget.props.groupWallet?.groupMembers ?? [];
+    final groupMember = groupMembers.firstWhereOrNull((m) => m.userId == member.id);
+    return groupMember?.groupRole;
+  }
+
   @override
   void didUpdateWidget(GroupWalletDetailPage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -175,7 +181,7 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
       log("Request body: $requestBody");
 
       final response = await http.post(
-        Uri.parse('${ApiPath.apiDomain}/api/v1/group'),
+        Uri.parse(ApiPath.apiDomain + ApiPath.group),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token,
@@ -413,7 +419,7 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
         log("Request body: $requestBody");
 
         final response = await http.put(
-          Uri.parse('${ApiPath.apiDomain}/api/v1/group/${widget.props.groupWallet!.id}'),
+          Uri.parse('${ApiPath.apiDomain}${ApiPath.group}/${widget.props.groupWallet!.id}'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token,
@@ -494,7 +500,7 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
         }
 
         final response = await http.delete(
-          Uri.parse('${ApiPath.apiDomain}/api/v1/group/${widget.props.groupWallet!.id}'),
+          Uri.parse('${ApiPath.apiDomain}${ApiPath.group}/${widget.props.groupWallet!.id}'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': token,
@@ -535,7 +541,7 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
       appBar: AppBar(
         backgroundColor: context.theme.primaryColor,
         title: Text(
-          widget.props.isEdit ? "Chỉnh sửa ví hội nhóm" : 'Tạo ví hội nhóm',
+          widget.props.isEdit ? "Thông tin hội nhóm " : 'Tạo hội nhóm',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -610,29 +616,45 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
                   ),
                   if (_selectedMembers.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    ..._selectedMembers.map((member) => CheckboxListTile(
-                          title: Text(member.fullName),
-                          subtitle: Text(member.email),
-                          value: member.isSelected,
-                          activeColor: Colors.green,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              // Update the member in the _selectedMembers list
-                              final index = _selectedMembers.indexOf(member);
-                              if (index != -1) {
-                                _selectedMembers[index] = member.copyWith(isSelected: value ?? false);
-                              }
+                    ..._selectedMembers.mapIndexed((index, member) {
+                      return CheckboxListTile(
+                        title: Text(member.fullName ?? member.username),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Email: ${member.email}", style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                            if (widget.props.isEdit)
+                              Text(
+                                _getWalletMemberRole(member) == "LEADER" ? "(Nhóm trưởng)" : "(Thành viên)",
+                                style: TextStyle(
+                                  color: _getWalletMemberRole(member) == "LEADER" ? Colors.blue : Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                          ],
+                        ),
+                        value: member.isSelected,
+                        activeColor: Colors.green,
+                        onChanged: (bool? value) {
+                          // Update the member in the _selectedMembers list
 
-                              // Also update the same member in _allMembers to maintain consistency
-                              final allMembersIndex = _allMembers.indexWhere((m) => m.id == member.id);
-                              if (allMembersIndex != -1) {
-                                _allMembers[allMembersIndex] =
-                                    _allMembers[allMembersIndex].copyWith(isSelected: value ?? false);
-                              }
-                            });
-                          },
-                          secondary: const CircleAvatar(child: Icon(Icons.person)),
-                        )),
+                          if (index != -1) {
+                            _selectedMembers[index] = member.copyWith(isSelected: value ?? false);
+                          }
+
+                          // Also update the same member in _allMembers to maintain consistency
+                          final allMembersIndex = _allMembers.indexWhere((m) => m.id == member.id);
+                          if (allMembersIndex != -1) {
+                            _allMembers[allMembersIndex] = _allMembers[allMembersIndex].copyWith(
+                              isSelected: value ?? false,
+                            );
+                          }
+                          setState(() {});
+                        },
+                        secondary: const CircleAvatar(child: Icon(Icons.person)),
+                      );
+                    }),
                   ],
                 ],
               ),

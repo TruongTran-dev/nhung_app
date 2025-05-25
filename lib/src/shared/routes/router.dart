@@ -1,3 +1,4 @@
+import 'package:expensive_management/presentation/screens/setting_screen/security/security.dart';
 import 'package:expensive_management/src/features/group_wallet/presentation/components/group_wallet_detail.dart';
 import 'package:expensive_management/src/features/group_wallet/presentation/page.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/day_analytic_bloc.dart';
@@ -9,7 +10,7 @@ import 'package:expensive_management/src/features/planning_balance_payment/prese
 import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/month_bloc.dart';
 import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/precious_bloc.dart';
 import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/year_bloc.dart';
-import 'package:expensive_management/src/features/planning_balance_payment/presentation/balance_payments/balance_payments.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/presentation/balance_payments.dart';
 import 'package:expensive_management/src/features/planning/presentation/components/current_finances.dart';
 import 'package:expensive_management/src/features/recurring_transaction/page.dart';
 import 'package:expensive_management/src/features/categories/presentation/categories_page.dart';
@@ -352,6 +353,14 @@ class AppRouter {
           return GroupWalletDetailPage(props: props);
         },
       ),
+
+      // Security route
+      GoRoute(
+        path: AppRoutes.security,
+        builder: (context, state) {
+          return const SecurityPage();
+        },
+      ),
     ],
   );
 }
@@ -397,6 +406,7 @@ class AppRoutes {
   static const String limitExpense = '/limit_expense';
   static const String limitInfor = '/limit_infor';
   static const String recurring = '/recurring';
+  static const String security = '/security';
 
   //group wallet
   static const String groupWalletDetail = '/group_wallet_detail';

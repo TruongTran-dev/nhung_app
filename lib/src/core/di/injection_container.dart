@@ -42,6 +42,7 @@ import 'package:expensive_management/src/features/my_wallet/domain/usecases/dele
 import 'package:expensive_management/src/features/my_wallet/domain/usecases/get_wallets.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/usecases/update_wallet.dart';
 import 'package:expensive_management/src/features/my_wallet/presentation/bloc/bloc.dart';
+import 'package:expensive_management/src/shared/services/notification_service.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,6 +55,9 @@ Future<void> configureDependenciesInjection() async {
   // Example:
   // serviceLocator.registerLazySingleton<SomeService>(() => SomeServiceImpl());
   // serviceLocator.registerFactory<SomeRepository>(() => SomeRepositoryImpl());
+
+  //* Firebase Messaging
+  serviceLocator.registerLazySingleton<NotificationService>(() => NotificationService());
 
   //* NetworkInfo
   serviceLocator.registerLazySingleton<NetworkInfo>(() => NetworkInfo());

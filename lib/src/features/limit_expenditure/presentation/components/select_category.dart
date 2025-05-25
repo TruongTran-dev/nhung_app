@@ -1,11 +1,14 @@
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/features/categories/presentation/bloc/bloc.dart';
+import 'package:expensive_management/src/features/categories/presentation/components/category_info.dart';
+import 'package:expensive_management/src/shared/routes/router.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
 import 'package:expensive_management/src/shared/widgets/app_image.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class SelectCategory extends StatefulWidget {
   final TransactionType type;
@@ -141,9 +144,33 @@ class _SelectCategoryState extends State<SelectCategory> {
   Widget _listViewCategory(List<CategoryModel> listCate) {
     if (listCate.isEmpty) {
       return Center(
-        child: Text(
-          widget.type == TransactionType.expense ? 'Không có hạng mục chi' : 'Không có hạng mục thu',
-          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              widget.type == TransactionType.expense ? 'Không có hạng mục chi' : 'Không có hạng mục thu',
+              style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () async {
+                final result = await context.push(
+                  AppRoutes.categoryInfo,
+                  extra: CategoryInfoProps(isExpandedCategory: widget.type == TransactionType.expense),
+                );
+
+                if (result != null && result is bool && result) {
+                  _categoryBloc.add(GetCategoriesEvent(type: widget.type.name));
+                }
+              },
+              icon: const Icon(Icons.add),
+              label: const Text("Tạo hạng mục mới"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
         ),
       );
     }

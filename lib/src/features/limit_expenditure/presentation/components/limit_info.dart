@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/data/models/limit_expenditure_model.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
@@ -55,7 +57,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
   bool _showIconClear = false;
 
   final List<CategoryModel> listCategorySelected = [];
-  final List<Wallet> listWalletSelected = [];
+  List<Wallet> listWalletSelected = [];
   final String _currency = serviceLocator<AppPrefStorage>().getCurrency();
 
   String dateStart = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -73,8 +75,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
       dateStart = DateFormat('yyyy-MM-dd').format(limitData.fromDate ?? DateTime.now());
       dateEnd = (limitData.toDate == null) ? null : DateFormat('yyyy-MM-dd').format((limitData.toDate)!);
       // listCategorySelected.addAll(limitData.categories ?? []);
-      listWalletSelected.clear();
-      listWalletSelected.addAll(limitData.listWallet ?? []);
+      listWalletSelected = limitData.listWallet ?? [];
       //
       listCategorySelected.clear();
       listCategorySelected.addAll(limitData.categoryIds?.map((e) => CategoryModel(id: int.parse(e), name: '')) ?? []);
@@ -92,53 +93,60 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          icon: const Icon(Icons.close, size: 24, color: Colors.white),
+    return GestureDetector(
+      onTap: () {
+        if (FocusScope.of(context).hasFocus) {
+          FocusScope.of(context).unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).primaryColor,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            icon: const Icon(Icons.close, size: 24, color: Colors.white),
+          ),
+          centerTitle: true,
+          title: Text(
+            widget.props.isEdit ? 'Sửa hạn mức chi' : 'Thêm hạn mức chi',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+          ),
         ),
-        centerTitle: true,
-        title: Text(
-          widget.props.isEdit ? 'Sửa hạn mức chi' : 'Thêm hạn mức chi',
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
-        ),
+        body: BlocConsumer<LimitExpenditureBloc, LimitExpenditureState>(
+            bloc: _limitBloc,
+            listener: (context, state) {
+              if (state is AddLimitErrorState) {
+                showMessage1OptionDialog(context, state.message);
+              }
+              if (state is AddLimitSuccessState) {
+                AppUtils.showSnackBar(context, 'Thêm hạn mức thành công');
+                Navigator.of(context).pop(true);
+              }
+              if (state is UpdateLimitErrorState) {
+                showMessage1OptionDialog(context, state.message);
+              }
+              if (state is UpdateLimitSuccessState) {
+                AppUtils.showSnackBar(context, 'Cập nhật hạn mức thành công');
+                Navigator.of(context).pop(true);
+              }
+              if (state is DeleteLimitErrorState) {
+                showMessage1OptionDialog(context, state.message);
+              }
+              if (state is DeleteLimitSuccessState) {
+                AppUtils.showSnackBar(context, 'Xóa hạn mức thành công');
+                Navigator.of(context).pop(true);
+              }
+            },
+            builder: (context, state) {
+              final isLoading = state is LimitExpenditureLoadingState;
+              return Stack(
+                children: [
+                  _body(),
+                  isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
+                ],
+              );
+            }),
       ),
-      body: BlocConsumer<LimitExpenditureBloc, LimitExpenditureState>(
-          bloc: _limitBloc,
-          listener: (context, state) {
-            if (state is AddLimitErrorState) {
-              showMessage1OptionDialog(context, state.message);
-            }
-            if (state is AddLimitSuccessState) {
-              AppUtils.showSnackBar(context, 'Thêm hạn mức thành công');
-              Navigator.of(context).pop(true);
-            }
-            if (state is UpdateLimitErrorState) {
-              showMessage1OptionDialog(context, state.message);
-            }
-            if (state is UpdateLimitSuccessState) {
-              AppUtils.showSnackBar(context, 'Cập nhật hạn mức thành công');
-              Navigator.of(context).pop(true);
-            }
-            if (state is DeleteLimitErrorState) {
-              showMessage1OptionDialog(context, state.message);
-            }
-            if (state is DeleteLimitSuccessState) {
-              AppUtils.showSnackBar(context, 'Xóa hạn mức thành công');
-              Navigator.of(context).pop(true);
-            }
-          },
-          builder: (context, state) {
-            final isLoading = state is LimitExpenditureLoadingState;
-            return Stack(
-              children: [
-                _body(),
-                isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
-              ],
-            );
-          }),
     );
   }
 
@@ -313,8 +321,10 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
   }
 
   Widget _selectWallet() {
+    print('listWalletSelected: $listWalletSelected');
     List<String> titles = listWalletSelected.map((wallet) => wallet.name).toList();
     String walletsName = titles.join(', ');
+    print('Selected wallets: $walletsName');
 
     return InkWell(
       onTap: _showDiaLogSelectWallet,
@@ -329,10 +339,10 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isNullOrEmpty(listWalletSelected) ? 'Chọn tài khoản' : walletsName,
+                    listWalletSelected.isEmpty ? 'Chọn tài khoản' : walletsName,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isNullOrEmpty(listWalletSelected) ? Colors.grey : Colors.black,
+                      color: listWalletSelected.isEmpty ? Colors.grey : Colors.black,
                     ),
                   ),
                 ],
@@ -354,15 +364,17 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
       enableDrag: false,
       builder: (context) => SizedBox(
         height: MediaQuery.of(context).size.height * 0.6,
-        child: SelectWallets(wallets: listWalletSelected),
+        child: SelectWallets(
+          wallets: listWalletSelected,
+          isMultiSelect: true,
+        ),
       ),
     );
+    log('Selected wallets: $wallet');
 
-    if (wallet != null) {
-      listWalletSelected.clear();
-      listWalletSelected.addAll(wallet);
-      setState(() {});
-    }
+    setState(() {
+      listWalletSelected = wallet ?? [];
+    });
   }
 
   Widget _selectCategory() {

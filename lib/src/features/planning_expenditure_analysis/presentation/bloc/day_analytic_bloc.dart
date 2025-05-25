@@ -30,7 +30,8 @@ class DayAnalyticBloc extends Bloc<DayAnalyticEvent, DayAnalyticState> {
             'fromTime': event.fromDate,
             'timeType': 'DAY',
             'toTime': event.toDate,
-            'type': event.type.name.toUpperCase()
+            'type': event.type.name.toUpperCase(),
+            if (event.groupId != null) 'groupId': event.groupId,
           };
 
           final Map<String, dynamic> data = {

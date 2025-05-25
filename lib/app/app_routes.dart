@@ -34,9 +34,7 @@ class AppRoutes {
 
   Map<String, Widget Function(BuildContext)> routes(BuildContext context, {required bool isLoggedIn}) {
     return {
-      AppRoutes.security: (context) {
-        return const SecurityPage();
-      },
+
       AppRoutes.exportFile: (context) {
         return const ExportPage();
       },

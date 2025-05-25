@@ -37,6 +37,9 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
   String fromDate =
       DateFormat('yyyy-MM-dd').format(DateTime(DateTime.now().year, DateTime.now().month - 1, DateTime.now().day));
 
+  String get _userId => serviceLocator<AppPrefStorage>().getUserId();
+  String get _userName => serviceLocator<AppPrefStorage>().getUserName();
+
   @override
   void initState() {
     currency = sharedPref.getCurrency();
@@ -57,14 +60,14 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
         ),
         centerTitle: true,
         title: Text(
-          "Tài khoản ${widget.wallet.name}",
+          "Thông tin tài khoản ví",
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () async {}, // => _reloadPage(),
+        onRefresh: _fetchWalletDetails,
         child: _body(),
       ),
     );
@@ -107,6 +110,7 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
       'fromDate': fromDate,
       'toDate': toDate,
       'walletId': widget.wallet.id,
+      "groupId": widget.wallet.groupId,
     };
     print("Params: $params");
 
@@ -128,14 +132,26 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
-      final url = Uri.parse("${ApiPath.apiDomain}${ApiPath.getReportByWalletId}"
-          .replaceAll("{fromDate}", fromDate)
-          .replaceAll("{toDate}", toDate)
-          .replaceAll("{walletId}", "${widget.wallet.id}"));
+      // final url = Uri.parse("${ApiPath.apiDomain}${ApiPath.getReportByWalletId}"
+      //     .replaceAll("{fromDate}", fromDate)
+      //     .replaceAll("{toDate}", toDate)
+      //     .replaceAll("{walletId}", "${widget.wallet.id}"));
+      // if (widget.wallet.groupId != null) {
+      //   url.replace(queryParameters: params);
+      // }
+      final url = Uri.parse("${ApiPath.apiDomain}/api/v1/report/").replace(queryParameters: {
+        'fromDate': fromDate,
+        'toDate': toDate,
+        'walletId': widget.wallet.id.toString(),
+        if (widget.wallet.groupId != null) 'groupId': widget.wallet.groupId.toString(),
+      });
+      print("Request Wallet Report URL: ${url.toString()}");
+
       final response = await http.get(url, headers: headers).timeout(Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
+        log("Response Wallet Report data: ${jsonEncode(data)}");
         return WalletReportData.fromJson(data);
       } else {
         print("Error: ${response.statusCode}");
@@ -165,9 +181,14 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            widget.wallet.name,
+            "Ví: ${widget.wallet.name}",
             style: TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold),
           ),
+          if (widget.wallet.groupId != null)
+            Text(
+              "Nhóm: ${widget.wallet.groupName}",
+              style: TextStyle(fontSize: 16, color: Colors.black.withValues(alpha: 0.6)),
+            ),
           const SizedBox(height: 8),
           Text(
             "Số dư: ${formatterDouble(balance)} $currency",
@@ -318,7 +339,9 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
   }
 
   void _onTapItemReport(CollectionModel collection) {
-    log("Collection: ${collection.toString()}");
+    if (_userId.isNullOrEmpty || _userId != collection.createdBy.toString()) {
+      return;
+    }
     context.push(AppRoutes.newCollection, extra: CollectionInfoProps(isEdit: true, collection: collection));
   }
 
@@ -346,40 +369,72 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
                 // ),
               ),
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                padding: EdgeInsets.fromLTRB(12, 4, 0, 4),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(width: 1, color: Colors.grey.withOpacity(0.2)),
                   ),
                 ),
-                child: Row(
-                  spacing: 10,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 4,
                   children: [
-                    Container(
-                      height: 32,
-                      width: 32,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.grey.withOpacity(0.2),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: AppImage(
-                          localPathOrUrl: collectionInfo.categoryLogo,
-                          boxFit: BoxFit.contain,
-                          errorWidget: const Icon(Icons.help_outline, size: 24, color: Colors.grey),
+                    Row(
+                      spacing: 10,
+                      children: [
+                        Container(
+                          height: 32,
+                          width: 32,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.grey.withOpacity(0.2),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: AppImage(
+                              localPathOrUrl: collectionInfo.categoryLogo,
+                              boxFit: BoxFit.contain,
+                              errorWidget: const Icon(Icons.help_outline, size: 24, color: Colors.grey),
+                            ),
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: Text(
+                            '${collectionInfo.categoryName}',
+                            style: const TextStyle(fontSize: 16, color: Colors.black),
+                          ),
+                        ),
+                        Text(
+                          '${isExpense ? "-" : "+"} ${formatterDouble((collectionInfo.amount ?? 0).toInt())} $currency',
+                          style: TextStyle(fontSize: 16, color: isExpense ? Colors.redAccent : Colors.greenAccent),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: !_userId.isNullOrEmpty && _userId == collectionInfo.createdBy.toString()
+                              ? Colors.grey.withValues(alpha: 0.7)
+                              : Colors.grey.withValues(alpha: 0.2),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Text(
-                        '${collectionInfo.categoryName}',
-                        style: const TextStyle(fontSize: 16, color: Colors.black),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4,
+                        children: [
+                          Text(
+                            '- Người tạo: ${_userId.isNullOrEmpty || _userId != collectionInfo.createdBy.toString() ? collectionInfo.createdByName ?? "(Không xác định)" : _userName.isNullOrEmpty ? collectionInfo.createdByName ?? "(Không xác định)" : _userName}',
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          collectionInfo.description.isNullOrEmpty
+                              ? const SizedBox.shrink()
+                              : Text(
+                                  '- Ghi chú: ${collectionInfo.description!}',
+                                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                                ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      '${isExpense ? "-" : "+"} ${formatterDouble((collectionInfo.amount ?? 0).toInt())} $currency',
-                      style: TextStyle(fontSize: 16, color: isExpense ? Colors.redAccent : Colors.greenAccent),
                     ),
                   ],
                 ),

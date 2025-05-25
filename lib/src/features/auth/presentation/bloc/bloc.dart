@@ -47,6 +47,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       LoginParams(
         username: event.username,
         password: event.password,
+        fcmToken: event.deviceToken.isNullOrEmpty ? null : event.deviceToken,
       ),
     );
 

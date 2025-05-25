@@ -359,6 +359,15 @@ class DioProvider {
           statusCode: statusCode,
         ));
       }
+
+      if (data.containsKey('errors')) {
+        final errors = data['errors'].first;
+        return Left(ServerError(
+          key: errors['errorCode']?.toString() ?? '',
+          message: errors['errorMessage']?.toString() ?? '',
+          statusCode: statusCode,
+        ));
+      }
     }
 
     // Default error case

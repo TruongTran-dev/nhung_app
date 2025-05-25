@@ -13,7 +13,8 @@ class CollectionModel {
   final String? transactionType;
   final String? imageUrl;
   final String? createdAt;
-  final int? createdBy;
+  final int createdBy;
+  final String? createdByName;
 
   CollectionModel({
     this.id,
@@ -30,11 +31,11 @@ class CollectionModel {
     this.transactionType,
     this.imageUrl,
     this.createdAt,
-    this.createdBy,
+    this.createdBy = 0,
+    this.createdByName,
   });
 
-  factory CollectionModel.fromJson(Map<String, dynamic> json) =>
-      CollectionModel(
+  factory CollectionModel.fromJson(Map<String, dynamic> json) => CollectionModel(
         id: json['id'],
         amount: double.tryParse(json['amount'].toString()),
         categoryId: json['categoryId'],
@@ -49,11 +50,33 @@ class CollectionModel {
         transactionType: json['transactionType'],
         imageUrl: json['imageUrl'],
         createdAt: json['createdAt'],
-        createdBy: json['createdBy'],
+        createdBy: json['createdBy'] ?? 0,
+        createdByName: json['createdByName'],
       );
 
   @override
   String toString() {
-    return 'CollectionModel{id: $id, amount: $amount, categoryId: $categoryId, categoryName: $categoryName, categoryLogo: $categoryLogo, description: $description, ariseDate: $ariseDate, walletId: $walletId, walletName: $walletName, walletType: $walletType, addToReport: $addToReport, transactionType: $transactionType, imageUrl: $imageUrl, createdAt: $createdAt, createdBy: $createdBy}';
+    return 'CollectionModel{id: $id, amount: $amount, categoryId: $categoryId, categoryName: $categoryName, categoryLogo: $categoryLogo, description: $description, ariseDate: $ariseDate, walletId: $walletId, walletName: $walletName, walletType: $walletType, addToReport: $addToReport, transactionType: $transactionType, imageUrl: $imageUrl, createdAt: $createdAt, createdBy: $createdBy, createdByName: $createdByName}';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'amount': amount,
+      'categoryId': categoryId,
+      'categoryName': categoryName,
+      'categoryLogo': categoryLogo,
+      'description': description,
+      'ariseDate': ariseDate,
+      'walletId': walletId,
+      'walletName': walletName,
+      'walletType': walletType,
+      'addToReport': addToReport,
+      'transactionType': transactionType,
+      'imageUrl': imageUrl,
+      'createdAt': createdAt,
+      'createdBy': createdBy,
+      'createdByName': createdByName,
+    };
   }
 }

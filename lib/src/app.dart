@@ -1,5 +1,7 @@
+import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/l10n/app_localizations/app_localizations.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';
+import 'package:expensive_management/src/shared/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:expensive_management/app/app_colors.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,7 +21,15 @@ class _MyWalletAppState extends State<MyWalletApp> {
   @override
   void initState() {
     super.initState();
-
+    serviceLocator<NotificationService>().initialize(onPermissionGranted: (isGranted) {
+      if (isGranted) {
+        // Handle permission granted
+        debugPrint('Notification permission granted');
+      } else {
+        // Handle permission denied
+        debugPrint('Notification permission denied');
+      }
+    });
     // notificationService.initLocalNotifications();
     // notificationService.initializedNotification();
   }

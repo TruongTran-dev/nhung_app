@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:expensive_management/data/api/api_path.dart';
 import 'package:expensive_management/src/core/common/dio_provider.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
+import 'package:flutter/cupertino.dart';
 
 abstract class AuthDataSource {
   Future<Either<Failure, Map<String, dynamic>>> login({required Map<String, dynamic> data});
@@ -19,6 +20,7 @@ class AuthDataSourceImpl implements AuthDataSource {
   @override
   Future<Either<Failure, Map<String, dynamic>>> login({required Map<String, dynamic> data}) async {
     try {
+      debugPrint('Login data: $data');
       if (await networkInfo.isNotConnected) {
         return Left(Failure('Không có kết nối mạng. Vui lòng kiểm tra lại.'));
       }

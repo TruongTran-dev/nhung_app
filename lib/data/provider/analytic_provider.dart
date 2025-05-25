@@ -1,3 +1,4 @@
+
 import 'package:expensive_management/data/models/analytic_model.dart';
 import 'package:expensive_management/data/response/base_response.dart';
 
@@ -15,17 +16,18 @@ class AnalyticProvider with ProviderMixin {
     }
     try {
       final response = await dio.put(
-        ApiPath.apiDomain + ApiPath.analyticReport,
+        ApiPath.apiDomain + ApiPath.reportStatistic,
         data: data,
         queryParameters: query,
         options: await defaultOptions(
-          url: ApiPath.apiDomain + ApiPath.analyticReport,
+          url: ApiPath.apiDomain + ApiPath.reportStatistic,
           contentType: 'application/json',
         ),
       );
+
       return AnalyticModel.fromJson(response.data);
     } catch (error, stacktrace) {
-      return errorResponse(error, stacktrace, ApiPath.analyticReport);
+      return errorResponse(error, stacktrace, ApiPath.reportStatistic);
     }
   }
 
