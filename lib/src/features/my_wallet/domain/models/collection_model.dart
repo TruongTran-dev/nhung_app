@@ -51,7 +51,7 @@ class CollectionModel {
         imageUrl: json['imageUrl'],
         createdAt: json['createdAt'],
         createdBy: json['createdBy'] ?? 0,
-        createdByName: json['createdByName'],
+        createdByName: json['username'],
       );
 
   @override

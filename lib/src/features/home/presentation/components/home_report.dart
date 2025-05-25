@@ -1,15 +1,14 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:math' show Random;
 
+import 'package:equatable/equatable.dart';
 import 'package:expensive_management/data/api/api_path.dart';
+import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
-import 'package:expensive_management/src/shared/utils/enum/enum.dart';
-import 'package:expensive_management/src/shared/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:expensive_management/data/models/category_report_model.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
 
 class ReportPage extends StatefulWidget {
@@ -41,9 +40,9 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
   // Method to fetch data based on current tab
   void _fetchData() {
     if (_tabController.index == 0) {
-      _getExpenditureRevenueDataReport(type: TransactionType.expense);
+      _getExpenseDataReport();
     } else {
-      _getExpenditureRevenueDataReport(type: TransactionType.income);
+      _getRevenueDataReport();
     }
   }
 
@@ -53,9 +52,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
     _tabController.dispose();
   }
 
-  Future<WeeklyReportModel?> _getExpenditureRevenueDataReport({
-    required TransactionType type,
-  }) async {
+  Future<List<CategoryReportData>> _getExpenseDataReport() async {
     try {
       final token = sharedPref.getAccessToken();
       if (!await AppUtils.isValidToken()) {
@@ -67,22 +64,69 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
-      final url = Uri.parse("${ApiPath.apiDomain}${ApiPath.weekReport}?type=${type.name.toUpperCase()}");
-      print("Fetching week report from: $url with headers: $headers");
+      final url = Uri.parse("${ApiPath.apiDomain}${ApiPath.categoryReport}?type=EXPENSE");
       final response = await http.get(url, headers: headers).timeout(Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         final reportData = data['data'];
-        final weeklyReport = WeeklyReportModel.fromJson(reportData);
-        return weeklyReport;
+        if (reportData is List) {
+          final List<CategoryReportData> reports = reportData
+              .map((item) => CategoryReportData(
+                    name: item['categoryName'] as String,
+                    percent: (item['percent'] as num).toDouble(),
+                  ))
+              .toList();
+          return reports;
+        }
+
+        return [];
       } else {
-        print("Error fetching week report: ${response.statusCode}");
-        return null;
+        print("Error fetching week expense report: ${response.statusCode}");
+        return [];
       }
     } catch (e) {
-      print("Error fetching week report: $e");
-      return null;
+      print("Error fetching week expense report: $e");
+      return [];
+    }
+  }
+
+  Future<List<CategoryReportData>> _getRevenueDataReport() async {
+    try {
+      final token = sharedPref.getAccessToken();
+      if (!await AppUtils.isValidToken()) {
+        //logout();
+      }
+
+      final headers = {
+        "Authorization": token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+      final url = Uri.parse("${ApiPath.apiDomain}${ApiPath.categoryReport}?type=INCOME");
+      final response = await http.get(url, headers: headers).timeout(Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        final reportData = data['data'];
+        if (reportData is List) {
+          final List<CategoryReportData> reports = reportData
+              .map((item) => CategoryReportData(
+                    name: item['categoryName'] as String,
+                    percent: (item['percent'] as num).toDouble(),
+                  ))
+              .toList();
+          return reports;
+        }
+
+        return [];
+      } else {
+        print("Error fetching week income report: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching week income report: $e");
+      return [];
     }
   }
 
@@ -145,11 +189,13 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
                                 borderRadius: BorderRadius.circular(12),
                                 color: _tabController.index == 0 ? Colors.white : Colors.transparent,
                               ),
-                              child: Text('Hạng mục chi',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: _tabController.index == 0 ? Colors.black : Colors.grey,
-                                  )),
+                              child: Text(
+                                'Hạng mục chi',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: _tabController.index == 0 ? Colors.black : Colors.grey,
+                                ),
+                              ),
                             ),
                           ),
                           Tab(
@@ -160,11 +206,13 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
                                 borderRadius: BorderRadius.circular(12),
                                 color: _tabController.index == 1 ? Colors.white : Colors.transparent,
                               ),
-                              child: Text('Hạng mục thu',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: _tabController.index == 1 ? Colors.black : Colors.grey,
-                                  )),
+                              child: Text(
+                                'Hạng mục thu',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: _tabController.index == 1 ? Colors.black : Colors.grey,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -175,38 +223,36 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
                         controller: _tabController,
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
-                          FutureBuilder<WeeklyReportModel?>(
-                            future: _getExpenditureRevenueDataReport(type: TransactionType.expense),
+                          FutureBuilder<List<CategoryReportData>>(
+                            future: _getExpenseDataReport(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const Center(child: CircularProgressIndicator.adaptive());
                               } else if (snapshot.hasError) {
                                 return Center(child: Text('Error: ${snapshot.error}'));
-                              } else if (!snapshot.hasData || snapshot.data!.detailReport.isEmpty) {
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                                 return const Center(child: Text('Chưa có dữ liệu báo cáo hạng mục chi'));
                               } else {
                                 return ReportView(
-                                  reports: snapshot.data!.detailReport,
+                                  reports: snapshot.data!,
                                   isRevenue: false,
-                                  total: snapshot.data!.total,
                                 );
                               }
                             },
                           ),
-                          FutureBuilder<WeeklyReportModel?>(
-                            future: _getExpenditureRevenueDataReport(type: TransactionType.income),
+                          FutureBuilder<List<CategoryReportData>>(
+                            future: _getRevenueDataReport(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const Center(child: CircularProgressIndicator.adaptive());
                               } else if (snapshot.hasError) {
                                 return Center(child: Text('Error: ${snapshot.error}'));
-                              } else if (!snapshot.hasData || snapshot.data!.detailReport.isEmpty) {
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                                 return const Center(child: Text('Chưa có dữ liệu báo cáo hạng mục thu'));
                               } else {
                                 return ReportView(
-                                  reports: snapshot.data!.detailReport,
+                                  reports: snapshot.data!,
                                   isRevenue: true,
-                                  total: snapshot.data!.total,
                                 );
                               }
                             },
@@ -226,15 +272,13 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
 }
 
 class ReportView extends StatefulWidget {
-  final List<DailyReportModel> reports;
+  final List<CategoryReportData> reports;
   final bool isRevenue;
-  final double total;
 
   const ReportView({
     super.key,
     required this.reports,
     this.isRevenue = false,
-    required this.total,
   });
 
   @override
@@ -244,124 +288,116 @@ class ReportView extends StatefulWidget {
 class _ReportViewState extends State<ReportView> {
   final TooltipBehavior _tooltip = TooltipBehavior(enable: true);
 
-  bool _showDetail = false;
-
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Colors.white),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 10, bottom: 10.0),
-            child: Text('(Đơn vị: %)', style: TextStyle(fontSize: 12, color: Colors.black)),
-          ),
-          SizedBox(
-            height: 350,
-            child: SfCircularChart(
-              tooltipBehavior: _tooltip,
-              series: <CircularSeries>[
-                PieSeries<DailyReportModel, String>(
-                  dataSource: widget.reports,
-                  xValueMapper: (DailyReportModel data, _) => data.time,
-                  yValueMapper: (DailyReportModel data, _) => data.totalAmount / widget.total * 100,
-                  name: widget.isRevenue ? 'Thu' : 'Chi',
-                  explode: false,
-                  pointColorMapper: (DailyReportModel data, index) {
-                    // Generate random color with good contrast
-                    if (index == 0) {
-                      return Color(0xfffbdcea);
-                    } else if (index == 1) {
-                      return Color(0xffdbd9ff);
-                    } else if (index == 2) {
-                      return Color(0xff7e9ae6);
-                    } else if (index == 3) {
-                      return Color(0xff73dce6);
-                    } else if (index == 4) {
-                      return Color(0xffcff5f4);
-                    } else {
-                      final random = Random();
-                      return Color.fromRGBO(random.nextInt(256), random.nextInt(256), random.nextInt(256), 1.0)
-                          .withValues(alpha: 0.4);
-                    }
-                  },
-                ),
-              ],
+      padding: EdgeInsets.only(bottom: 12),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 10, bottom: 10.0),
+              child: Text('(Đơn vị: %)', style: TextStyle(fontSize: 12, color: Colors.black)),
             ),
-          ),
-          // listDetails(widget.reports),
-        ],
-      ),
-    );
-  }
-
-  Widget listDetails(List<DailyReportModel> listReport) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () {
-              setState(() {
-                _showDetail = !_showDetail;
-              });
-            },
-            child: SizedBox(
-              height: 40,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Xem chi tiết',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
-                  ),
-                  Icon(
-                    _showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                    size: 20,
-                    color: Colors.grey,
+            SizedBox(
+              height: 300,
+              child: SfCircularChart(
+                margin: EdgeInsets.zero,
+                tooltipBehavior: _tooltip,
+                series: <CircularSeries>[
+                  PieSeries<CategoryReportData, String>(
+                    dataSource: widget.reports,
+                    xValueMapper: (CategoryReportData data, _) => data.name,
+                    yValueMapper: (CategoryReportData data, _) => data.percent,
+                    name: widget.isRevenue ? 'Thu' : 'Chi',
+                    explode: false,
+                    pointColorMapper: (CategoryReportData data, index) => getColor(index),
                   ),
                 ],
               ),
             ),
-          ),
-          if (_showDetail && listReport.isNotEmpty)
-            SizedBox(
-              height: 40 * (listReport.length).toDouble(),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                physics: const NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: listReport.length,
-                itemBuilder: (context, index) => details(listReport[index]),
-              ),
-            ),
-        ],
+            ...widget.reports.mapIndexed((index, report) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: getColor(index),
+                        shape: BoxShape.rectangle,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        report.name,
+                        style: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.7)),
+                      ),
+                    ),
+                    Text(
+                      '${report.percent.toStringAsFixed(2)}%',
+                      style: TextStyle(fontSize: 14, color: Colors.black.withValues(alpha: 0.7)),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
 
-  Widget details(DailyReportModel report) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-            bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-            Text('${formatterDouble(report.totalAmount.toInt())} %', style: const TextStyle(color: Colors.black)),
-          ],
-        ),
-      ),
+  Color getColor(int index) {
+    if (index == 0) {
+      return Color(0xfffbdcea);
+    } else if (index == 1) {
+      return Color(0xffdbd9ff);
+    } else if (index == 2) {
+      return Color(0xff7e9ae6);
+    } else if (index == 3) {
+      return Color(0xff73dce6);
+    } else if (index == 4) {
+      return Color(0xffcff5f4);
+    } else {
+      final random = Random();
+      return Color.fromRGBO(random.nextInt(256), random.nextInt(256), random.nextInt(256), 1.0).withValues(alpha: 0.4);
+    }
+  }
+}
+
+class CategoryReportData extends Equatable {
+  final String name;
+  final double percent;
+
+  const CategoryReportData({
+    required this.name,
+    required this.percent,
+  });
+
+  factory CategoryReportData.fromJson(Map<String, dynamic> json) {
+    return CategoryReportData(
+      name: json['comm'] as String,
+      percent: (json['percent'] as num).toDouble(),
+    );
+  }
+
+  @override
+  List<Object?> get props => [name, percent];
+  @override
+  bool get stringify => true;
+
+  CategoryReportData copyWith({
+    String? name,
+    double? percent,
+  }) {
+    return CategoryReportData(
+      name: name ?? this.name,
+      percent: percent ?? this.percent,
     );
   }
 }

@@ -218,7 +218,8 @@ class _HomeViewState extends State<HomePage> {
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         final reportData = data['data'];
-        // log("Report data: $reportData");
+
+        log("Week Report data: $reportData");
         final report = WeekReportModel.fromJson(reportData);
         return report;
       } else {

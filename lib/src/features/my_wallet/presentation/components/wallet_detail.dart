@@ -132,13 +132,7 @@ class _WalletDetailPageState extends State<WalletDetailPage> {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
-      // final url = Uri.parse("${ApiPath.apiDomain}${ApiPath.getReportByWalletId}"
-      //     .replaceAll("{fromDate}", fromDate)
-      //     .replaceAll("{toDate}", toDate)
-      //     .replaceAll("{walletId}", "${widget.wallet.id}"));
-      // if (widget.wallet.groupId != null) {
-      //   url.replace(queryParameters: params);
-      // }
+      
       final url = Uri.parse("${ApiPath.apiDomain}/api/v1/report/").replace(queryParameters: {
         'fromDate': fromDate,
         'toDate': toDate,
