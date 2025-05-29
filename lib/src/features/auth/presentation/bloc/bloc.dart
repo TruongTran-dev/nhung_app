@@ -4,6 +4,7 @@ import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/core/common/dio_provider.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/features/auth/domain/models/user_model.dart';
+import 'package:expensive_management/src/features/auth/domain/usecases/change_pwd.dart';
 import 'package:expensive_management/src/features/auth/domain/usecases/get_otp_forgot_pwd.dart';
 import 'package:expensive_management/src/features/auth/domain/usecases/login.dart';
 import 'package:expensive_management/src/features/auth/domain/usecases/register.dart';
@@ -20,6 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GetOtpForgotPwdUseCase getOtpForgotPwdUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
   final UpdateNewPwdUseCase updateNewPwdUseCase;
+  final ChangePwdUseCase changePwdUseCase;
   final AppPrefStorage appPrefStorage;
 
   AuthBloc({
@@ -28,6 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.getOtpForgotPwdUseCase,
     required this.verifyOtpUseCase,
     required this.updateNewPwdUseCase,
+    required this.changePwdUseCase,
     required this.appPrefStorage,
   }) : super(AuthInitial()) {
     on<ReValidateFormEvent>((event, emit) => emit(AuthInitial()), transformer: droppable());
@@ -36,6 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<GetOTPForgotPasswordEvent>(_onGetOTPForgotPasswordEvent, transformer: droppable());
     on<SubmitVerifyOtpEvent>(_onSubmitVerifyOtpEvent, transformer: droppable());
     on<SubmitNewPasswordEvent>(_onSubmitNewPasswordEvent, transformer: droppable());
+    on<ChangePasswordEvent>(_onChangePasswordEvent, transformer: droppable());
   }
 
   Future<void> _onSubmitLoginEvent(SubmitLoginEvent event, Emitter<AuthState> emit) async {
@@ -192,6 +196,43 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(UpdateNewPasswordFailedState(
           key: "400",
           errorMessage: "Mã OTP không hợp lệ",
+        ));
+      });
+    }
+  }
+
+  Future<void> _onChangePasswordEvent(ChangePasswordEvent event, Emitter<AuthState> emit) async {
+    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+      emit(LoadingState());
+    });
+
+    final response = await changePwdUseCase.call(
+      ChangePwdParams(
+        oldPassword: event.oldPassword,
+        newPassword: event.newPassword,
+      ),
+    );
+
+    if (response.isLeft) {
+      final error = response.left;
+      GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+        emit(ChangePasswordFailedState(
+          key: error is ServerError ? error.key : error.statusCode.toString(),
+          errorMessage: error.message,
+        ));
+      });
+      return;
+    }
+
+    if (response.right) {
+      GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+        emit(ChangePasswordSuccessState());
+      });
+    } else {
+      GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+        emit(ChangePasswordFailedState(
+          key: "400",
+          errorMessage: "error occurred while changing password",
         ));
       });
     }

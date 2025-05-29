@@ -35,10 +35,9 @@ class RecurringListModel {
     this.dayInWeeks,
   });
 
-  factory RecurringListModel.fromJson(Map<String, dynamic> json) =>
-      RecurringListModel(
+  factory RecurringListModel.fromJson(Map<String, dynamic> json) => RecurringListModel(
         id: json['id'] ?? 0,
-        amount: json['amount'] ?? 0.0,
+        amount: json['amount'] ?? 0,
         categoryId: json['categoryId'] ?? 0,
         categoryName: json['categoryName'] ?? '',
         categoryLogo: json['categoryLogo'] ?? '',
@@ -60,7 +59,6 @@ class RecurringListModel {
   }
 }
 
-
 TransactionType getTransactionType(String transactionTypeString) {
   switch (transactionTypeString.toUpperCase()) {
     case 'EXPENSE':
@@ -68,7 +66,7 @@ TransactionType getTransactionType(String transactionTypeString) {
     case 'INCOME':
       return TransactionType.income;
     default:
-    // Handle unrecognized transaction type if needed
+      // Handle unrecognized transaction type if needed
       throw Exception('Invalid transaction type: $transactionTypeString');
   }
 }
@@ -88,7 +86,7 @@ FrequencyType getFrequencyType(String frequencyTypeString) {
     case 'WEEKDAY':
       return FrequencyType.weekday;
     default:
-    // Handle unrecognized frequency type if needed
+      // Handle unrecognized frequency type if needed
       throw Exception('Invalid frequency type: $frequencyTypeString');
   }
 }

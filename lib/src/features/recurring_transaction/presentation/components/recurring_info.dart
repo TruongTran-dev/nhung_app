@@ -1,24 +1,23 @@
-// ignore_for_file: use_build_context_synchronously
+import 'dart:developer';
 
+import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
+import 'package:expensive_management/src/core/utils/app_utils.dart';
+import 'package:expensive_management/src/features/collection/presentation/components/option_category.dart';
+import 'package:expensive_management/src/features/collection/presentation/components/select_wallet_collection.dart';
+import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:intl/intl.dart';
 import 'package:expensive_management/src/features/recurring_transaction/presentation/bloc/recurring_info_bloc.dart';
 import 'package:expensive_management/data/models/frequency_model.dart';
 import 'package:expensive_management/data/models/recurring_list_model.dart';
 import 'package:expensive_management/data/models/recurring_post_model.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
-import 'package:expensive_management/data/repository/recurring_repository.dart';
-import 'package:expensive_management/data/response/base_get_response.dart';
 import 'package:expensive_management/src/features/collection/presentation/collection_page.dart';
 import 'package:expensive_management/src/features/recurring_transaction/presentation/components/option_repeat_time.dart';
-import 'package:expensive_management/src/shared/widgets/animation_loading.dart';
 import 'package:expensive_management/src/shared/widgets/app_image.dart';
 import 'package:expensive_management/src/shared/widgets/primary_button.dart';
-import 'package:expensive_management/src/shared/utils/app_constants.dart';
-import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
@@ -35,8 +34,6 @@ class RecurringInfo extends StatefulWidget {
 }
 
 class _RecurringInfoState extends State<RecurringInfo> {
-  final _recurringRepository = RecurringRepository();
-
   final _noteController = TextEditingController();
   final _moneyController = TextEditingController();
 
@@ -44,18 +41,9 @@ class _RecurringInfoState extends State<RecurringInfo> {
 
   final String _currency = serviceLocator<AppPrefStorage>().getCurrency();
 
-  late RecurringInfoBloc _recurringInfoBloc;
-
-  int? walletId;
-  String? walletName;
-  String? walletType;
-
-  bool _isMathReport = false;
-
+  Wallet? selectedWallet;
   String? optionTitle;
-
   ItemCategory? itemCategorySelected;
-  // =    ItemCategory(categoryId: null, title: "Chọn hạng mục", iconLeading: '', type: TransactionType.expense);
 
   List<DayOfWeek> listDay = [];
   FrequencyType frequencyType = FrequencyType.daily;
@@ -63,26 +51,29 @@ class _RecurringInfoState extends State<RecurringInfo> {
   String time = DateFormat('HH:mm').format(DateTime.now());
 
   void initWhenEdit() {
-    setState(() {
-      frequencyType = widget.recurringListModel?.frequencyType ?? FrequencyType.daily;
-      listDay = getDayOfWeekListFromStrings(widget.recurringListModel?.dayInWeeks ?? []);
-      time = widget.recurringListModel?.time ?? DateFormat('HH:mm').format(DateTime.now());
-      fromDate = getDateTimeFormat(widget.recurringListModel?.fromDate ?? DateTime.now());
-      toDate = isNotNullOrEmpty(toDate) ? getDateTimeFormat((widget.recurringListModel?.toDate)!) : null;
-      // itemCategorySelected = ItemCategory(
-      //   categoryId: widget.recurringListModel?.categoryId,
-      //   title: widget.recurringListModel?.categoryName,
-      //   iconLeading: widget.recurringListModel?.categoryLogo,
-      //   type: widget.recurringListModel?.transactionType ?? TransactionType.expense,
-      // );
-      walletId = widget.recurringListModel?.walletId;
-      walletName = widget.recurringListModel?.walletName;
-      walletType = 'wallet';
-      _moneyController.text = widget.recurringListModel?.amount.toString() ?? '';
-      _noteController.text = widget.recurringListModel?.description.toString() ?? '';
-      _isMathReport = widget.recurringListModel?.addToReport ?? false;
-      initOptionTitle();
-    });
+    frequencyType = widget.recurringListModel?.frequencyType ?? FrequencyType.daily;
+    listDay = getDayOfWeekListFromStrings(widget.recurringListModel?.dayInWeeks ?? []);
+    time = widget.recurringListModel?.time ?? DateFormat('HH:mm').format(DateTime.now());
+    fromDate = getDateTimeFormat(widget.recurringListModel?.fromDate ?? DateTime.now());
+    toDate = isNotNullOrEmpty(toDate) ? getDateTimeFormat((widget.recurringListModel?.toDate)!) : null;
+    itemCategorySelected = ItemCategory(
+      categoryId: widget.recurringListModel?.categoryId ?? 0,
+      title: widget.recurringListModel?.categoryName ?? 'Chọn hạng mục',
+      iconLeading: widget.recurringListModel?.categoryLogo ?? '',
+      type: widget.recurringListModel?.transactionType ?? TransactionType.expense,
+    );
+    selectedWallet = Wallet(
+      id: widget.recurringListModel?.walletId ?? 0,
+      name: widget.recurringListModel?.walletName ?? 'Chọn tài khoản/ ví',
+      accountType: 'wallet',
+      accountBalance: 0,
+      currency: _currency,
+    );
+
+    _moneyController.text = (widget.recurringListModel?.amount ?? 0).toInt().currencyFormat();
+    _noteController.text = widget.recurringListModel?.description.toString() ?? '';
+    // _isMathReport = widget.recurringListModel?.addToReport ?? false;
+    initOptionTitle();
   }
 
   void initOptionTitle() {
@@ -92,21 +83,20 @@ class _RecurringInfoState extends State<RecurringInfo> {
 
     String frequencyName = (frequencyType == FrequencyType.weekday) ? dayWeek : getTitleByFrequencyType(frequencyType);
     String fromDateF = 'Từ $fromDate';
-    String toDateF = isNullOrEmpty(toDate) ? '' : 'Đến $toDate';
+    String toDateF = toDate.isNullOrEmpty ? '' : 'Đến $toDate';
     String timeF = 'Lúc $time';
-    setState(() {
-      optionTitle = isNullOrEmpty(time)
-          ? [frequencyName, fromDateF].join('. ')
-          : isNullOrEmpty(toDateF)
-              ? [frequencyName, fromDateF, timeF].join('. ')
-              : [frequencyName, fromDateF, toDateF, timeF].join('. ');
-    });
+    optionTitle = time.isNullOrEmpty
+        ? [frequencyName, fromDateF].join('. ')
+        : toDateF.isNullOrEmpty
+            ? [frequencyName, fromDateF, timeF].join('. ')
+            : [frequencyName, fromDateF, toDateF, timeF].join('. ');
+    setState(() {});
   }
+
+  final _recurringBloc = serviceLocator<RecurringInfoBloc>();
 
   @override
   void initState() {
-    _recurringInfoBloc = BlocProvider.of<RecurringInfoBloc>(context)..add(RecurringInfoInit());
-
     _noteController.addListener(() {
       setState(() {
         _showClearNote = _noteController.text.isNotEmpty;
@@ -121,7 +111,6 @@ class _RecurringInfoState extends State<RecurringInfo> {
     _noteController.dispose();
     _moneyController.dispose();
     super.dispose();
-    _recurringInfoBloc.close();
   }
 
   @override
@@ -134,27 +123,45 @@ class _RecurringInfoState extends State<RecurringInfo> {
           icon: const Icon(Icons.close, size: 24, color: Colors.white),
         ),
         centerTitle: true,
-        title: const Text('Giao dịch định kỳ',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+        title: const Text(
+          'Giao dịch định kỳ',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+        ),
       ),
       body: BlocConsumer<RecurringInfoBloc, RecurringInfoState>(
-        listenWhen: (preState, curState) {
-          return curState.apiError != ApiError.noError;
-        },
+        bloc: _recurringBloc,
         listener: (context, state) {
-          if (state.apiError == ApiError.internalServerError) {
-            showMessage1OptionDialog(context, 'Error!', content: 'Internal_server_error');
-          }
-          if (state.apiError == ApiError.noInternetConnection) {
-            showMessageNoInternetDialog(context);
+          if (state is AddRecurringSuccessState) {
+            AppUtils.showSnackBar(context, 'Thêm giao dịch định kỳ thành công');
+            initWhenEdit();
+          } else if (state is AddRecurringFailureState) {
+            showMessage1OptionDialog(context, state.message);
+          } else if (state is UpdateRecurringSuccessState) {
+            AppUtils.showSnackBar(context, 'Cập nhật giao dịch định kỳ thành công');
+            Navigator.of(context).pop(true);
+          } else if (state is UpdateRecurringFailureState) {
+            showMessage1OptionDialog(context, state.message);
+          } else if (state is DeleteRecurringSuccessState) {
+            AppUtils.showSnackBar(context, 'Xóa giao dịch định kỳ thành công');
+            Navigator.of(context).pop(true);
+          } else if (state is DeleteRecurringFailureState) {
+            showMessage1OptionDialog(context, state.message);
           }
         },
-        builder: (context, state) => state.isLoading ? const AnimationLoading() : _body(context, state),
+        builder: (context, state) {
+          final isLoading = state is RecurringInfoLoading;
+          return Stack(
+            children: [
+              _body(),
+              isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _body(BuildContext context, RecurringInfoState state) {
+  Widget _body() {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       physics: const BouncingScrollPhysics(),
@@ -164,27 +171,25 @@ class _RecurringInfoState extends State<RecurringInfo> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             _money(),
-            _select(state),
-            widget.isEdit
-                ? _buttonDeleteUpdate(context, walletId, itemCategorySelected?.categoryId)
-                : _buttonSave(context, walletId, itemCategorySelected?.categoryId),
+            _select(),
+            widget.isEdit ? _buttonDeleteUpdate() : _buttonSave(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buttonSave(BuildContext context, int? walletID, int? categoryID) {
+  Widget _buttonSave() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: PrimaryButton(
         text: 'Lưu',
-        onTap: () async => await handleButtonSave(context, walletID, categoryID),
+        onTap: () async => await handleButtonSave(),
       ),
     );
   }
 
-  Widget _buttonDeleteUpdate(BuildContext context, int? walletID, int? categoryID) {
+  Widget _buttonDeleteUpdate() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
@@ -200,11 +205,11 @@ class _RecurringInfoState extends State<RecurringInfo> {
                 cancelLabel: 'Huỷ',
                 okLabel: 'Xóa',
                 onOK: () async {
-                  //todo: need move code to bloc
-                  if (widget.recurringListModel?.id != null) {
-                    await _recurringRepository.deleteRecurring(recurringID: (widget.recurringListModel?.id)!);
-                    Navigator.of(this.context).pop(true);
+                  if (widget.recurringListModel == null || widget.recurringListModel!.id == null) {
+                    showMessage1OptionDialog(context, 'Không tìm thấy giao dịch định kỳ để cập nhật');
+                    return;
                   }
+                  _recurringBloc.add(DeleteRecurringEvent(widget.recurringListModel!.id!));
                 },
               );
             },
@@ -212,11 +217,16 @@ class _RecurringInfoState extends State<RecurringInfo> {
           PrimaryButton(
             text: 'Cập nhật',
             onTap: () async {
+              if (widget.recurringListModel == null || widget.recurringListModel!.id == null) {
+                showMessage1OptionDialog(context, 'Không tìm thấy giao dịch định kỳ để cập nhật');
+                return;
+              }
+
               if (_moneyController.text.isEmpty) {
                 showMessage1OptionDialog(context, 'Bạn chưa nhập số tiền');
-              } else if (isNullOrEmpty(walletID)) {
+              } else if (selectedWallet == null) {
                 showMessage1OptionDialog(context, 'Vui lòng chọn tài khoản');
-              } else if (isNullOrEmpty(categoryID)) {
+              } else if (itemCategorySelected == null) {
                 showMessage1OptionDialog(context, 'Vui lòng chọn hạng mục');
               } else if (isNullOrEmpty(optionTitle)) {
                 showMessage1OptionDialog(context, 'Vui lòng chọn thời gian lặp lại');
@@ -224,9 +234,9 @@ class _RecurringInfoState extends State<RecurringInfo> {
                 List<String> enList = listDayOfWeek.map((day) => day.en.toUpperCase()).toList();
 
                 final Map<String, dynamic> data = {
-                  // "addToReport": _isMathReport,
-                  "amount": double.parse(_moneyController.text.trim().toString()),
-                  "categoryId": categoryID!.toString(),
+                  "addToReport": true,
+                  "amount": int.parse(_moneyController.text.trim().replaceAll(',', '')),
+                  "categoryId": itemCategorySelected!.categoryId.toString(),
                   "dayInWeeks": frequencyType == FrequencyType.weekday ? enList : [],
                   "description": _noteController.text.trim(),
                   "frequencyType": frequencyType.name.toUpperCase(),
@@ -234,29 +244,9 @@ class _RecurringInfoState extends State<RecurringInfo> {
                   "time": time,
                   "toDate": toDate,
                   "transactionType": itemCategorySelected?.type.name.toUpperCase(),
-                  "walletId": walletID!.toString()
+                  "walletId": selectedWallet!.toString()
                 };
-                if (widget.recurringListModel?.id != null) {
-                  final response = await _recurringRepository.updateRecurring(
-                    recurringID: (widget.recurringListModel?.id)!,
-                    data: data,
-                  );
-
-                  if (response is RecurringPost) {
-                    if (!mounted) return;
-                    showMessage1OptionDialog(
-                      this.context,
-                      'Cập nhật giao dịch định kỳ thành công',
-                      onClose: () {
-                        Navigator.of(context).pop(true);
-                      },
-                    );
-                  } else if (response is ExpiredTokenGetResponse) {
-                    logoutIfNeed(this.context);
-                  } else {
-                    showMessage1OptionDialog(this.context, 'Cập nhật giao dịch định kỳ thất bại');
-                  }
-                }
+                _recurringBloc.add(UpdateRecurringEvent(widget.recurringListModel!.id!, data));
               }
             },
           ),
@@ -265,12 +255,12 @@ class _RecurringInfoState extends State<RecurringInfo> {
     );
   }
 
-  Future handleButtonSave(BuildContext context, int? walletID, int? categoryID) async {
+  Future<void> handleButtonSave() async {
     if (_moneyController.text.isEmpty) {
       showMessage1OptionDialog(context, 'Bạn chưa nhập số tiền');
-    } else if (isNullOrEmpty(walletID)) {
+    } else if (selectedWallet == null) {
       showMessage1OptionDialog(context, 'Vui lòng chọn tài khoản');
-    } else if (isNullOrEmpty(categoryID)) {
+    } else if (itemCategorySelected == null) {
       showMessage1OptionDialog(context, 'Vui lòng chọn hạng mục');
     } else if (isNullOrEmpty(optionTitle)) {
       showMessage1OptionDialog(context, 'Vui lòng chọn thời gian lặp lại');
@@ -278,9 +268,9 @@ class _RecurringInfoState extends State<RecurringInfo> {
       List<String> enList = listDayOfWeek.map((day) => day.en.toUpperCase()).toList();
 
       final Map<String, dynamic> data = {
-        // "addToReport": _isMathReport,
-        "amount": double.parse(_moneyController.text.trim().toString()),
-        "categoryId": categoryID!.toString(),
+        "addToReport": true,
+        "amount": int.parse(_moneyController.text.trim().replaceAll(',', '')),
+        "categoryId": itemCategorySelected!.categoryId.toString(),
         "dayInWeeks": frequencyType == FrequencyType.weekday ? enList : [],
         "description": _noteController.text.trim(),
         "frequencyType": frequencyType.name.toUpperCase(),
@@ -288,125 +278,131 @@ class _RecurringInfoState extends State<RecurringInfo> {
         "time": time,
         "toDate": toDate,
         "transactionType": itemCategorySelected?.type.name.toUpperCase(),
-        "walletId": walletID!.toString()
+        "walletId": selectedWallet!.id.toString()
       };
-
-      final response = await _recurringRepository.addRecurring(data);
-
-      if (response is RecurringPost && mounted) {
-        showMessage1OptionDialog(
-          this.context,
-          'Thêm giao dịch định kỳ thành công',
-          onClose: () {
-            _moneyController.clear();
-            _noteController.clear();
-            setState(
-              () {
-                optionTitle = '';
-                walletId = null;
-                walletName = '';
-                walletType = '';
-                // itemCategorySelected = ItemCategory(
-                //   categoryId: null,
-                //   title: "Chọn hạng mục",
-                //   iconLeading: '',
-                //   type: TransactionType.expense,
-                // );
-              },
-            );
-          },
-        );
-      } else if (response is ExpiredTokenGetResponse) {
-        logoutIfNeed(this.context);
-      } else {
-        showMessage1OptionDialog(this.context, 'Thêm giao dịch định kỳ thất bại');
-      }
+      log("data : $data");
+      _recurringBloc.add(AddRecurringEvent(data));
     }
   }
 
-  Widget _select(RecurringInfoState state) {
+  Widget _select() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
       child: Container(
-        decoration:
-            BoxDecoration(borderRadius: BorderRadius.circular(10), color: Theme.of(context).colorScheme.background),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _selectWallet(state.listWallet),
+            _selectWallet(),
             Divider(height: 0.5, color: Colors.grey.withOpacity(0.3)),
-            _selectCategory(context),
+            _selectCategory(),
             Divider(height: 0.5, color: Colors.grey.withOpacity(0.3)),
             _note(),
             Divider(height: 0.5, color: Colors.grey.withOpacity(0.3)),
             _selectDate(),
-            Divider(height: 0.5, color: Colors.grey.withOpacity(0.3)),
-            Divider(height: 0.5, color: Colors.grey.withOpacity(0.3)),
           ],
         ),
       ),
     );
   }
 
-  Widget _selectWallet(List<Wallet>? listWallet) {
-    return ListTile(
-      onTap: () async => await _getWallet(listWallet),
-      dense: false,
-      horizontalTitleGap: 6,
-      leading: Icon(isNotNullOrEmpty(walletType) ? getIconWallet(walletType: walletType!) : Icons.help_outline,
-          size: 30, color: Colors.grey),
-      title: Text(
-        walletName ?? 'Chọn tài khoản/ ví',
-        style: TextStyle(fontSize: 16, color: isNotNullOrEmpty(walletName) ? Colors.black : Colors.grey),
+  Widget _selectWallet() {
+    return InkWell(
+      onTap: _showDiaLogSelectWallet,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        child: Row(
+          children: [
+            Icon(
+              selectedWallet != null ? getIconWallet(walletType: selectedWallet!.accountType) : Icons.help_outline,
+              size: 30,
+              color: Colors.grey,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                selectedWallet?.name ?? 'Chọn tài khoản/ ví',
+                style: TextStyle(fontSize: 16, color: selectedWallet != null ? Colors.black : Colors.grey),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
-  Widget _selectCategory(BuildContext context) {
-    return ListTile(
-      onTap: () async {
-        // final ItemCategory? itemCategory = await Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => BlocProvider(
-        //       create: (context) => OptionCategoryBloc(context),
-        //       child: OptionCategoryPage(
-        //         categoryIdSelected: itemCategorySelected?.categoryId,
-        //         tabIndex: itemCategorySelected?.type == TransactionType.expense ? 0 : 1,
-        //       ),
-        //     ),
-        //   ),
-        // );
-        // if (itemCategory != null) {
-        //   setState(() {
-        //     itemCategorySelected = itemCategory;
-        //   });
-        // } else {
-        //   showMessage1OptionDialog(this.context, 'Vui lòng chọn hạng mục');
-        //   return;
-        // }
-      },
-      dense: false,
-      horizontalTitleGap: 6,
-      leading: Container(
-        height: 30,
-        width: 30,
-        decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-        child: AppImage(
-          localPathOrUrl: itemCategorySelected?.iconLeading,
-          width: 30,
-          height: 30,
-          boxFit: BoxFit.cover,
-          alignment: Alignment.center,
-          errorWidget: const Icon(Icons.help_outline, color: Colors.grey, size: 30),
+  void _showDiaLogSelectWallet() async {
+    final result = await showModalBottomSheet<Wallet?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.6,
+        child: SelectWalletCollection(
+          selectedWallet: selectedWallet,
         ),
       ),
-      title: Text(
-        itemCategorySelected?.title ?? 'Chọn hạng mục',
-        style: TextStyle(fontSize: 16, color: (itemCategorySelected?.categoryId != null) ? Colors.black : Colors.grey),
+    );
+
+    setState(() {
+      selectedWallet = result;
+    });
+  }
+
+  void _onSelectCategory() async {
+    final itemSelected = await showModalBottomSheet<ItemCategory>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      constraints: BoxConstraints(maxHeight: context.screenSize.height * 0.6),
+      builder: (context) => OptionCategoryPage(
+        props: OptionCategoryProp(
+          categoryIdSelected: itemCategorySelected?.categoryId,
+          tabIndex: 0,
+        ),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+    );
+
+    if (itemSelected == null) return;
+
+    setState(() {
+      itemCategorySelected = itemSelected;
+    });
+  }
+
+  Widget _selectCategory() {
+    return InkWell(
+      onTap: _onSelectCategory,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        child: Row(
+          children: [
+            Container(
+              height: 30,
+              width: 30,
+              decoration: BoxDecoration(color: Colors.grey.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+              child: AppImage(
+                localPathOrUrl: itemCategorySelected?.iconLeading,
+                width: 30,
+                height: 30,
+                boxFit: BoxFit.cover,
+                alignment: Alignment.center,
+                errorWidget: const Icon(Icons.help_outline, color: Colors.grey, size: 30),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                itemCategorySelected?.title ?? 'Chọn hạng mục',
+                style: TextStyle(
+                    fontSize: 16, color: (itemCategorySelected?.categoryId != null) ? Colors.black : Colors.grey),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 
@@ -449,76 +445,31 @@ class _RecurringInfoState extends State<RecurringInfo> {
   }
 
   Widget _selectDate() {
-    return SizedBox(
-      child: ListTile(
-        onTap: () async => await _getOptionFrequency(),
-        dense: false,
-        visualDensity: const VisualDensity(horizontal: 0, vertical: 0),
-        leading: const Icon(Icons.sync, size: 30, color: Colors.grey),
-        title: Padding(
-          padding: const EdgeInsets.only(bottom: 4.0),
-          child: Text(
-            'Tùy chọn lặp lại',
-            style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4)),
-          ),
-        ),
-        subtitle: Text(
-          isNotNullOrEmpty(optionTitle) ? optionTitle! : 'Chọn thời gian lặp lại',
-          style: TextStyle(fontSize: 16, color: isNotNullOrEmpty(optionTitle) ? Colors.black : Colors.grey),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-      ),
-    );
-  }
-
-  // ignore: unused_element
-  Widget _mathReport() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).colorScheme.background,
-      ),
+    return GestureDetector(
+      onTap: _getOptionFrequency,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 10, 0, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        child: Row(
           children: [
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _isMathReport = !_isMathReport;
-                });
-              },
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+            const Icon(Icons.sync, size: 30, color: Colors.grey),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Expanded(
-                    child: Text('Không tính vào báo cáo', style: TextStyle(fontSize: 16, color: Colors.black)),
+                  Text(
+                    'Tùy chọn lặp lại',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4)),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    child: FlutterSwitch(
-                      activeColor: Theme.of(context).primaryColor,
-                      width: 40,
-                      height: 20,
-                      valueFontSize: 25.0,
-                      toggleSize: 18,
-                      value: _isMathReport,
-                      borderRadius: 10,
-                      padding: 2,
-                      showOnOff: false,
-                      onToggle: (val) {
-                        setState(() {
-                          _isMathReport = val;
-                        });
-                      },
-                    ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isNotNullOrEmpty(optionTitle) ? optionTitle! : 'Chọn thời gian lặp lại',
+                    style: TextStyle(fontSize: 16, color: isNotNullOrEmpty(optionTitle) ? Colors.black : Colors.grey),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 10),
-            const Text(AppConstants.mathReport, style: TextStyle(fontSize: 14, color: Colors.grey)),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
           ],
         ),
       ),
@@ -529,8 +480,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Container(
-        decoration:
-            BoxDecoration(color: Theme.of(context).colorScheme.background, borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -551,6 +501,41 @@ class _RecurringInfoState extends State<RecurringInfo> {
                         textAlign: TextAlign.end,
                         style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
                         // inputFormatters: [InputFormatter()],
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            // Remove all non-digit characters
+                            String digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
+
+                            // Convert to number and format with thousand separators
+                            if (digitsOnly.isNotEmpty) {
+                              try {
+                                int number = int.parse(digitsOnly);
+                                String formatted = number.currencyFormat();
+
+                                // Update controller without triggering another onChanged
+                                if (formatted != value) {
+                                  _moneyController.value = TextEditingValue(
+                                    text: formatted,
+                                    selection: TextSelection.collapsed(offset: formatted.length),
+                                  );
+                                }
+                              } catch (e) {
+                                // Show error for integer overflow
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Số tiền quá lớn, vui lòng nhập giá trị nhỏ hơn',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                );
+
+                                // Reset to a valid value
+                                _moneyController.text = '';
+                              }
+                            }
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -570,131 +555,43 @@ class _RecurringInfoState extends State<RecurringInfo> {
     );
   }
 
-  Future _getOptionFrequency() async {
-    final OptionRepeatData result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OptionRepeatTime(
-            fromDate: fromDate, toDate: toDate, time: time, frequencyType: frequencyType, listDay: listDay),
+  void _getOptionFrequency() async {
+    final result = await showModalBottomSheet<OptionRepeatData>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.6,
+        child: OptionRepeatTime(
+          fromDate: fromDate,
+          toDate: toDate,
+          time: time,
+          frequencyType: frequencyType,
+          listDay: listDay,
+        ),
       ),
     );
+
+    if (result == null) return;
+
     result.dayOfWeeks.sort((a, b) => a.index.compareTo(b.index));
     List<String> titles = result.dayOfWeeks.map((day) => day.title).toList();
     String dayWeek = titles.join(',');
 
     String frequencyName = (result.frequency.frequencyType == FrequencyType.weekday) ? dayWeek : result.frequency.title;
     String fromDateF = 'Từ ${result.fromDate}';
-    String toDateF = isNullOrEmpty(result.toDate) ? '' : 'Đến ${result.toDate}';
+    String toDateF = result.toDate.isNullOrEmpty ? '' : 'Đến ${result.toDate}';
     String timeF = 'Lúc ${result.time}';
-    setState(() {
-      optionTitle = isNullOrEmpty(toDateF)
-          ? isNullOrEmpty(time)
-              ? [frequencyName, fromDateF].join('. ')
-              : [frequencyName, fromDateF, timeF].join('. ')
-          : [frequencyName, fromDateF, toDateF, timeF].join('. ');
-      listDay = result.dayOfWeeks;
-      frequencyType = result.frequency.frequencyType;
-      fromDate = result.fromDate;
-      toDate = result.toDate;
-      time = result.time;
-    });
-  }
-
-  Future _getWallet(List<Wallet>? listWallet) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            elevation: 0,
-            leading: InkWell(
-              onTap: () => Navigator.pop(context),
-              child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
-            ),
-            centerTitle: true,
-            title: const Text(
-              'Chọn tài khoản',
-              style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: isNullOrEmpty(listWallet)
-                ? Text(
-                    'Không có dữ liệu tài khoản, vui lòng thêm tài khoản mới.',
-                    style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
-                  )
-                : ListView.builder(
-                    itemCount: listWallet!.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              walletId = listWallet[index].id;
-                              walletName = listWallet[index].name;
-                              walletType = listWallet[index].accountType;
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Theme.of(context).colorScheme.background),
-                            alignment: Alignment.center,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: Icon(
-                                    isNotNullOrEmpty(listWallet[index].accountType)
-                                        ? getIconWallet(walletType: listWallet[index].accountType)
-                                        : Icons.help,
-                                    size: 30,
-                                    color: Colors.grey.withOpacity(0.6),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        listWallet[index].name,
-                                        style: const TextStyle(fontSize: 16, color: Colors.black),
-                                      ),
-                                      Text(
-                                        '${listWallet[index].accountBalance} ${listWallet[index].currency}',
-                                        style: const TextStyle(fontSize: 14, color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (walletId == listWallet[index].id)
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                    child: Icon(Icons.check_circle_outline,
-                                        color: Theme.of(context).primaryColor, size: 24),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ),
-      ),
-    ).whenComplete(() {
-      setState(() {});
-    });
+    optionTitle = toDateF.isNullOrEmpty
+        ? time.isNullOrEmpty
+            ? [frequencyName, fromDateF].join('. ')
+            : [frequencyName, fromDateF, timeF].join('. ')
+        : [frequencyName, fromDateF, toDateF, timeF].join('. ');
+    listDay = result.dayOfWeeks;
+    frequencyType = result.frequency.frequencyType;
+    fromDate = result.fromDate;
+    toDate = result.toDate;
+    time = result.time;
+    setState(() {});
   }
 }

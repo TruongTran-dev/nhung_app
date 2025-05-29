@@ -321,10 +321,8 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
   }
 
   Widget _selectWallet() {
-    print('listWalletSelected: $listWalletSelected');
     List<String> titles = listWalletSelected.map((wallet) => wallet.name).toList();
     String walletsName = titles.join(', ');
-    print('Selected wallets: $walletsName');
 
     return InkWell(
       onTap: _showDiaLogSelectWallet,

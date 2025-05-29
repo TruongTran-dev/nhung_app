@@ -1,37 +1,69 @@
 part of 'recurring_info_bloc.dart';
 
-class RecurringInfoState implements ApiResultState {
-  final bool isLoading;
-  final ApiError _apiError;
-  final List<CategoryModel>? listExCategory;
-  final List<Wallet>? listWallet;
-  final bool addSuccess;
-
-  RecurringInfoState({
-    this.isLoading = false,
-    ApiError apiError = ApiError.noError,
-    this.listExCategory,
-    this.listWallet,
-    this.addSuccess = false,
-  }) : _apiError = apiError;
+abstract class RecurringInfoState extends Equatable {
+  const RecurringInfoState();
 
   @override
-  ApiError get apiError => _apiError;
+  List<Object?> get props => [];
+
+  @override
+  bool get stringify => true;
 }
 
-extension RecurringInfoStateEx on RecurringInfoState {
-  RecurringInfoState copyWith({
-    bool? isLoading,
-    ApiError? apiError,
-    List<CategoryModel>? listExCategory,
-    List<Wallet>? listWallet,
-    bool? addSuccess,
-  }) =>
-      RecurringInfoState(
-        isLoading: isLoading ?? this.isLoading,
-        apiError: apiError ?? this.apiError,
-        listExCategory: listExCategory ?? this.listExCategory,
-        listWallet: listWallet ?? this.listWallet,
-        addSuccess: addSuccess ?? this.addSuccess,
-      );
+class RecurringInfoInitial extends RecurringInfoState {}
+
+class RecurringInfoLoading extends RecurringInfoState {}
+
+class AddRecurringSuccessState extends RecurringInfoState {}
+
+class AddRecurringFailureState extends RecurringInfoState {
+  final String message;
+  final String? key;
+
+  const AddRecurringFailureState({
+    required this.message,
+    this.key,
+  });
+
+  @override
+  List<Object?> get props => [message, key];
+
+  @override
+  bool get stringify => true;
+}
+
+class UpdateRecurringSuccessState extends RecurringInfoState {}
+
+class UpdateRecurringFailureState extends RecurringInfoState {
+  final String message;
+  final String? key;
+
+  const UpdateRecurringFailureState({
+    required this.message,
+    this.key,
+  });
+
+  @override
+  List<Object?> get props => [message, key];
+
+  @override
+  bool get stringify => true;
+}
+
+class DeleteRecurringSuccessState extends RecurringInfoState {}
+
+class DeleteRecurringFailureState extends RecurringInfoState {
+  final String message;
+  final String? key;
+
+  const DeleteRecurringFailureState({
+    required this.message,
+    this.key,
+  });
+
+  @override
+  List<Object?> get props => [message, key];
+
+  @override
+  bool get stringify => true;
 }

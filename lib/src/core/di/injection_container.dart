@@ -5,6 +5,7 @@ import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/features/auth/data/datasource/auth_datasoure.dart';
 import 'package:expensive_management/src/features/auth/data/repos/auth_repo_impl.dart';
 import 'package:expensive_management/src/features/auth/domain/repos/auth_repo.dart';
+import 'package:expensive_management/src/features/auth/domain/usecases/change_pwd.dart';
 import 'package:expensive_management/src/features/auth/domain/usecases/get_otp_forgot_pwd.dart';
 import 'package:expensive_management/src/features/auth/domain/usecases/login.dart';
 import 'package:expensive_management/src/features/auth/domain/usecases/register.dart';
@@ -42,6 +43,13 @@ import 'package:expensive_management/src/features/my_wallet/domain/usecases/dele
 import 'package:expensive_management/src/features/my_wallet/domain/usecases/get_wallets.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/usecases/update_wallet.dart';
 import 'package:expensive_management/src/features/my_wallet/presentation/bloc/bloc.dart';
+import 'package:expensive_management/src/features/recurring_transaction/data/datasources/datasource.dart';
+import 'package:expensive_management/src/features/recurring_transaction/data/repo_impls/recurring_repo_impl.dart';
+import 'package:expensive_management/src/features/recurring_transaction/domain/repos/recurring_repo.dart';
+import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/add_recurring.dart';
+import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/delete_recurring.dart';
+import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/update_recurring.dart';
+import 'package:expensive_management/src/features/recurring_transaction/presentation/bloc/recurring_info_bloc.dart';
 import 'package:expensive_management/src/shared/services/notification_service.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:get_it/get_it.dart';
@@ -93,6 +101,9 @@ Future<void> configureDependenciesInjection() async {
   serviceLocator.registerLazySingleton<UpdateNewPwdUseCase>(
     () => UpdateNewPwdUseCase(repository: serviceLocator()),
   );
+  serviceLocator.registerLazySingleton<ChangePwdUseCase>(
+    () => ChangePwdUseCase(repository: serviceLocator()),
+  );
   // Bloc
   serviceLocator.registerLazySingleton<AuthBloc>(() => AuthBloc(
         loginUseCase: serviceLocator(),
@@ -100,6 +111,7 @@ Future<void> configureDependenciesInjection() async {
         getOtpForgotPwdUseCase: serviceLocator(),
         verifyOtpUseCase: serviceLocator(),
         updateNewPwdUseCase: serviceLocator(),
+        changePwdUseCase: serviceLocator(),
         appPrefStorage: serviceLocator(),
       ));
   //*
@@ -223,4 +235,31 @@ Future<void> configureDependenciesInjection() async {
         deleteLimitUseCase: serviceLocator(),
       ));
   //*
+
+  //* Recurring Transaction
+  // DataSource
+  serviceLocator.registerLazySingleton<RecurringDataSource>(() => RecurringDataSourceImpl(
+        dioProvider: serviceLocator(),
+        networkInfo: serviceLocator(),
+        appPrefStorage: serviceLocator(),
+      ));
+  // Repository
+  serviceLocator.registerLazySingleton<RecurringRepo>(() => RecurringRepoImpl(dataSource: serviceLocator()));
+  // UseCase
+  serviceLocator.registerLazySingleton<AddRecurringUseCase>(
+    () => AddRecurringUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton<UpdateRecurringUseCase>(
+    () => UpdateRecurringUseCase(repository: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton<DeleteRecurringUseCase>(
+    () => DeleteRecurringUseCase(repository: serviceLocator()),
+  );
+
+  // Bloc
+  serviceLocator.registerLazySingleton<RecurringInfoBloc>(() => RecurringInfoBloc(
+        addRecurringUseCase: serviceLocator(),
+        updateRecurringUseCase: serviceLocator(),
+        deleteRecurringUseCase: serviceLocator(),
+      ));
 }

@@ -58,19 +58,25 @@ class _OptionRepeatTimeState extends State<OptionRepeatTime> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
           automaticallyImplyLeading: false,
           centerTitle: true,
-          title: const Text('Tùy chọn lặp lại', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+          title: const Text('Tùy chọn lặp lại',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
           actions: [
             IconButton(
               onPressed: () {
                 if (isNullOrEmpty(time)) {
                   showMessage1OptionDialog(context, 'Vui lòng chọn thời gian');
                 } else {
-                  OptionRepeatData optionRepeatData = OptionRepeatData(dayOfWeeks: listDay, frequency: frequency, fromDate: dateStart, toDate: dateEnd ?? '', time: time);
+                  OptionRepeatData optionRepeatData = OptionRepeatData(
+                      dayOfWeeks: listDay,
+                      frequency: frequency,
+                      fromDate: dateStart,
+                      toDate: dateEnd ?? '',
+                      time: time);
                   Navigator.of(context).pop(optionRepeatData);
                 }
               },
@@ -138,69 +144,110 @@ class _OptionRepeatTimeState extends State<OptionRepeatTime> {
   }
 
   Widget _selectDateEnd() {
-    return ListTile(
-      onTap: () => showDatePickerPlus(
-        context,
-        minTime: DateTime(2000, 01, 01),
-        maxTime: DateTime(2025, 12, 30),
-        currentTime: DateTime.now(),
-        onConfirm: (date) {
-          setState(() {
-            dateEnd = DateFormat('yyyy-MM-dd').format(date);
-          });
-        },
-        onCancel: () {
-          setState(() {});
-        },
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      child: InkWell(
+        onTap: () => showDatePickerPlus(
+          context,
+          minTime: DateTime(2000, 01, 01),
+          maxTime: DateTime(2026, 12, 30),
+          currentTime: DateTime.now(),
+          onConfirm: (date) {
+            setState(() {
+              dateEnd = DateFormat('yyyy-MM-dd').format(date);
+            });
+          },
+          onCancel: () {
+            setState(() {});
+          },
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.calendar_month, size: 30, color: Colors.grey),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Ngày kêt thúc', style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
+                  const SizedBox(height: 4),
+                  Text(
+                    isNotNullOrEmpty(dateEnd) ? dateEnd! : 'Không xác định',
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
       ),
-      dense: false,
-      visualDensity: const VisualDensity(horizontal: 0, vertical: 0),
-      leading: const Icon(Icons.calendar_month, size: 30, color: Colors.grey),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Ngày kêt thúc', style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
-          Text(isNotNullOrEmpty(dateEnd) ? dateEnd! : 'Không xác định', style: const TextStyle(fontSize: 16, color: Colors.black)),
-        ],
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
   Widget _selectTime() {
-    return ListTile(
-      onTap: () => showDatePickerPlus(
-        context,
-        currentTime: DateTime.now(),
-        onConfirm: (date) {
-          setState(() {
-            time = DateFormat('HH:mm:ss').format(date);
-          });
-        },
-        onCancel: () {
-          setState(() {});
-        },
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      child: InkWell(
+        onTap: () => showDatePickerPlus(
+          context,
+          currentTime: DateTime.now(),
+          onConfirm: (date) {
+            setState(() {
+              time = DateFormat('HH:mm:ss').format(date);
+            });
+          },
+          onCancel: () {
+            setState(() {});
+          },
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.calendar_month, size: 30, color: Colors.grey),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Thời gian', style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
+                  const SizedBox(height: 4),
+                  Text(
+                    isNotNullOrEmpty(time) ? time : 'Không xác định',
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
       ),
-      dense: false,
-      visualDensity: const VisualDensity(horizontal: 0, vertical: 0),
-      leading: const Icon(Icons.calendar_month, size: 30, color: Colors.grey),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Thời gian', style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4))),
-          Text(isNotNullOrEmpty(time) ? time : 'Không xác định', style: const TextStyle(fontSize: 16, color: Colors.black)),
-        ],
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 
   Widget _selectFrequency() {
-    return ListTile(
+    return InkWell(
       onTap: () async {
-        final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => FrequencyPickerScreen(frequency: frequency, listDay: listDay)));
+        final result = await showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => DraggableScrollableSheet(
+            initialChildSize: 0.55,
+            maxChildSize: 0.6,
+            minChildSize: 0.5,
+            expand: false,
+            builder: (context, scrollController) {
+              return FrequencyPickerScreen(
+                frequency: frequency,
+                listDay: listDay,
+              );
+            },
+          ),
+        );
+
         if (result is Frequency) {
           setState(() {
             frequency = result;
@@ -218,24 +265,32 @@ class _OptionRepeatTimeState extends State<OptionRepeatTime> {
           return;
         }
       },
-      dense: false,
-      visualDensity: const VisualDensity(horizontal: 0, vertical: 0),
-      leading: const Icon(Icons.calendar_month, size: 30, color: Colors.grey),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Tần suất',
-            style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4)),
-          ),
-          Text(
-            (frequency.frequencyType == FrequencyType.weekday ? nameDayOfWeek : frequency.title) ?? 'Hằng ngày',
-            style: const TextStyle(fontSize: 16, color: Colors.black),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        child: Row(
+          children: [
+            const Icon(Icons.calendar_month, size: 30, color: Colors.grey),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tần suất',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.4)),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    (frequency.frequencyType == FrequencyType.weekday ? nameDayOfWeek : frequency.title) ?? 'Hằng ngày',
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
     );
   }
 }

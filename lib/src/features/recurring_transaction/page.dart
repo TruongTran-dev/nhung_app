@@ -1,7 +1,6 @@
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/src/features/recurring_transaction/presentation/bloc/recurring_info_bloc.dart';
 import 'package:expensive_management/src/features/recurring_transaction/presentation/bloc/recurring_transaction_bloc.dart';
 import 'package:expensive_management/data/models/frequency_model.dart';
 import 'package:expensive_management/data/models/recurring_list_model.dart';
@@ -80,12 +79,7 @@ class _RecurringPageState extends State<RecurringPage> {
               onPressed: () async {
                 final bool result = await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => BlocProvider<RecurringInfoBloc>(
-                      create: (context) => RecurringInfoBloc(context)..add(RecurringInfoInit()),
-                      child: const RecurringInfo(),
-                    ),
-                  ),
+                  MaterialPageRoute(builder: (context) => const RecurringInfo()),
                 );
                 if (result) {
                   _reloadPage();
@@ -168,10 +162,7 @@ class _RecurringPageState extends State<RecurringPage> {
             final bool result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => BlocProvider<RecurringInfoBloc>(
-                  create: (context) => RecurringInfoBloc(context)..add(RecurringInfoInit()),
-                  child: RecurringInfo(isEdit: true, recurringListModel: recurring),
-                ),
+                builder: (context) => RecurringInfo(isEdit: true, recurringListModel: recurring),
               ),
             );
             if (result) {

@@ -7,6 +7,5 @@ abstract class AuthRepo {
   Future<Either<Failure, bool>> getOtpForgotPwd({required Map<String, dynamic> data});
   Future<Either<Failure, bool>> verifyOtp({required Map<String, dynamic> data});
   Future<Either<Failure, bool>> updateNewPassword({required Map<String, dynamic> data});
-  // Future<Either<Failure, Map<String, dynamic>>> forgotPassword({required Map<String, dynamic> data});
-  // Future<Either<Failure, Map<String, dynamic>>> changePassword({required Map<String, dynamic> data});
+  Future<Either<Failure, bool>> changePassword({required Map<String, dynamic> data});
 }

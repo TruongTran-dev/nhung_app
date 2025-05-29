@@ -31,4 +31,10 @@ class AuthRepoImpl implements AuthRepo {
   Future<Either<Failure, bool>> updateNewPassword({required Map<String, dynamic> data}) async {
     return await dataSource.updateNewPassword(data: data);
   }
+
+  @override
+  Future<Either<Failure,bool>> changePassword({required Map<String, dynamic> data}) async {
+    return await dataSource.changePassword(data: data);
+  }
+  
 }

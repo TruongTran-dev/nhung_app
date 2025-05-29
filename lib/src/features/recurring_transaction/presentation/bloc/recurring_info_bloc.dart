@@ -1,76 +1,93 @@
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:expensive_management/src/core/common/api_result_state.dart';
-import 'package:expensive_management/data/provider/category_provider.dart';
-import 'package:expensive_management/data/provider/wallet_provider.dart';
-import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
-import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
-import 'package:expensive_management/src/shared/utils/network_info.dart';
-import 'package:flutter/material.dart';
+import 'package:expensive_management/src/core/common/dio_provider.dart';
+import 'package:expensive_management/src/core/common/extensions.dart';
+import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/add_recurring.dart';
+import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/delete_recurring.dart';
+import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/update_recurring.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/data/models/recurring_post_model.dart';
-import 'package:expensive_management/data/repository/recurring_repository.dart';
-import 'package:expensive_management/data/response/base_get_response.dart';
-import 'package:expensive_management/data/response/get_list_category_response.dart';
-import 'package:expensive_management/data/response/get_list_wallet_response.dart';
-import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
-import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 
 part 'recurring_info_event.dart';
 part 'recurring_info_state.dart';
 
 class RecurringInfoBloc extends Bloc<RecurringInfoEvent, RecurringInfoState> {
-  final BuildContext context;
+  final AddRecurringUseCase addRecurringUseCase;
+  final UpdateRecurringUseCase updateRecurringUseCase;
+  final DeleteRecurringUseCase deleteRecurringUseCase;
 
-  final _categoryProvider = CategoryProvider();
-  final _walletProvider = WalletProvider();
-  final _recurringRepository = RecurringRepository();
+  RecurringInfoBloc({
+    required this.addRecurringUseCase,
+    required this.updateRecurringUseCase,
+    required this.deleteRecurringUseCase,
+  }) : super(RecurringInfoInitial()) {
+    on<AddRecurringEvent>(_onAddRecurringEvent, transformer: droppable());
+    on<UpdateRecurringEvent>(_onUpdateRecurringEvent, transformer: droppable());
+    on<DeleteRecurringEvent>(_onDeleteRecurringEvent, transformer: droppable());
+  }
 
-  RecurringInfoBloc(this.context) : super(RecurringInfoState()) {
-    on((event, emit) async {
-      if (event is RecurringInfoEvent) {
-        emit(state.copyWith(isLoading: true));
+  Future<void> _onAddRecurringEvent(AddRecurringEvent event, Emitter<RecurringInfoState> emit) async {
+    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+      emit(RecurringInfoLoading());
+    });
+    final result = await addRecurringUseCase(event.data);
 
-        if (await NetworkInfo().isNotConnected) {
-          emit(state.copyWith(isLoading: false, apiError: ApiError.noInternetConnection));
-        } else {
-          final response = await _categoryProvider.getAllListCategory(param: "EXPENSE");
-          if (response is GetCategoryResponse) {
-            emit(state.copyWith(isLoading: false, apiError: ApiError.noError, listExCategory: response.listCategory));
-          } else if (response is ExpiredTokenGetResponse && context.mounted) {
-            logoutIfNeed(context);
-          } else {
-            emit(state.copyWith(isLoading: false, apiError: ApiError.internalServerError, listExCategory: []));
-          }
+    if (result.isLeft) {
+      final left = result.left;
+      GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+        emit(AddRecurringFailureState(
+          message: left.message,
+          key: left is ServerError ? left.key : null,
+        ));
+      });
+      return;
+    }
 
-          final walletResponse = await _walletProvider.getListWallet();
+    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+      emit(AddRecurringSuccessState());
+    });
+  }
 
-          if (walletResponse is GetListWalletResponse) {
-            emit(state.copyWith(isLoading: false, apiError: ApiError.noError, listWallet: walletResponse.walletList));
-          } else if (response is ExpiredTokenGetResponse && context.mounted) {
-            logoutIfNeed(context);
-          } else {
-            emit(state.copyWith(isLoading: false, apiError: ApiError.internalServerError, listWallet: []));
-          }
-        }
-      }
+  Future<void> _onUpdateRecurringEvent(UpdateRecurringEvent event, Emitter<RecurringInfoState> emit) async {
+    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+      emit(RecurringInfoLoading());
+    });
+    final result = await updateRecurringUseCase(UpdateRecurringParams(id: event.id, data: event.data));
 
-      if (event is AddRecurringEvent) {
-        emit(state.copyWith(isLoading: true));
+    if (result.isLeft) {
+      final left = result.left;
+      GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+        emit(UpdateRecurringFailureState(
+          message: left.message,
+          key: left is ServerError ? left.key : null,
+        ));
+      });
+      return;
+    }
 
-        if (await NetworkInfo().isNotConnected) {
-          emit(state.copyWith(isLoading: false, apiError: ApiError.noInternetConnection));
-        } else {
-          final response = await _recurringRepository.addRecurring(event.data);
+    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+      emit(UpdateRecurringSuccessState());
+    });
+  }
 
-          if (response is RecurringPost) {
-            emit(state.copyWith(isLoading: false, apiError: ApiError.noError, addSuccess: true));
-          } else if (response is ExpiredTokenGetResponse && context.mounted) {
-            logoutIfNeed(context);
-          } else {
-            emit(state.copyWith(isLoading: false, addSuccess: false, apiError: ApiError.noError));
-          }
-        }
-      }
+  Future<void> _onDeleteRecurringEvent(DeleteRecurringEvent event, Emitter<RecurringInfoState> emit) async {
+    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+      emit(RecurringInfoLoading());
+    });
+    final result = await deleteRecurringUseCase(event.id);
+
+    if (result.isLeft) {
+      final left = result.left;
+      GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+        emit(DeleteRecurringFailureState(
+          message: left.message,
+          key: left is ServerError ? left.key : null,
+        ));
+      });
+      return;
+    }
+
+    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
+      emit(DeleteRecurringSuccessState());
     });
   }
 }

@@ -85,7 +85,6 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
   void initCollectionEdit() {
     final collection = widget.props.collection;
     if (collection != null) {
-      log('Edit collection: ${collection}');
       setState(() {
         itemOption = (collection.transactionType == 'EXPENSE')
             ? ItemOption(itemId: 0, title: 'Chi tiền', icon: Icons.remove)

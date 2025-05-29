@@ -84,3 +84,18 @@ class UpdateNewPasswordFailedState extends AuthState {
   @override
   bool get stringify => true;
 }
+
+class ChangePasswordSuccessState extends AuthState {}
+
+class ChangePasswordFailedState extends AuthState {
+  final String errorMessage;
+  final String key;
+
+  const ChangePasswordFailedState({required this.errorMessage, required this.key});
+
+  @override
+  List<Object> get props => [errorMessage, key];
+
+  @override
+  bool get stringify => true;
+}

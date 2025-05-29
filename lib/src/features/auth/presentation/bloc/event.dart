@@ -133,3 +133,29 @@ class SubmitNewPasswordEvent extends AuthEvent {
     );
   }
 }
+
+class ChangePasswordEvent extends AuthEvent {
+  final String oldPassword;
+  final String newPassword;
+
+  const ChangePasswordEvent({
+    required this.oldPassword,
+    required this.newPassword,
+  });
+
+  @override
+  List<Object> get props => [oldPassword, newPassword];
+
+  @override
+  bool get stringify => true;
+
+  ChangePasswordEvent copyWith({
+    String? oldPassword,
+    String? newPassword,
+  }) {
+    return ChangePasswordEvent(
+      oldPassword: oldPassword ?? this.oldPassword,
+      newPassword: newPassword ?? this.newPassword,
+    );
+  }
+}

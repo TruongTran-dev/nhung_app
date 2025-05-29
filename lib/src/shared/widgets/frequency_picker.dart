@@ -85,10 +85,7 @@ class _FrequencyPickerScreenState extends State<FrequencyPickerScreen> {
               title: Text(frequency.title),
               subtitle: (frequency.frequencyType == FrequencyType.weekday)
                   ? isNotNullOrEmpty(sortedTitles)
-                      ? Text(
-                          sortedTitles!,
-                          textAlign: TextAlign.end,
-                        )
+                      ? Text(sortedTitles!, textAlign: TextAlign.end)
                       : null
                   : null,
               trailing: frequencySelected.frequencyType == frequency.frequencyType
@@ -104,10 +101,16 @@ class _FrequencyPickerScreenState extends State<FrequencyPickerScreen> {
                 });
 
                 if (frequency.frequencyType == FrequencyType.weekday) {
-                  final List<DayOfWeek>? result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DayOfWeekPickerScreen(listDay: listDay),
+                  final List<DayOfWeek>? result = await showModalBottomSheet<List<DayOfWeek>>(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                    builder: (context) => Container(
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                      child: DayOfWeekPickerScreen(listDay: listDay),
                     ),
                   );
                   setState(() {
