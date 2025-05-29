@@ -1,6 +1,7 @@
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/features/auth/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,6 +50,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         listener: (context, state) {
           if (state is GetOTPSuccessState) {
             context.push(AppRoutes.otp, extra: _emailController.text.trim());
+          }
+          if (state is GetOTPFailedState) {
+            showMessage1OptionDialog(context, state.errorMessage);
           }
         },
         builder: (context, state) {
