@@ -40,4 +40,5 @@ void showTimePickerPlus(
       onConfirm: onConfirm,
       onChanged: onChanged,
       onCancel: onCancel,
+      showSecondsColumn: false,
     ).whenComplete(() => whenComplete);

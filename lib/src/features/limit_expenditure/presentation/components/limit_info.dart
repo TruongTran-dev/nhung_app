@@ -353,7 +353,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
     );
   }
 
-  Future<void> _showDiaLogSelectWallet() async {
+  void _showDiaLogSelectWallet() async {
     final wallet = await showModalBottomSheet<List<Wallet>>(
       context: context,
       isScrollControlled: true,

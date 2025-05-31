@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:expensive_management/firebase_options.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -9,7 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 @pragma('vm:entry-point')
-void notificationTapBackground(NotificationResponse notificationResponse) {
+void notificationTapBackground(NotificationResponse notificationResponse) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // This function is called when the app is in the background and a notification is tapped
   final data = json.decode(notificationResponse.payload!) as Map<String, dynamic>;
   debugPrint('Notification tapped in background: $data');

@@ -463,7 +463,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isNotNullOrEmpty(optionTitle) ? optionTitle! : 'Chọn thời gian lặp lại',
+                    !optionTitle.isNullOrEmpty ? optionTitle! : 'Chọn thời gian lặp lại',
                     style: TextStyle(fontSize: 16, color: isNotNullOrEmpty(optionTitle) ? Colors.black : Colors.grey),
                   ),
                 ],

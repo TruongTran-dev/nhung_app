@@ -189,12 +189,12 @@ class _OptionRepeatTimeState extends State<OptionRepeatTime> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
       child: InkWell(
-        onTap: () => showDatePickerPlus(
+        onTap: () => showTimePickerPlus(
           context,
           currentTime: DateTime.now(),
           onConfirm: (date) {
             setState(() {
-              time = DateFormat('HH:mm:ss').format(date);
+              time = DateFormat('HH:mm').format(date);
             });
           },
           onCancel: () {
