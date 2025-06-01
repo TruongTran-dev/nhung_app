@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
@@ -8,6 +10,7 @@ import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/features/collection/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
 import 'package:expensive_management/src/features/my_wallet/presentation/bloc/bloc.dart';
+import 'package:expensive_management/src/shared/services/firebase_storage_services.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -70,14 +73,13 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
 
   Wallet? selectedWallet;
 
-  int? walletId;
-  String? walletName;
-  String? walletType;
   int currentWalletAmount = 0;
 
   String? imageUrl;
   bool isOnline = true;
   int? groupId;
+
+  bool isLoadingUploadImage = false;
 
   final _collectionBloc = serviceLocator<CollectionBloc>();
   final _walletBloc = serviceLocator<WalletBloc>();
@@ -137,66 +139,92 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-      child: BlocConsumer<CollectionBloc, CollectionState>(
-        bloc: _collectionBloc,
-        listener: (context, state) {
-          if (state is AddNewCollectionSuccessState) {
-            AppUtils.showSnackBar(context, 'Thêm giao dịch thành công');
-            reloadPage();
-            _walletBloc.add(GetWalletsEvent());
-          }
-          if (state is AddNewCollectionFailureState) {
-            showMessage1OptionDialog(
-              context,
-              "Lỗi",
-              content: state.message,
-              onClose: () {
-                AppUtils.checkLogoutWhenTokenExpired(context, errorKey: state.key);
-              },
+    return Material(
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: BlocConsumer<CollectionBloc, CollectionState>(
+          bloc: _collectionBloc,
+          listener: (context, state) {
+            if (state is AddNewCollectionSuccessState) {
+              AppUtils.showSnackBar(context, 'Thêm giao dịch thành công');
+              reloadPage();
+              _walletBloc.add(GetWalletsEvent());
+            }
+            if (state is AddNewCollectionFailureState) {
+              showMessage1OptionDialog(
+                context,
+                "Lỗi",
+                content: state.message,
+                onClose: () {
+                  AppUtils.checkLogoutWhenTokenExpired(context, errorKey: state.key);
+                },
+              );
+            }
+            if (state is UpdateCollectionSuccessState) {
+              AppUtils.showSnackBar(context, 'Cập nhật giao dịch thành công');
+              _walletBloc.add(GetWalletsEvent());
+              context.pop();
+            }
+            if (state is UpdateCollectionFailureState) {
+              showMessage1OptionDialog(
+                context,
+                "Lỗi",
+                content: state.message,
+                onClose: () {
+                  AppUtils.checkLogoutWhenTokenExpired(context, errorKey: state.key);
+                },
+              );
+            }
+            if (state is DeleteCollectionSuccessState) {
+              AppUtils.showSnackBar(context, 'Xóa giao dịch thành công');
+              _walletBloc.add(GetWalletsEvent());
+              context.pop();
+            }
+            if (state is DeleteCollectionFailureState) {
+              showMessage1OptionDialog(
+                context,
+                "Lỗi",
+                content: state.message,
+                onClose: () {
+                  AppUtils.checkLogoutWhenTokenExpired(context, errorKey: state.key);
+                },
+              );
+            }
+          },
+          builder: (context, state) {
+            final isLoading = state is CollectionLoadingState;
+            return Stack(
+              children: [
+                _view(),
+                isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
+                isLoadingUploadImage
+                    ? Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.5),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const CircularProgressIndicator(color: Colors.white),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Đang tải ảnh lên...',
+                                  style: TextStyle(color: Colors.white, fontSize: 16),
+                                ),
+                                Text(
+                                  'Vui lòng chờ',
+                                  style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ],
             );
-          }
-          if (state is UpdateCollectionSuccessState) {
-            AppUtils.showSnackBar(context, 'Cập nhật giao dịch thành công');
-            _walletBloc.add(GetWalletsEvent());
-            context.pop();
-          }
-          if (state is UpdateCollectionFailureState) {
-            showMessage1OptionDialog(
-              context,
-              "Lỗi",
-              content: state.message,
-              onClose: () {
-                AppUtils.checkLogoutWhenTokenExpired(context, errorKey: state.key);
-              },
-            );
-          }
-          if (state is DeleteCollectionSuccessState) {
-            AppUtils.showSnackBar(context, 'Xóa giao dịch thành công');
-            _walletBloc.add(GetWalletsEvent());
-            context.pop();
-          }
-          if (state is DeleteCollectionFailureState) {
-            showMessage1OptionDialog(
-              context,
-              "Lỗi",
-              content: state.message,
-              onClose: () {
-                AppUtils.checkLogoutWhenTokenExpired(context, errorKey: state.key);
-              },
-            );
-          }
-        },
-        builder: (context, state) {
-          final isLoading = state is CollectionLoadingState;
-          return Stack(
-            children: [
-              _view(),
-              isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
-            ],
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -274,10 +302,8 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                   ),
                 ),
               ),
-              //TODO: add image
-
-              // _selectImage(),
-              // const SizedBox(height: 16),
+              _selectImage(),
+              const SizedBox(height: 16),
               _buttonSave(canEdit),
             ],
           ),
@@ -361,7 +387,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
     String newCategoryName = itemCategorySelected?.title ?? '';
     String newDescription = _noteController.text.trim();
     String newTransactionType = (itemOption.itemId == 0) ? 'EXPENSE' : 'INCOME';
-    int newWalletId = walletId!;
+    int? newWalletId = selectedWallet?.id;
 
     int oldAmount = widget.props.collection!.amount?.toInt() ?? 0;
     String oldAriseDate = widget.props.collection!.ariseDate ?? '';
@@ -383,14 +409,19 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
     // Show dialog to confirm changes
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
         title: const Text('Xác nhận cập nhật'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Các thông tin thay đổi:'),
+            if (newAmount != oldAmount ||
+                newTransactionType != oldTransactionType ||
+                newCategoryId != oldCategoryId ||
+                newDescription != oldDescription ||
+                newWalletId != oldWalletId)
+              const Text('Các thông tin thay đổi:'),
             if (newAmount != oldAmount)
               Text('• Số tiền: ${oldAmount.currencyFormat()} → ${newAmount.currencyFormat()}'),
             if (newTransactionType != oldTransactionType)
@@ -408,8 +439,23 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
             child: const Text('Hủy'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
+            onPressed: () async {
+              // Check if there are any changes
+              bool hasChanges = newAmount != oldAmount ||
+                  newAriseDate != oldAriseDate ||
+                  newCategoryId != oldCategoryId ||
+                  newDescription != oldDescription ||
+                  newTransactionType != oldTransactionType ||
+                  newWalletId != oldWalletId;
+
+              // If no changes, show message and return
+              if (!hasChanges) {
+                Navigator.pop(context);
+                AppUtils.showSnackBar(context, 'Không có thông tin nào thay đổi');
+                return;
+              }
+
+              // Navigator.pop(context);
 
               final data = {
                 'amount': newAmount,
@@ -421,7 +467,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                 "addToReport": true,
                 // "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
                 if (groupId != null) "groupId": groupId,
-                // if (!imageUrlUpload.isNullOrEmpty && imageUrl.isNullOrEmpty) 'imageUrl': imageUrlUpload,
+                if (!imageUrl.isNullOrEmpty && isOnline) 'imageUrl': imageUrl,
               };
               print("Send data update collection: $data");
 
@@ -435,13 +481,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
   }
 
   Future<void> _postCollection() async {
-    // String imageUrlUpload = '';
-    // if (!imageUrl.isNullOrEmpty) {
-    //   imageUrlUpload = await FirebaseService().uploadImageToStorage(image: File(imageUrl!));
-    //   print('imageUrlUpload: $imageUrlUpload');
-    // }
-
-    // await Future.delayed(const Duration(milliseconds: 2));
+    print("image: $imageUrl - isOnline: $isOnline");
     final data = {
       'amount': int.parse(_moneyController.text.trim().replaceAll(',', '')),
       'ariseDate': _getDateTimePicked() ?? DateTime.now().toIso8601String(),
@@ -450,20 +490,13 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       'transactionType': (itemOption.itemId == 0) ? 'EXPENSE' : 'INCOME',
       'walletId': selectedWallet!.id,
       "addToReport": true,
-      // "scopeType": groupId != null ? "GROUP" : "PERSONAL", // GROUP or PERSONAL
       if (groupId != null) "groupId": groupId,
-
-      // if (!imageUrlUpload.isNullOrEmpty && imageUrl.isNullOrEmpty) 'imageUrl': imageUrlUpload,
+      if (!imageUrl.isNullOrEmpty && isOnline) 'imageUrl': imageUrl,
     };
+
     log("Send data new collection: $data");
 
-    //TODO: recheck late for image upload
-
-    // if (!imageUrl.isNullOrEmpty) {
-    //   _collectionBloc.add(UploadImageEvent(imagePath: imageUrl!, data: data));
-    // } else {
-    _collectionBloc.add(AddNewCollectionEvent(data));
-    // }
+    _collectionBloc.add(AddNewCollectionEvent(data: data));
   }
 
   void reloadPage() {
@@ -521,15 +554,20 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
             CupertinoActionSheetAction(
               onPressed: () async {
                 Navigator.pop(context);
-                await Permission.camera.request();
+
+                if (!await Permission.photos.isGranted) {
+                  await Permission.photos.request();
+                }
+
                 String? imagePath = await pickPhoto(ImageSource.gallery);
-                if (isNullOrEmpty(imagePath)) {
+                if (imagePath.isNullOrEmpty) {
                   return;
                 } else {
                   setState(() {
                     if (isOnline) isOnline = false;
                     imageUrl = imagePath;
                   });
+                  _postImageToFirebaseStorage();
                 }
               },
               child: const Text('Chọn ảnh từ thư viện', style: TextStyle(fontSize: 16, color: Colors.black)),
@@ -544,7 +582,36 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
     );
   }
 
-  // ignore: unused_element
+  void _postImageToFirebaseStorage() async {
+    if (imageUrl.isNullOrEmpty) return;
+
+    setState(() {
+      isLoadingUploadImage = true;
+    });
+
+    try {
+      final imageUrlUpload = await serviceLocator<FirebaseStorageService>().uploadImage(File(imageUrl!));
+      log('imageUrlUpload: $imageUrlUpload');
+      if (imageUrlUpload.isNullOrEmpty) {
+        if (!mounted) return;
+        showMessage1OptionDialog(context, 'Lỗi tải ảnh lên', content: 'Không thể tải ảnh lên. Vui lòng thử lại.');
+      } else {
+        setState(() {
+          isOnline = true;
+          imageUrl = imageUrlUpload;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showMessage1OptionDialog(context, 'Lỗi tải ảnh lên', content: 'Đã xảy ra lỗi khi tải ảnh lên: ${e.toString()}');
+    } finally {
+      setState(() {
+        isOnline = true;
+        isLoadingUploadImage = false;
+      });
+    }
+  }
+
   Widget _selectImage() {
     return Stack(
       children: [
@@ -797,7 +864,9 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
       dense: false,
       horizontalTitleGap: 6,
       leading: Icon(
-        isNotNullOrEmpty(walletType) ? getIconWallet(walletType: walletType!) : Icons.help_outline,
+        isNotNullOrEmpty(selectedWallet?.accountType)
+            ? getIconWallet(walletType: selectedWallet?.accountType)
+            : Icons.help_outline,
         size: 30,
         color: Colors.grey,
       ),

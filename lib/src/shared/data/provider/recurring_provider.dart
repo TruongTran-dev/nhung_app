@@ -42,7 +42,7 @@ class RecurringProvider with ProviderMixin {
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();
     }
-    String apiUpdate =  ApiPath.apiDomain + '${ApiPath.recurring}/${recurringID.toString()}';
+    String apiUpdate =  '${ApiPath.apiDomain}${ApiPath.recurring}/${recurringID.toString()}';
     try {
       final response = await dio.put(
         apiUpdate,
@@ -60,7 +60,7 @@ class RecurringProvider with ProviderMixin {
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();
     }
-    String apiDelete = ApiPath.apiDomain +  '${ApiPath.recurring}/${recurringID.toString()}';
+    String apiDelete = '${ApiPath.apiDomain}${ApiPath.recurring}/${recurringID.toString()}';
     try {
       final response = await dio.delete(apiDelete, options: await defaultOptions(url: apiDelete));
       return response;

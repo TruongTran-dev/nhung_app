@@ -55,8 +55,10 @@ import 'package:expensive_management/src/features/recurring_transaction/domain/u
 import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/delete_recurring.dart';
 import 'package:expensive_management/src/features/recurring_transaction/domain/usecases/update_recurring.dart';
 import 'package:expensive_management/src/features/recurring_transaction/presentation/bloc/recurring_info_bloc.dart';
+import 'package:expensive_management/src/shared/services/firebase_storage_services.dart';
 import 'package:expensive_management/src/shared/services/notification_service.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -84,6 +86,11 @@ Future<void> configureDependenciesInjection() async {
 
   //* Dio Provider
   serviceLocator.registerFactory<DioProvider>(() => DioProvider());
+
+  //firebase_storage
+  serviceLocator.registerLazySingleton<FirebaseStorageService>(
+    () => FirebaseStorageService(storage: FirebaseStorage.instance),
+  );
 
   //* Login
   // DataSource
@@ -276,7 +283,7 @@ Future<void> configureDependenciesInjection() async {
         networkInfo: serviceLocator(),
         appPrefStorage: serviceLocator(),
       ));
-      // Repository
+  // Repository
   serviceLocator.registerLazySingleton<ExportRepo>(() => ExportRepoImpl(dataSource: serviceLocator()));
   // UseCase
   serviceLocator.registerLazySingleton<ExportUseCase>(() => ExportUseCase(repository: serviceLocator()));
@@ -284,5 +291,4 @@ Future<void> configureDependenciesInjection() async {
   serviceLocator.registerLazySingleton<ExportBloc>(() => ExportBloc(
         exportUseCase: serviceLocator(),
       ));
-  
 }

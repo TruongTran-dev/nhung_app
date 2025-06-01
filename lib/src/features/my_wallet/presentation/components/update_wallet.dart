@@ -43,7 +43,6 @@ class _UpdateWalletPageState extends State<UpdateWalletPage> {
   void initBeforeEdit() {
     _showOnReport = widget.wallet.report;
     String formattedBalance = widget.wallet.accountBalance.currencyFormat();
-    ;
     _moneyController.text = formattedBalance;
     _nameController.text = widget.wallet.name;
     _noteController.text = widget.wallet.description ?? '';
