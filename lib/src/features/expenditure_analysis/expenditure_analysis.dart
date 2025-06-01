@@ -91,8 +91,23 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
     _tabController = TabController(length: 3, vsync: this);
     listWalletSelected = widget.props.listWallet;
     walletIDs = initWallet(widget.props.listWallet);
-    listCateSelected = widget.props.listCategory;
+    listCateSelected = _initListCateSelected();
     super.initState();
+  }
+
+  List<CategoryModel> _initListCateSelected() {
+    final List<CategoryModel> listCate = [];
+    for (CategoryModel category in widget.props.listCategory) {
+      category.isChecked = true;
+      listCate.add(category);
+      if (category.childCategory != null) {
+        for (CategoryModel childCategory in category.childCategory!) {
+          childCategory.isChecked = true;
+          listCate.add(childCategory);
+        }
+      }
+    }
+    return listCate;
   }
 
   @override
@@ -555,9 +570,32 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
     );
   }
 
+  int initCatesLenght() {
+    int count = 0;
+    for (CategoryModel category in widget.props.listCategory) {
+      if (category.childCategory != null) {
+        count += category.childCategory!.length + 1; // +1 for the parent category
+      } else {
+        count++;
+      }
+    }
+    return count;
+  }
+
   Widget _selectCategory() {
     return ListTile(
       onTap: () async {
+        if (listCateSelected.length == initCatesLenght()) {
+          for (var category in listCateSelected) {
+            category.isChecked = true;
+            if (category.childCategory != null) {
+              for (CategoryModel childCategory in category.childCategory!) {
+                childCategory.isChecked = true;
+              }
+            }
+          }
+        }
+
         final itemSelected = await showModalBottomSheet<List<CategoryModel>>(
           context: context,
           isScrollControlled: true,
@@ -619,7 +657,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
       horizontalTitleGap: 10,
       leading: const Icon(Icons.category_outlined, size: 30, color: Colors.grey),
       title: Text(
-        (listCateSelected.length == widget.props.listCategory.length)
+        (listCateSelected.length == initCatesLenght() && widget.props.listCategory.isNotEmpty)
             ? 'Tất cả hạng mục'
             : isNullOrEmpty(listCateSelected)
                 ? 'Chọn hạng mục'

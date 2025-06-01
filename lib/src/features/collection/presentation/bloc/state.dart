@@ -13,6 +13,7 @@ class CollectionState extends Equatable {
 class CollectionInitialState extends CollectionState {}
 
 class CollectionLoadingState extends CollectionState {}
+class CollectionLoadingUploadImageState extends CollectionState {}
 
 class CollectionUploadImageFailureState extends CollectionState {
   final String message;

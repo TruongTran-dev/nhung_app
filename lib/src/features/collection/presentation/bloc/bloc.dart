@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
@@ -9,7 +8,6 @@ import 'package:expensive_management/src/features/collection/domain/usecases/add
 import 'package:expensive_management/src/features/collection/domain/usecases/delete_collection.dart';
 import 'package:expensive_management/src/features/collection/domain/usecases/update_collection.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/collection_model.dart';
-import 'package:expensive_management/src/shared/services/firebase_services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'event.dart';
@@ -28,34 +26,6 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
     on<AddNewCollectionEvent>(_onAddCollectionEvent, transformer: droppable());
     on<UpdateCollectionEvent>(_onUpdateCollectionEvent, transformer: droppable());
     on<DeleteCollectionEvent>(_onDeleteCollectionEvent, transformer: droppable());
-    on<UploadImageEvent>(_onUploadImageEvent, transformer: droppable());
-  }
-
-  Future<void> _onUploadImageEvent(UploadImageEvent event, Emitter<CollectionState> emit) async {
-    GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
-      emit(CollectionLoadingState());
-    });
-    try {
-      final imageUrl = await FirebaseService().uploadImageToStorage(image: File(event.imagePath));
-      if (imageUrl == null) {
-        GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
-          emit(CollectionUploadImageFailureState(message: 'Có lỗi xảy ra trong quá trình tải ảnh lên'));
-        });
-
-        return;
-      }
-      await Future.delayed(const Duration(milliseconds: 2));
-
-      Map<String, dynamic> updatedData = Map<String, dynamic>.from(event.data);
-      updatedData['imageUrl'] = imageUrl;
-      log("updatedData: $updatedData");
-      add(AddNewCollectionEvent(updatedData));
-    } catch (e) {
-      log('Error uploading image: $e');
-      GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
-        emit(CollectionUploadImageFailureState(message: 'Có lỗi xảy ra trong quá trình tải ảnh lên'));
-      });
-    }
   }
 
   Future<void> _onAddCollectionEvent(AddNewCollectionEvent event, Emitter<CollectionState> emit) async {
@@ -114,7 +84,9 @@ class CollectionBloc extends Bloc<CollectionEvent, CollectionState> {
 
     final right = response.right;
     GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
-      emit(right ? DeleteCollectionSuccessState() : DeleteCollectionFailureState(message: 'Có lỗi xảy ra. Vui lòng thử lại sau.'));
+      emit(right
+          ? DeleteCollectionSuccessState()
+          : DeleteCollectionFailureState(message: 'Có lỗi xảy ra. Vui lòng thử lại sau.'));
     });
   }
 }

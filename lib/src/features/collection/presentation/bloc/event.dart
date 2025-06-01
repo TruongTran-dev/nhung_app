@@ -13,7 +13,7 @@ class CollectionEvent extends Equatable {
 class AddNewCollectionEvent extends CollectionEvent {
   final Map<String, dynamic> data;
 
-  const AddNewCollectionEvent(this.data);
+  const AddNewCollectionEvent({required this.data});
 
   @override
   List<Object?> get props => [data];
