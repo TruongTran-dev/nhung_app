@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
-import 'package:expensive_management/data/provider/provider_mixin.dart';
-import '../api/api_path.dart';
+import 'package:expensive_management/src/shared/data/provider/provider_mixin.dart';
+import '../../../core/common/api_path.dart';
 import '../response/base_get_response.dart';
 import '../response/get_list_category_response.dart';
 

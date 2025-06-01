@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:expensive_management/app/app_colors.dart';
-import 'package:expensive_management/data/api/api_path.dart';
+import 'package:expensive_management/src/core/common/app_colors.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/features/main/presentation/main_app.dart';

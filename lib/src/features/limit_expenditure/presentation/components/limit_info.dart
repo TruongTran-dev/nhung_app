@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
-import 'package:expensive_management/data/models/limit_expenditure_model.dart';
+import 'package:expensive_management/src/shared/data/models/limit_expenditure_model.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';

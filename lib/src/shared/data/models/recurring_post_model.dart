@@ -1,4 +1,4 @@
-import 'package:expensive_management/data/models/recurring_list_model.dart';
+import 'package:expensive_management/src/shared/data/models/recurring_list_model.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 

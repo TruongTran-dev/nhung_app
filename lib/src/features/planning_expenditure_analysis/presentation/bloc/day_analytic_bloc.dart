@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/api_result_state.dart';
-import 'package:expensive_management/data/models/analytic_model.dart';
-import 'package:expensive_management/data/provider/analytic_provider.dart';
-import 'package:expensive_management/data/response/base_response.dart';
+import 'package:expensive_management/src/shared/data/models/analytic_model.dart';
+import 'package:expensive_management/src/shared/data/provider/analytic_provider.dart';
+import 'package:expensive_management/src/shared/data/response/base_response.dart';
 import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';

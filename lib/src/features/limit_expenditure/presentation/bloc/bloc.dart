@@ -1,6 +1,6 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
-import 'package:expensive_management/data/models/limit_expenditure_model.dart';
+import 'package:expensive_management/src/shared/data/models/limit_expenditure_model.dart';
 import 'package:expensive_management/src/core/common/dio_provider.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/features/limit_expenditure/domain/usecases/add_limit.dart';

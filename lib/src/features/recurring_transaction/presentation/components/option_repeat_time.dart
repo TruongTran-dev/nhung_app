@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:expensive_management/data/models/frequency_model.dart';
-import 'package:expensive_management/data/models/recurring_post_model.dart';
+import 'package:expensive_management/src/shared/data/models/frequency_model.dart';
+import 'package:expensive_management/src/shared/data/models/recurring_post_model.dart';
 import 'package:expensive_management/src/shared/widgets/frequency_picker.dart';
 import 'package:expensive_management/src/shared/utils/enum/date_time_picker.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';

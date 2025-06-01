@@ -1,4 +1,4 @@
-import 'package:expensive_management/data/models/report_expenditure_revenue_model.dart';
+import 'package:expensive_management/src/shared/data/models/report_expenditure_revenue_model.dart';
 import 'package:expensive_management/src/shared/widgets/animation_loading.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/month_bloc.dart';
-import 'package:expensive_management/data/models/data_sfcartesian_char_model.dart';
+import 'package:expensive_management/src/features/planning_balance_payment/domain/models/data_sfcartesian_char_model.dart';
 
 class MonthAnalytic extends StatefulWidget {
   final List<int> walletIDs;

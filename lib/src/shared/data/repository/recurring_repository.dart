@@ -1,4 +1,4 @@
-import 'package:expensive_management/data/provider/recurring_provider.dart';
+import 'package:expensive_management/src/shared/data/provider/recurring_provider.dart';
 
 class RecurringRepository {
   final _recurringProvider = RecurringProvider();

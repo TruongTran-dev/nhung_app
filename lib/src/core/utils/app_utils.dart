@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:expensive_management/data/api/api_path.dart';
-import 'package:expensive_management/data/models/refresh_token_model.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
+import 'package:expensive_management/src/shared/data/models/refresh_token_model.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';

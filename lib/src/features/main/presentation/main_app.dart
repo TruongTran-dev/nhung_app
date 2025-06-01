@@ -1,7 +1,7 @@
 import 'package:expensive_management/src/shared/widgets/bouncing.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:expensive_management/app/app_colors.dart';
+import 'package:expensive_management/src/core/common/app_colors.dart';
 import 'package:expensive_management/src/shared/utils/app_constants.dart';
 
 class MainApp extends StatefulWidget {

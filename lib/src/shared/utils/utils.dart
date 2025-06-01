@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:expensive_management/data/models/frequency_model.dart';
+import 'package:expensive_management/src/shared/data/models/frequency_model.dart';
 
 import 'enum/enum.dart';
 import 'enum/wallet_type.dart';

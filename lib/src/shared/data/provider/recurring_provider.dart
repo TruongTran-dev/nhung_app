@@ -1,7 +1,7 @@
-import 'package:expensive_management/data/api/api_path.dart';
-import 'package:expensive_management/data/models/recurring_post_model.dart';
-import 'package:expensive_management/data/response/base_get_response.dart';
-import 'package:expensive_management/data/response/recurring_response.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
+import 'package:expensive_management/src/shared/data/models/recurring_post_model.dart';
+import 'package:expensive_management/src/shared/data/response/base_get_response.dart';
+import 'package:expensive_management/src/shared/data/response/recurring_response.dart';
 
 import 'provider_mixin.dart';
 

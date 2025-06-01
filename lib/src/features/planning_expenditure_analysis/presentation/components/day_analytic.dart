@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/day_analytic_bloc.dart';
-import 'package:expensive_management/data/models/analytic_model.dart';
+import 'package:expensive_management/src/shared/data/models/analytic_model.dart';
 import 'package:expensive_management/src/shared/widgets/animation_loading.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';

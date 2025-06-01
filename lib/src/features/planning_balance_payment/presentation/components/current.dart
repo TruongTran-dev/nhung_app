@@ -1,4 +1,4 @@
-import 'package:expensive_management/data/models/report_expenditure_revenue_model.dart';
+import 'package:expensive_management/src/shared/data/models/report_expenditure_revenue_model.dart';
 import 'package:expensive_management/src/shared/widgets/animation_loading.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
-import 'package:expensive_management/data/api/api_path.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/features/categories/presentation/components/category_info.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';

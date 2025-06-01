@@ -1,9 +1,9 @@
 
-import 'package:expensive_management/data/models/analytic_model.dart';
-import 'package:expensive_management/data/response/base_response.dart';
+import 'package:expensive_management/src/shared/data/models/analytic_model.dart';
+import 'package:expensive_management/src/shared/data/response/base_response.dart';
 
-import 'package:expensive_management/data/api/api_path.dart';
-import 'package:expensive_management/data/response/report_expenditure_revenue_response.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
+import 'package:expensive_management/src/shared/data/response/report_expenditure_revenue_response.dart';
 import 'provider_mixin.dart';
 
 class AnalyticProvider with ProviderMixin {

@@ -1,6 +1,6 @@
-import 'package:expensive_management/data/response/get_list_wallet_response.dart';
+import 'package:expensive_management/src/shared/data/response/get_list_wallet_response.dart';
 
-import '../api/api_path.dart';
+import '../../../core/common/api_path.dart';
 import '../response/base_get_response.dart';
 import 'provider_mixin.dart';
 

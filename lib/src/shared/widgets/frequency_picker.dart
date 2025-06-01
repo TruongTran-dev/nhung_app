@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:expensive_management/data/models/frequency_model.dart';
+import 'package:expensive_management/src/shared/data/models/frequency_model.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 

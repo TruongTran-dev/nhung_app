@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:either_dart/either.dart';
-import 'package:expensive_management/data/api/api_path.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/shared/utils/async_job_retrier.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';

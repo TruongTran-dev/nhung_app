@@ -1,15 +1,15 @@
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/api_result_state.dart';
-import 'package:expensive_management/data/provider/category_provider.dart';
-import 'package:expensive_management/data/provider/wallet_provider.dart';
+import 'package:expensive_management/src/shared/data/provider/category_provider.dart';
+import 'package:expensive_management/src/shared/data/provider/wallet_provider.dart';
 import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/data/response/base_get_response.dart';
-import 'package:expensive_management/data/response/get_list_category_response.dart';
-import 'package:expensive_management/data/response/get_list_wallet_response.dart';
+import 'package:expensive_management/src/shared/data/response/base_get_response.dart';
+import 'package:expensive_management/src/shared/data/response/get_list_category_response.dart';
+import 'package:expensive_management/src/shared/data/response/get_list_wallet_response.dart';
 import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 

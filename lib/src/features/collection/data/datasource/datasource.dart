@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:expensive_management/data/api/api_path.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/common/dio_provider.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';

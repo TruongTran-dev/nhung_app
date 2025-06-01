@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math' show Random;
 
 import 'package:equatable/equatable.dart';
-import 'package:expensive_management/data/api/api_path.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';

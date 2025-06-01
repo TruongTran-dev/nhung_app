@@ -1,5 +1,5 @@
 import 'package:either_dart/either.dart';
-import 'package:expensive_management/data/api/api_path.dart';
+import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/common/dio_provider.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:flutter/cupertino.dart';

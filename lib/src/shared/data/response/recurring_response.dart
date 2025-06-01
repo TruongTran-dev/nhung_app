@@ -1,5 +1,5 @@
-import 'package:expensive_management/data/models/recurring_list_model.dart';
-import 'package:expensive_management/data/response/base_get_response.dart';
+import 'package:expensive_management/src/shared/data/models/recurring_list_model.dart';
+import 'package:expensive_management/src/shared/data/response/base_get_response.dart';
 
 class RecurringResponse extends BaseGetResponse {
   final List<RecurringListModel>? listRecurring;

@@ -1,5 +1,5 @@
 import 'package:expensive_management/src/features/export/presentation/export_file.dart';
-import 'package:expensive_management/presentation/screens/setting_screen/security/security.dart';
+import 'package:expensive_management/src/features/menu_setting/presentation/components/security.dart';
 import 'package:expensive_management/src/features/group_wallet/presentation/components/group_wallet_detail.dart';
 import 'package:expensive_management/src/features/group_wallet/presentation/page.dart';
 import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/bloc/day_analytic_bloc.dart';

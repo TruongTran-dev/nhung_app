@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:expensive_management/src/features/auth/domain/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:expensive_management/data/models/refresh_token_model.dart';
+import 'package:expensive_management/src/shared/data/models/refresh_token_model.dart';
 
 import '../../shared/utils/app_constants.dart';
 

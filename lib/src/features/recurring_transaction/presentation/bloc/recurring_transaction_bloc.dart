@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/api_result_state.dart';
-import 'package:expensive_management/data/models/recurring_list_model.dart';
+import 'package:expensive_management/src/shared/data/models/recurring_list_model.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:expensive_management/data/repository/recurring_repository.dart';
-import 'package:expensive_management/data/response/base_get_response.dart';
-import 'package:expensive_management/data/response/recurring_response.dart';
+import 'package:expensive_management/src/shared/data/repository/recurring_repository.dart';
+import 'package:expensive_management/src/shared/data/response/base_get_response.dart';
+import 'package:expensive_management/src/shared/data/response/recurring_response.dart';
 import 'package:expensive_management/src/shared/utils/enum/api_error_result.dart';
 import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
