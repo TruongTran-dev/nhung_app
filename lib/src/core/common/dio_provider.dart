@@ -155,7 +155,7 @@ class DioProvider {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         });
-        _logRequest('GET', path, data, queryParameters);
+        _logRequest('GET', _dio.options.baseUrl + path, data, queryParameters);
         Response<T> response = await _dio.get(
           path,
           data: data,
@@ -192,7 +192,7 @@ class DioProvider {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           });
-          _logRequest('POST', path, data, queryParameters);
+          _logRequest('POST', _dio.options.baseUrl + path, data, queryParameters);
           Response response = await _dio.post(
             path,
             data: data,
@@ -228,7 +228,7 @@ class DioProvider {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         });
-        _logRequest('PUT', path, data, queryParameters);
+        _logRequest('PUT', _dio.options.baseUrl + path, data, queryParameters);
         Response response = await _dio.put(
           path,
           data: data,
@@ -265,7 +265,7 @@ class DioProvider {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         });
-        _logRequest('DELETE', path, data, queryParameters);
+        _logRequest('DELETE', _dio.options.baseUrl + path, data, queryParameters);
         Response response = await _dio.delete(
           path,
           data: data,

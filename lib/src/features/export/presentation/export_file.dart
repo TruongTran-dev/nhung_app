@@ -10,10 +10,11 @@ import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/features/export/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/components/select_wallets.dart';
-import 'package:expensive_management/src/features/planning_expenditure_analysis/analytics.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';
+import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/models/wallet.dart';
@@ -125,26 +126,87 @@ class _ExportPageState extends State<ExportPage> {
                 return;
               } else {
                 //   // Request storage permission
-                var status = await Permission.storage.status;
-                if (!status.isGranted) {
-                  status = await Permission.storage.request();
-                  if (!status.isGranted) {
-                    AppUtils.showSnackBar(context, 'Cần cấp quyền truy cập bộ nhớ để lưu file');
-                    return;
-                  }
-                }
+                // Check storage permission
+                // var status = await Permission.storage.status;
+                // if (!status.isGranted) {
+                //   // Show popup explaining why we need storage permission
+                //   // bool proceed = await showDialog(
+                //   //       context: context,
+                //   //       builder: (context) => AlertDialog(
+                //   //         title: const Text('Quyền truy cập bộ nhớ'),
+                //   //         content: const Text(
+                //   //             'Ứng dụng cần quyền truy cập bộ nhớ để lưu file báo cáo. Bạn có muốn cấp quyền không?'),
+                //   //         actions: [
+                //   //           TextButton(
+                //   //             onPressed: () => Navigator.pop(context, false),
+                //   //             child: const Text('Từ chối'),
+                //   //           ),
+                //   //           TextButton(
+                //   //             onPressed: ()async {
+
+                //   //               Navigator.pop(context, true);
+
+                //   //             },
+                //   //             child: const Text('Đồng ý'),
+                //   //           ),
+                //   //         ],
+                //   //       ),
+                //   //     ) ??
+                //   //     false;
+                //   await Permission.storage.request();
+
+                //   if (!await Permission.storage.isGranted) {
+                //     AppUtils.showSnackBar(context, 'Không thể xuất file khi chưa được cấp quyền');
+                //     return;
+                //   }
+
+                //   // status = await Permission.storage.request();
+                //   // if (await Permission.storage.isGranted) {
+                //   //   AppUtils.showSnackBar(context, 'Cần cấp quyền truy cập bộ nhớ để lưu file');
+                //   //   return;
+                //   // }
+                // }
 
                 // For Android 11 (API level 30) and above
-                if (Platform.isAndroid) {
-                  var externalStorageStatus = await Permission.manageExternalStorage.status;
-                  if (!externalStorageStatus.isGranted) {
-                    externalStorageStatus = await Permission.manageExternalStorage.request();
-                    if (!externalStorageStatus.isGranted) {
-                      AppUtils.showSnackBar(context, 'Cần cấp quyền truy cập bộ nhớ để lưu file');
-                      return;
-                    }
-                  }
-                }
+                // if (Platform.isAndroid) {
+                //   var externalStorageStatus = await Permission.manageExternalStorage.status;
+                //   if (!externalStorageStatus.isGranted) {
+                //     await Permission.manageExternalStorage.request();
+                //     // Show popup for external storage permission
+                //     // bool proceed = await showDialog(
+                //     //       context: context,
+                //     //       builder: (context) => AlertDialog(
+                //     //         title: const Text('Quyền quản lý bộ nhớ'),
+                //     //         content: const Text(
+                //     //             'Ứng dụng cần quyền quản lý bộ nhớ ngoài để lưu file báo cáo. Bạn có muốn cấp quyền không?'),
+                //     //         actions: [
+                //     //           TextButton(
+                //     //             onPressed: () => Navigator.pop(context, false),
+                //     //             child: const Text('Từ chối'),
+                //     //           ),
+                //     //           TextButton(
+                //     //             onPressed: () => Navigator.pop(context, true),
+                //     //             child: const Text('Đồng ý'),
+                //     //           ),
+                //     //         ],
+                //     //       ),
+                //     //     ) ??
+                //     //     false;
+
+                //     // log("Proceed with external storage permission: $proceed");
+
+                //     // if (!proceed) {
+                //     //   AppUtils.showSnackBar(context, 'Không thể xuất file khi chưa được cấp quyền');
+                //     //   return;
+                //     // }
+
+                //     // externalStorageStatus = await Permission.manageExternalStorage.request();
+                //     if (!await Permission.manageExternalStorage.isGranted) {
+                //       AppUtils.showSnackBar(context, 'Cần cấp quyền quản lý bộ nhớ để lưu file');
+                //       return;
+                //     }
+                //   }
+                // }
 
                 final Map<String, dynamic> query = {
                   'fromDate': dateStart,
@@ -153,63 +215,6 @@ class _ExportPageState extends State<ExportPage> {
                 };
                 log("Query: $query");
                 _exportBloc.add(ExportDataEvent(queryParams: query));
-
-                //   final Directory downloadPath = await getApplicationDocumentsDirectory();
-                //   final String fileName =
-                //       (dateEnd != null) ? 'report_${dateStart}_$dateEnd.xlsx' : 'report_$dateStart.xlsx';
-
-                //   final savePath = isNullOrEmpty(downloadPath)
-                //       ? '/storage/emulated/0/Download/$fileName'
-                //       : '${downloadPath.path}/$fileName';
-
-                //   // print('savePath: $savePath');
-
-                //   final response = await ExportProvider().getFileReport(
-                //     query: query,
-                //     // fromDate: dateStart,
-                //     // toDate: dateEnd,
-                //     // walletIDs: walletIDs,
-                //     savePath: savePath,
-                //   );
-
-                //   if (response is File) {
-                //     final path = response.path;
-                //     // Show success message
-                //     showSnackbarMessage(
-                //       context,
-                //       message: 'Xuất file thành công. File được lưu tại: $path',
-                //       backgroundColor: Colors.green,
-                //       action: SnackBarAction(
-                //         label: 'Mở',
-                //         onPressed: () {
-                //           Navigator.push(
-                //             context,
-                //             MaterialPageRoute(builder: (context) => XlsxViewerScreen(filePath: path)),
-                //           );
-                //         },
-                //       ),
-                //     );
-
-                //     // print('file: ${response.path}');
-
-                //     // await OpenFile.open(response.path);
-
-                //     // await Share.shareFiles([response.path], text: fileName);
-
-                //     // if (await canLaunchUrl(Uri.file(response.path))) {
-                //     //   await launchUrl(Uri.file(response.path));
-                //     // } else {
-                //     //   throw 'Could not launch ${Uri.file(response.path)}';
-                //     // }
-                //   } else if (response is ExpiredTokenResponse) {
-                //     logoutIfNeed(this.context);
-                //   } else {
-                //     showSnackbarMessage(
-                //       context,
-                //       message: 'Xuất file thất bại',
-                //       backgroundColor: Colors.red,
-                //     );
-                //   }
               }
             },
           ),
