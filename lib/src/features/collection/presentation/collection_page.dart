@@ -708,7 +708,7 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                   onTap: () {
                     setState(() {
                       if (isOnline) isOnline = false;
-                      imageUrl = '';
+                      imageUrl = null;
                     });
                   },
                   child: const Icon(Icons.cancel, size: 24, color: Colors.redAccent),

@@ -30,10 +30,12 @@ class SubmitLoginEvent extends AuthEvent {
   SubmitLoginEvent copyWith({
     String? username,
     String? password,
+    String? deviceToken,
   }) {
     return SubmitLoginEvent(
       username: username ?? this.username,
       password: password ?? this.password,
+      deviceToken: deviceToken ?? this.deviceToken,
     );
   }
 }

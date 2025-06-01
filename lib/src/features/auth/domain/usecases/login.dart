@@ -47,6 +47,6 @@ class LoginParams extends Equatable {
   Map<String, dynamic> get data => {
         'username': username,
         'password': password,
-        if (!fcmToken.isNullOrEmpty) 'fcm_token': fcmToken,
+        if (!fcmToken.isNullOrEmpty) 'deviceToken': fcmToken,
       };
 }
