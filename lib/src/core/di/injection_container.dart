@@ -27,6 +27,11 @@ import 'package:expensive_management/src/features/collection/domain/usecases/add
 import 'package:expensive_management/src/features/collection/domain/usecases/delete_collection.dart';
 import 'package:expensive_management/src/features/collection/domain/usecases/update_collection.dart';
 import 'package:expensive_management/src/features/collection/presentation/bloc/bloc.dart';
+import 'package:expensive_management/src/features/export/data/datasource/datasource.dart';
+import 'package:expensive_management/src/features/export/data/repo_impls/repo_impl.dart';
+import 'package:expensive_management/src/features/export/domain/repos/repo.dart';
+import 'package:expensive_management/src/features/export/domain/usecases/export.dart';
+import 'package:expensive_management/src/features/export/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/features/limit_expenditure/data/datasource/datasource.dart';
 import 'package:expensive_management/src/features/limit_expenditure/data/repos/repo_impl.dart';
 import 'package:expensive_management/src/features/limit_expenditure/domain/repos/repo.dart';
@@ -262,4 +267,22 @@ Future<void> configureDependenciesInjection() async {
         updateRecurringUseCase: serviceLocator(),
         deleteRecurringUseCase: serviceLocator(),
       ));
+  //*
+
+  //* Export
+  //DataSource
+  serviceLocator.registerLazySingleton<ExportDataSource>(() => ExportDataSourceImpl(
+        dioProvider: serviceLocator(),
+        networkInfo: serviceLocator(),
+        appPrefStorage: serviceLocator(),
+      ));
+      // Repository
+  serviceLocator.registerLazySingleton<ExportRepo>(() => ExportRepoImpl(dataSource: serviceLocator()));
+  // UseCase
+  serviceLocator.registerLazySingleton<ExportUseCase>(() => ExportUseCase(repository: serviceLocator()));
+  // Bloc
+  serviceLocator.registerLazySingleton<ExportBloc>(() => ExportBloc(
+        exportUseCase: serviceLocator(),
+      ));
+  
 }

@@ -1,3 +1,4 @@
+import 'package:expensive_management/src/features/export/presentation/export_file.dart';
 import 'package:expensive_management/presentation/screens/setting_screen/security/security.dart';
 import 'package:expensive_management/src/features/group_wallet/presentation/components/group_wallet_detail.dart';
 import 'package:expensive_management/src/features/group_wallet/presentation/page.dart';
@@ -361,6 +362,27 @@ class AppRouter {
           return const SecurityPage();
         },
       ),
+
+      // Export route
+      GoRoute(
+        path: AppRoutes.export,
+        builder: (context, state) {
+          return const ExportPage();
+        },
+      ),
+
+      // File View route
+      GoRoute(
+        path: AppRoutes.fileView,
+        builder: (context, state) {
+          final extra = state.extra;
+          final filePath = extra is String ? extra : null;
+          if (filePath == null) {
+            return ErrorNotFoundPage(error: 'File path not found');
+          }
+          return XlsxViewerScreen(filePath: filePath);
+        },
+      ),
     ],
   );
 }
@@ -407,6 +429,8 @@ class AppRoutes {
   static const String limitInfor = '/limit_infor';
   static const String recurring = '/recurring';
   static const String security = '/security';
+  static const String export = '/export';
+  static const String fileView = '/file_view';
 
   //group wallet
   static const String groupWalletDetail = '/group_wallet_detail';
