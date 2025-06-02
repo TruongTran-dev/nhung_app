@@ -236,7 +236,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
                 final Map<String, dynamic> data = {
                   "addToReport": true,
                   "amount": int.parse(_moneyController.text.trim().replaceAll(',', '')),
-                  "categoryId": itemCategorySelected!.categoryId.toString(),
+                  "categoryId": itemCategorySelected!.categoryId,
                   "dayInWeeks": frequencyType == FrequencyType.weekday ? enList : [],
                   "description": _noteController.text.trim(),
                   "frequencyType": frequencyType.name.toUpperCase(),
@@ -244,7 +244,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
                   "time": time,
                   "toDate": toDate,
                   "transactionType": itemCategorySelected?.type.name.toUpperCase(),
-                  "walletId": selectedWallet!.toString()
+                  "walletId": selectedWallet!.id,
                 };
                 _recurringBloc.add(UpdateRecurringEvent(widget.recurringListModel!.id!, data));
               }
@@ -270,7 +270,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
       final Map<String, dynamic> data = {
         "addToReport": true,
         "amount": int.parse(_moneyController.text.trim().replaceAll(',', '')),
-        "categoryId": itemCategorySelected!.categoryId.toString(),
+        "categoryId": itemCategorySelected!.categoryId,
         "dayInWeeks": frequencyType == FrequencyType.weekday ? enList : [],
         "description": _noteController.text.trim(),
         "frequencyType": frequencyType.name.toUpperCase(),
@@ -278,7 +278,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
         "time": time,
         "toDate": toDate,
         "transactionType": itemCategorySelected?.type.name.toUpperCase(),
-        "walletId": selectedWallet!.id.toString()
+        "walletId": selectedWallet!.id,
       };
       log("data : $data");
       _recurringBloc.add(AddRecurringEvent(data));

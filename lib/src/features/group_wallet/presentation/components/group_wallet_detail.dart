@@ -57,6 +57,8 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
 
   bool isLoading = false;
 
+  bool isHasUpdatePermission = false;
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +71,12 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
       _descriptionController.text = widget.props.groupWallet!.description;
       final groupMembers = widget.props.groupWallet!.groupMembers;
       _memberIdsPrevious = groupMembers.map((member) => member.userId).toList();
+
+      final leaderMember = groupMembers.firstWhereOrNull((m) => m.groupRole == 'LEADER');
+      final currentUserID = serviceLocator<AppPrefStorage>().getUserId();
+      isHasUpdatePermission = leaderMember?.userId.toString() == currentUserID;
+    } else {
+      isHasUpdatePermission = true;
     }
 
     _allMembers = await _fetchUsers();
@@ -596,7 +604,63 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
                 ],
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const Text(
+                    "Vai trò của bạn:",
+                    textAlign: TextAlign.start,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.blue,
+                          child: Icon(Icons.person, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${serviceLocator<AppPrefStorage>().getUserName()} (Bạn)",
+                                style: const TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                serviceLocator<AppPrefStorage>().getUserEmail(),
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isHasUpdatePermission ? Colors.blue.shade100 : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            isHasUpdatePermission ? "Nhóm trưởng" : "Thành viên",
+                            style: TextStyle(
+                              color: isHasUpdatePermission ? Colors.blue : Colors.grey,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   GestureDetector(
                     onTap: _showBottomSelectMemberSheet,
                     child: Row(
@@ -617,42 +681,70 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
                   if (_selectedMembers.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     ..._selectedMembers.mapIndexed((index, member) {
-                      return CheckboxListTile(
-                        title: Text(member.fullName ?? member.username),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      return Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Row(
                           children: [
-                            Text("Email: ${member.email}", style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                            if (widget.props.isEdit)
-                              Text(
-                                _getWalletMemberRole(member) == "LEADER" ? "(Nhóm trưởng)" : "(Thành viên)",
-                                style: TextStyle(
-                                  color: _getWalletMemberRole(member) == "LEADER" ? Colors.blue : Colors.grey,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
+                            // User Avatar
+                            const CircleAvatar(radius: 20, child: Icon(Icons.person)),
+                            const SizedBox(width: 12),
+
+                            // User Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    member.fullName ?? member.username,
+                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "Email: ${member.email}",
+                                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                  ),
+                                  if (widget.props.isEdit)
+                                    Text(
+                                      _getWalletMemberRole(member) == "LEADER" ? "(Nhóm trưởng)" : "(Thành viên)",
+                                      style: TextStyle(
+                                        color: _getWalletMemberRole(member) == "LEADER" ? Colors.blue : Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                ],
                               ),
+                            ),
+
+                            // Checkbox
+                            Checkbox(
+                              value: member.isSelected,
+                              activeColor: Colors.green,
+                              onChanged: widget.props.isEdit && !isHasUpdatePermission
+                                  ? null // Disable checkbox when in edit mode without permission
+                                  : (bool? value) {
+                                      // Update the member in the _selectedMembers list
+                                      if (index != -1) {
+                                        _selectedMembers[index] = member.copyWith(isSelected: value ?? false);
+                                      }
+
+                                      // Also update the same member in _allMembers to maintain consistency
+                                      final allMembersIndex = _allMembers.indexWhere((m) => m.id == member.id);
+                                      if (allMembersIndex != -1) {
+                                        _allMembers[allMembersIndex] = _allMembers[allMembersIndex].copyWith(
+                                          isSelected: value ?? false,
+                                        );
+                                      }
+                                      setState(() {});
+                                    },
+                            ),
                           ],
                         ),
-                        value: member.isSelected,
-                        activeColor: Colors.green,
-                        onChanged: (bool? value) {
-                          // Update the member in the _selectedMembers list
-
-                          if (index != -1) {
-                            _selectedMembers[index] = member.copyWith(isSelected: value ?? false);
-                          }
-
-                          // Also update the same member in _allMembers to maintain consistency
-                          final allMembersIndex = _allMembers.indexWhere((m) => m.id == member.id);
-                          if (allMembersIndex != -1) {
-                            _allMembers[allMembersIndex] = _allMembers[allMembersIndex].copyWith(
-                              isSelected: value ?? false,
-                            );
-                          }
-                          setState(() {});
-                        },
-                        secondary: const CircleAvatar(child: Icon(Icons.person)),
                       );
                     }),
                   ],
@@ -662,7 +754,7 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
 
             const SizedBox(height: 24),
 
-            if (widget.props.isEdit)
+            if (widget.props.isEdit && isHasUpdatePermission)
               Row(
                 children: [
                   Expanded(
