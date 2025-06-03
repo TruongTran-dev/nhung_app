@@ -245,6 +245,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
                   "toDate": toDate,
                   "transactionType": itemCategorySelected?.type.name.toUpperCase(),
                   "walletId": selectedWallet!.id,
+                  if(selectedWallet!.groupId != null) "groupId": selectedWallet!.groupId,
                 };
                 _recurringBloc.add(UpdateRecurringEvent(widget.recurringListModel!.id!, data));
               }
@@ -279,6 +280,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
         "toDate": toDate,
         "transactionType": itemCategorySelected?.type.name.toUpperCase(),
         "walletId": selectedWallet!.id,
+       if(selectedWallet!.groupId != null) "groupId": selectedWallet!.groupId,
       };
       log("data : $data");
       _recurringBloc.add(AddRecurringEvent(data));
