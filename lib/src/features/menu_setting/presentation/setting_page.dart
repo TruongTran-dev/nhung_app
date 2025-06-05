@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';
@@ -16,7 +18,9 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   bool _isHiddenAmount = false;
-  final AppPrefStorage sharedPref = serviceLocator<AppPrefStorage>();
+
+  final _balanceVisibilityService = serviceLocator<BalanceVisibilityService>();
+  final sharedPref = serviceLocator<AppPrefStorage>();
 
   @override
   void initState() {
@@ -293,13 +297,18 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  void _onVisibilityChanged(bool newValue) async {
+    setState(() {
+      _isHiddenAmount = newValue;
+    });
+    await sharedPref.setHiddenAmount(newValue);
+    _balanceVisibilityService.notifyVisibilityChanged(newValue);
+  }
+
   Widget _widgetHideAmount() {
     return InkWell(
-      onTap: () async {
-        setState(() {
-          _isHiddenAmount = !_isHiddenAmount;
-        });
-        await serviceLocator<AppPrefStorage>().setHiddenAmount(_isHiddenAmount);
+      onTap: () {
+        _onVisibilityChanged(!_isHiddenAmount);
       },
       child: Column(
         children: [
@@ -335,11 +344,7 @@ class _SettingPageState extends State<SettingPage> {
                     borderRadius: 12,
                     padding: 2,
                     showOnOff: false,
-                    onToggle: (val) {
-                      setState(() {
-                        _isHiddenAmount = val;
-                      });
-                    },
+                    onToggle: _onVisibilityChanged,
                   ),
                 ),
               ],
@@ -349,4 +354,28 @@ class _SettingPageState extends State<SettingPage> {
       ),
     );
   }
+}
+
+/// A service to coordinate balance visibility state across the app
+class BalanceVisibilityService {
+  /// Stream controller for balance visibility changes
+  final _visibilityController = StreamController<bool>.broadcast();
+
+  /// Stream of balance visibility changes
+  Stream<bool> get visibilityChanges => _visibilityController.stream;
+
+  /// Notify listeners when balance visibility changes
+  void notifyVisibilityChanged(bool isVisible) {
+    _visibilityController.add(isVisible);
+  }
+
+  /// Dispose resources
+  void dispose() {
+    _visibilityController.close();
+  }
+
+  /// Singleton instance
+  static final BalanceVisibilityService _instance = BalanceVisibilityService._internal();
+  factory BalanceVisibilityService() => _instance;
+  BalanceVisibilityService._internal();
 }

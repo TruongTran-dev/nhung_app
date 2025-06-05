@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -6,6 +7,7 @@ import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/features/main/presentation/main_app.dart';
+import 'package:expensive_management/src/features/menu_setting/presentation/setting_page.dart';
 import 'package:expensive_management/src/features/my_wallet/presentation/bloc/bloc.dart';
 import 'package:expensive_management/src/shared/routes/router.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
@@ -31,8 +33,9 @@ class HomePage extends StatefulWidget {
 
 class _HomeViewState extends State<HomePage> {
   final sharedPref = serviceLocator<AppPrefStorage>();
+  final _balanceVisibilityService = serviceLocator<BalanceVisibilityService>();
   bool _isShowBalance = false;
-
+  StreamSubscription? _visibilitySubscription;
   String get currency => sharedPref.getCurrency();
 
   bool _showDetail = true;
@@ -47,6 +50,15 @@ class _HomeViewState extends State<HomePage> {
     _isShowBalance = sharedPref.getHiddenAmount();
     _walletBloc = serviceLocator<WalletBloc>();
     _walletBloc.add(GetWalletsEvent());
+
+    // Listen for visibility changes from other parts of the app
+    _visibilitySubscription = _balanceVisibilityService.visibilityChanges.listen((isVisible) {
+      if (mounted && _isShowBalance != isVisible) {
+        setState(() {
+          _isShowBalance = isVisible;
+        });
+      }
+    });
     super.initState();
   }
 
@@ -60,71 +72,73 @@ class _HomeViewState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _buildAmountWalletList(),
-    );
+  void dispose() {
+    _visibilitySubscription?.cancel();
+    super.dispose();
   }
 
-  Widget _buildAmountWalletList() {
-    return BlocConsumer<WalletBloc, WalletState>(
-      bloc: _walletBloc,
-      listener: (context, state) {
-        // print("BuildWalletState: ${state.runtimeType}");
-        if (state is GetListWalletSuccessState) {
-          _amount = state.moneyTotal;
-          _listWallet.clear();
-          _listWallet = state.wallets;
-        } else if (state is GetListWalletErrorState) {
-          log("Error: ${state.message}");
-          // showToast(state.message);
-          showMessage1OptionDialog(
-            context,
-            state.message,
-          );
-        }
-      },
-      builder: (context, state) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _balance(_amount),
-            Expanded(
-              child: ShaderMask(
-                shaderCallback: (Rect bounds) {
-                  return LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.white.withAlpha(0),
-                      Colors.white.withAlpha(100),
-                      Colors.white.withAlpha(200),
-                      Colors.white,
-                      Colors.white,
-                      Colors.white.withAlpha(200),
-                      Colors.white.withAlpha(100),
-                      Colors.white.withAlpha(0),
-                    ],
-                    stops: const [0.0, 0.01, 0.05, 0.2, 0.9, 0.95, 0.99, 1.0],
-                  ).createShader(bounds);
-                },
-                blendMode: BlendMode.dstIn,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 24),
-                      _myWallet(_listWallet),
-                      _weekReport(),
-                      ReportPage(),
-                      const SizedBox(height: 50),
-                    ],
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: BlocConsumer<WalletBloc, WalletState>(
+        bloc: _walletBloc,
+        listener: (context, state) {
+          // print("BuildWalletState: ${state.runtimeType}");
+          if (state is GetListWalletSuccessState) {
+            _amount = state.moneyTotal;
+            _listWallet.clear();
+            _listWallet = state.wallets;
+          } else if (state is GetListWalletErrorState) {
+            log("Error: ${state.message}");
+            // showToast(state.message);
+            showMessage1OptionDialog(
+              context,
+              state.message,
+            );
+          }
+        },
+        builder: (context, state) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _balance(_amount),
+              Expanded(
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white.withAlpha(0),
+                        Colors.white.withAlpha(100),
+                        Colors.white.withAlpha(200),
+                        Colors.white,
+                        Colors.white,
+                        Colors.white.withAlpha(200),
+                        Colors.white.withAlpha(100),
+                        Colors.white.withAlpha(0),
+                      ],
+                      stops: const [0.0, 0.01, 0.05, 0.2, 0.9, 0.95, 0.99, 1.0],
+                    ).createShader(bounds);
+                  },
+                  blendMode: BlendMode.dstIn,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 24),
+                        _myWallet(_listWallet),
+                        _weekReport(),
+                        ReportPage(),
+                        const SizedBox(height: 50),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -393,10 +407,12 @@ class _HomeViewState extends State<HomePage> {
                   padding: const EdgeInsets.only(left: 10),
                   child: InkWell(
                     onTap: () async {
+                      final newVisibility = !_isShowBalance;
                       setState(() {
-                        _isShowBalance = !_isShowBalance;
+                        _isShowBalance = newVisibility;
                       });
-                      await sharedPref.setHiddenAmount(_isShowBalance);
+                      await sharedPref.setHiddenAmount(newVisibility);
+                      _balanceVisibilityService.notifyVisibilityChanged(newVisibility);
                     },
                     child: Icon(
                       _isShowBalance ? Icons.visibility : Icons.visibility_off,

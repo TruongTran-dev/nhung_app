@@ -40,6 +40,7 @@ import 'package:expensive_management/src/features/limit_expenditure/domain/useca
 import 'package:expensive_management/src/features/limit_expenditure/domain/usecases/get_limits.dart';
 import 'package:expensive_management/src/features/limit_expenditure/domain/usecases/update_limit.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/bloc/bloc.dart';
+import 'package:expensive_management/src/features/menu_setting/presentation/setting_page.dart';
 import 'package:expensive_management/src/features/my_wallet/data/datasource/datasource.dart';
 import 'package:expensive_management/src/features/my_wallet/data/repos/repo_impl.dart';
 import 'package:expensive_management/src/features/my_wallet/domain/repos/repo.dart';
@@ -91,6 +92,9 @@ Future<void> configureDependenciesInjection() async {
   serviceLocator.registerLazySingleton<FirebaseStorageService>(
     () => FirebaseStorageService(storage: FirebaseStorage.instance),
   );
+
+  // stream
+  serviceLocator.registerLazySingleton(() => BalanceVisibilityService());
 
   //* Login
   // DataSource
