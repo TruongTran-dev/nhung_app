@@ -97,6 +97,7 @@ Future<void> configureDependenciesInjection() async {
   serviceLocator.registerLazySingleton<AuthDataSource>(() => AuthDataSourceImpl(
         dioProvider: serviceLocator(),
         networkInfo: serviceLocator(),
+        appPrefStorage: serviceLocator(),
       ));
   // Repository
   serviceLocator.registerLazySingleton<AuthRepo>(() => AuthRepoImpl(dataSource: serviceLocator()));

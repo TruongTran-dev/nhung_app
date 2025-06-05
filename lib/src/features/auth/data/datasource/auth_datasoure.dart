@@ -1,6 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:expensive_management/src/core/common/api_path.dart';
 import 'package:expensive_management/src/core/common/dio_provider.dart';
+import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/shared/utils/network_info.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -16,7 +19,9 @@ abstract class AuthDataSource {
 class AuthDataSourceImpl implements AuthDataSource {
   final DioProvider dioProvider;
   final NetworkInfo networkInfo;
-  AuthDataSourceImpl({required this.dioProvider, required this.networkInfo});
+  final AppPrefStorage appPrefStorage;
+
+  AuthDataSourceImpl({required this.dioProvider, required this.networkInfo, required this.appPrefStorage});
 
   @override
   Future<Either<Failure, Map<String, dynamic>>> login({required Map<String, dynamic> data}) async {
@@ -105,7 +110,20 @@ class AuthDataSourceImpl implements AuthDataSource {
       if (await networkInfo.isNotConnected) {
         return Left(Failure('Không có kết nối mạng. Vui lòng kiểm tra lại.'));
       }
-      final response = await dioProvider.post(ApiPath.changePassword, data: data);
+      if (!await AppUtils.isValidToken()) {
+        return Left(ServerError(key: 'token_expired', message: 'Token expired'));
+      }
+      final token = appPrefStorage.getAccessToken();
+      final headers = {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      };
+
+      final response = await dioProvider.post(
+        ApiPath.changePassword,
+        data: data,
+        options: Options(headers: headers),
+      );
 
       if (response.isLeft) return Left(response.left);
 

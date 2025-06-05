@@ -24,13 +24,30 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
   final _authBloc = serviceLocator<AuthBloc>();
 
+  void _clearSession() {
+    _oldPassCon.clear();
+    _newPassCon.clear();
+    _confirmNewPassCon.clear();
+    _showOld = false;
+    _showNew = false;
+    _showConfirm = false;
+    if (FocusScope.of(context).hasFocus) {
+      FocusScope.of(context).unfocus();
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       bloc: _authBloc,
       listener: (context, state) {
         if (state is ChangePasswordSuccessState) {
-          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Đổi mật khẩu thành công')),
+          );
+          _clearSession();
+          // Navigator.pop(context);
         } else if (state is ChangePasswordFailedState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.errorMessage)),
