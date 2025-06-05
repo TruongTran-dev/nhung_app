@@ -1,4 +1,5 @@
 import 'package:expensive_management/src/core/di/injection_container.dart';
+import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/features/auth/presentation/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,9 +45,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       listener: (context, state) {
         if (state is ChangePasswordSuccessState) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đổi mật khẩu thành công')),
+            const SnackBar(content: Text('Đổi mật khẩu thành công, vui lòng đăng nhập lại')),
           );
           _clearSession();
+          AppUtils.logout(context: context);
           // Navigator.pop(context);
         } else if (state is ChangePasswordFailedState) {
           ScaffoldMessenger.of(context).showSnackBar(
