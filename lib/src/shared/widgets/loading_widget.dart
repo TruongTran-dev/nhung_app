@@ -7,14 +7,24 @@ class LoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withValues(alpha: 0.35),
+      color: Colors.black.withOpacity(0.35),
       child: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator.adaptive(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+            const CircularProgressIndicator.adaptive(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
             if (text != null) ...[
-              SizedBox(height: 10),
-              Text(text!, style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              Text(
+                text!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ],
           ],
         ),
