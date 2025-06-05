@@ -94,7 +94,7 @@ class _PlanningPageState extends State<PlanningPage> {
                               AppRoutes.expenditure,
                               extra: ExpenditureProps(
                                 listWallet: state.listWallet ?? [],
-                                listCategory: state.listExCategory ?? [],
+                                listCategory: state.listCoCategory ?? [],
                                 type: TransactionType.income,
                               ),
                             ),
