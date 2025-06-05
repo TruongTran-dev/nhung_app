@@ -568,11 +568,14 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
             // Group Name Field
             TextField(
               controller: _groupNameController,
-              decoration: const InputDecoration(
+              enabled: isHasUpdatePermission,
+              decoration: InputDecoration(
                 labelText: 'Tên hội nhóm',
                 hintText: 'Nhập tên hội nhóm',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.group),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.group),
+                filled: !isHasUpdatePermission,
+                fillColor: !isHasUpdatePermission ? Colors.grey.shade100 : null,
               ),
             ),
             const SizedBox(height: 16),
@@ -581,10 +584,13 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
             TextField(
               controller: _descriptionController,
               maxLines: 3,
-              decoration: const InputDecoration(
+              enabled: isHasUpdatePermission,
+              decoration: InputDecoration(
                 labelText: 'Mô tả nhóm',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.description),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.description),
+                filled: !isHasUpdatePermission,
+                fillColor: !isHasUpdatePermission ? Colors.grey.shade100 : null,
               ),
             ),
             const SizedBox(height: 24),
@@ -683,6 +689,7 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
                     ..._selectedMembers.mapIndexed((index, member) {
                       return Container(
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                        margin: const EdgeInsets.symmetric(vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(8),
@@ -785,8 +792,8 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
                     ),
                   ),
                 ],
-              )
-            else
+              ),
+            if (isHasUpdatePermission && !widget.props.isEdit)
               ElevatedButton(
                 onPressed: _createGroupWallet,
                 style: ElevatedButton.styleFrom(
@@ -805,6 +812,8 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
   }
 
   void _showBottomSelectMemberSheet() async {
+    if (!mounted || !isHasUpdatePermission) return;
+
     final selectedMembersResult = await showModalBottomSheet<List<UserMemberData>>(
       context: context,
       isScrollControlled: true,
