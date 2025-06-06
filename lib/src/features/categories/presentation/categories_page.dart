@@ -277,7 +277,18 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child: Text(category.name ?? '', style: const TextStyle(fontSize: 16, color: Colors.black)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(category.name ?? '', style: const TextStyle(fontSize: 16, color: Colors.black)),
+                        if (category.groupId != null)
+                          Text(
+                            '(Hạng mục nhóm)',
+                            style: TextStyle(fontSize: 13, color: Colors.grey.withOpacity(0.6)),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -402,9 +413,23 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                                             Expanded(
                                               child: Padding(
                                                 padding: const EdgeInsets.only(left: 10),
-                                                child: Text(
-                                                  listCoCategory[index].name ?? '',
-                                                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      listCoCategory[index].name ?? '',
+                                                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                                                    ),
+                                                    if (listCoCategory[index].groupId != null)
+                                                      Text(
+                                                        '(Hạng mục nhóm)',
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: Colors.grey.withOpacity(0.6),
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
                                               ),
                                             ),
@@ -568,9 +593,23 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 16.0),
-                        child: Text(
-                          item?.name ?? '',
-                          style: const TextStyle(fontSize: 16, color: Colors.black),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              item?.name ?? '',
+                              style: const TextStyle(fontSize: 16, color: Colors.black),
+                            ),
+                            if (item?.groupId != null)
+                              Text(
+                                '(Hạng mục nhóm)',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey.withOpacity(0.6),
+                                ),
+                              )
+                          ],
                         ),
                       ),
                     ),

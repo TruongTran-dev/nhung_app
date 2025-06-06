@@ -1,4 +1,3 @@
-
 import 'package:expensive_management/src/shared/utils/utils.dart';
 
 class CategoryModel {
@@ -12,6 +11,7 @@ class CategoryModel {
   final String? categoryType;
   final String? createdAt;
   final int? createdBy;
+  final int? groupId;
   final bool pay;
 
   ///using for checkList in select category in limit_expenditure
@@ -29,6 +29,7 @@ class CategoryModel {
     this.createdAt,
     this.createdBy,
     this.pay = false,
+    this.groupId,
     this.isChecked = false,
   });
 
@@ -49,12 +50,13 @@ class CategoryModel {
       categoryType: json['categoryType'],
       createdAt: json['createdAt'],
       createdBy: json['createdBy'],
+      groupId: json['groupId'],
       pay: json['pay'],
     );
   }
 
   @override
   String toString() {
-    return 'CategoryModel{id: $id, name: $name, childCategory: $childCategory, isChecked: $isChecked}';
+    return 'CategoryModel{id: $id, name: $name, childCategory: $childCategory, isChecked: $isChecked, groupId: $groupId}';
   }
 }

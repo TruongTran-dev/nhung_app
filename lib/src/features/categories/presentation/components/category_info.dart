@@ -3,10 +3,13 @@ import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/api_path.dart';
+import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/core/utils/app_utils.dart';
 import 'package:expensive_management/src/features/categories/presentation/bloc/bloc.dart';
+import 'package:expensive_management/src/features/group_wallet/domain/models/group_wallet_datamodel.dart';
+import 'package:expensive_management/src/features/my_wallet/presentation/components/select_group_bottom_sheet.dart';
 import 'package:expensive_management/src/shared/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:expensive_management/src/features/categories/domain/models/category_model.dart';
@@ -97,12 +100,16 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
 
   bool isExpandedCategory = true;
 
+  bool isGroupCategory = false;
+  GroupWallet? _selectedGroup;
+
+  List<GroupWallet> listGroupWallets = [];
+
   final _sharedPref = serviceLocator<AppPrefStorage>();
   final _categoryBloc = serviceLocator<CategoryBloc>();
 
-  void init() {
+  void init() async {
     isExpandedCategory = widget.props.isExpandedCategory;
-    log('isExpandedCategory: $isExpandedCategory');
     if (widget.props.category != null) {
       categoryIconUrl = widget.props.category?.logoImageUrl;
       categoryIconId = widget.props.category?.logoImageID;
@@ -112,6 +119,44 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
     parentId = widget.props.parentId;
     parentName = widget.props.parentName;
     iconParentUrl = widget.props.iconParentUrl;
+
+    isGroupCategory = widget.props.category?.groupId != null;
+    listGroupWallets = await _fetchWalletGroups();
+
+    if (listGroupWallets.isNotEmpty && widget.props.category?.groupId != null) {
+      _selectedGroup = listGroupWallets.firstWhereOrNull(
+        (group) => group.id == widget.props.category?.groupId,
+      );
+      setState(() {});
+    }
+  }
+
+  Future<List<GroupWallet>> _fetchWalletGroups() async {
+    try {
+      final token = serviceLocator<AppPrefStorage>().getAccessToken();
+      if (!await AppUtils.isValidToken() || token.isNullOrEmpty) {
+        return [];
+      }
+
+      final response = await http.get(
+        Uri.parse(ApiPath.apiDomain + ApiPath.group),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final List<GroupWallet> wallets = GroupWalletResponse.fromJson(responseData).content;
+        return wallets;
+      } else {
+        throw Exception('Failed to load wallet groups: ${response.statusCode}');
+      }
+    } catch (e) {
+      log('Error fetching wallet groups: $e');
+      return [];
+    }
   }
 
   @override
@@ -207,6 +252,7 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
+        spacing: 12,
         children: [
           Container(
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Colors.white),
@@ -243,7 +289,9 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
                                   height: 50,
                                   width: 50,
                                   decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(25), color: Colors.grey.withOpacity(0.25)),
+                                    borderRadius: BorderRadius.circular(25),
+                                    color: Colors.grey.withOpacity(0.25),
+                                  ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(25),
                                     child: AppImage(
@@ -251,14 +299,16 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
                                       height: 50,
                                       width: 50,
                                       boxFit: BoxFit.cover,
-                                      errorWidget: const Icon(Icons.help_outline, size: 40, color: Colors.grey),
+                                      errorWidget: const Icon(Icons.help_outline, size: 30, color: Colors.grey),
                                     ),
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4),
-                                  child: Text('Chọn icon',
-                                      style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor)),
+                                  child: Text(
+                                    'Chọn icon',
+                                    style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),
+                                  ),
                                 ),
                               ],
                             ),
@@ -297,7 +347,7 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
                                   child: AppImage(
                                     localPathOrUrl: iconParentUrl,
                                     boxFit: BoxFit.cover,
-                                    errorWidget: const Icon(Icons.help_outline, size: 30, color: Colors.grey),
+                                    errorWidget: const Icon(Icons.help_outline, size: 24, color: Colors.grey),
                                   ),
                                 ),
                               ),
@@ -335,7 +385,7 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
                                 child: Icon(
                                   isNotNullOrEmpty(parentName) ? Icons.cancel : Icons.navigate_next,
                                   color: Colors.grey,
-                                  size: 20,
+                                  size: 24,
                                 ),
                               ),
                             ),
@@ -370,7 +420,7 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
                               borderRadius: BorderRadius.circular(20),
                               color: Colors.grey.withOpacity(0.25),
                             ),
-                            child: const Icon(Icons.event_note, size: 30, color: Colors.grey),
+                            child: const Icon(Icons.event_note, size: 24, color: Colors.grey),
                           ),
                         ),
                         suffixIcon: _showClearNote
@@ -386,6 +436,62 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
                   ),
                 ],
               ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Column(
+              spacing: 8,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  spacing: 8,
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey.withOpacity(0.25),
+                      ),
+                      child: const Icon(Icons.group, size: 24, color: Colors.grey),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        'Đặt làm hạng mục nhóm',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                    ),
+                    Transform.scale(
+                      scale: 0.8,
+                      child: Switch(
+                        value: isGroupCategory,
+                        activeColor: Theme.of(context).primaryColor,
+                        inactiveTrackColor: Colors.grey.withOpacity(0.1),
+                        onChanged: (bool value) {
+                          setState(() {
+                            isGroupCategory = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                if (isGroupCategory) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'Hạng mục nhóm sẽ được sử dụng chung cho tất cả các thành viên trong nhóm. Bạn có thể tạo hạng mục nhóm để quản lý chi tiêu chung.',
+                      style: TextStyle(fontSize: 14, color: Colors.grey.withOpacity(0.7)),
+                    ),
+                  ),
+                  _buildSelectGroup(),
+                ],
+              ],
             ),
           ),
           Padding(
@@ -430,8 +536,56 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
     );
   }
 
-  Future<void> _onSelectParentCategory() async {
-    await showModalBottomSheet(
+  Widget _buildSelectGroup() {
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      // padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Chọn nhóm sử dụng tài khoản này'),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              final newGroupSelected = await showModalBottomSheet(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                constraints: BoxConstraints(maxHeight: context.screenSize.height * 0.6),
+                builder: (_) => SelectGroupBottomSheet(selectedGroup: _selectedGroup),
+              );
+              setState(() {
+                _selectedGroup = newGroupSelected;
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.group, size: 30, color: context.theme.primaryColor.withValues(alpha: 0.6)),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      _selectedGroup?.name ?? 'Chọn nhóm tài khoản',
+                      style: TextStyle(fontSize: 16, color: _selectedGroup != null ? Colors.black : Colors.grey),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios_outlined, size: 16, color: Colors.grey),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onSelectParentCategory() {
+    showModalBottomSheet(
       context: context,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.6,
@@ -603,8 +757,8 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
     }
   }
 
-  Future<void> _onTapSelectIcon() async {
-    await showModalBottomSheet(
+  void _onTapSelectIcon() {
+    showModalBottomSheet(
       context: context,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.6,
@@ -737,30 +891,105 @@ class _CategoryInfoPageState extends State<CategoryInfoPage> {
     }
   }
 
-  Future<void> _onSubmitAddCategory() async {
+  void _onSubmitAddCategory() {
+    if (_cateController.text.trim().isEmpty) {
+      AppUtils.showSnackBar(context, 'Vui lòng nhập tên hạng mục');
+      return;
+    }
+
+    if (isGroupCategory && _selectedGroup == null) {
+      AppUtils.showSnackBar(context, 'Vui lòng chọn nhóm');
+      return;
+    }
+
     final Map<String, dynamic> data = {
       "categoryType": isExpandedCategory ? 'EXPENSE' : 'INCOME',
       "description": _noteController.text.trim(),
       "logoImageID": categoryIconId,
       "name": _cateController.text.trim(),
       "parentId": parentId ?? 0,
-      "pay": true
+      "pay": true,
+      if (isGroupCategory && _selectedGroup != null) "groupId": _selectedGroup!.id,
     };
     _categoryBloc.add(AddCategoryEvent(data: data));
   }
 
-  Future<void> _onSubmitUpdateCategory() async {
-    final id = widget.props.category?.id;
-    if (id == null) return;
-    final Map<String, dynamic> data = {
-      "categoryType": isExpandedCategory ? 'EXPENSE' : 'INCOME',
-      "description": _noteController.text.trim(),
-      "logoImageID": isNotNullOrEmpty(categoryIconId) ? categoryIconId! : null,
-      "name": _cateController.text.trim(),
-      "parentId": parentId ?? 0,
-      "pay": true
-    };
-    _categoryBloc.add(UpdateCategoryEvent(categoryId: id, data: data));
+  void _onSubmitUpdateCategory() async {
+    if (_cateController.text.trim().isEmpty) {
+      AppUtils.showSnackBar(context, 'Vui lòng nhập tên hạng mục');
+      return;
+    }
+
+    if (isGroupCategory && _selectedGroup == null) {
+      AppUtils.showSnackBar(context, 'Vui lòng chọn nhóm');
+      return;
+    }
+
+    // Check if data has changed before adding/updating
+    if (widget.props.canEdit) {
+      final category = widget.props.category;
+      bool hasChanges = false;
+
+      if (category != null) {
+        // Check if name changed
+        if (_cateController.text.trim() != category.name) {
+          hasChanges = true;
+        }
+        // Check if description changed
+        else if (_noteController.text.trim() != (category.description ?? '')) {
+          hasChanges = true;
+        }
+        // Check if icon changed
+        else if (categoryIconId != category.logoImageID) {
+          hasChanges = true;
+        }
+        // Check if group category status changed
+        else if (isGroupCategory != (category.groupId != null)) {
+          hasChanges = true;
+        }
+        // Check if selected group changed
+        else if (isGroupCategory && _selectedGroup?.id != category.groupId) {
+          hasChanges = true;
+        }
+
+        if (!hasChanges) {
+          AppUtils.showSnackBar(context, 'Không có thay đổi nào');
+          return;
+        }
+
+        // Show confirmation dialog
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            title: const Text('Xác nhận thay đổi', style: TextStyle(fontSize: 18)),
+            content: const Text('Bạn có chắc muốn cập nhật hạng mục này không?'),
+            actions: <Widget>[
+              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy')),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Xác nhận', style: TextStyle(color: Theme.of(context).primaryColor)),
+              ),
+            ],
+          ),
+        );
+
+        if (confirmed == true) {
+          final id = widget.props.category?.id;
+          if (id == null) return;
+          final Map<String, dynamic> data = {
+            "categoryType": isExpandedCategory ? 'EXPENSE' : 'INCOME',
+            "description": _noteController.text.trim(),
+            "logoImageID": isNotNullOrEmpty(categoryIconId) ? categoryIconId! : null,
+            "name": _cateController.text.trim(),
+            "parentId": parentId ?? 0,
+            "pay": true,
+            if (isGroupCategory && _selectedGroup != null) "groupId": _selectedGroup!.id,
+          };
+          _categoryBloc.add(UpdateCategoryEvent(categoryId: id, data: data));
+        }
+      }
+    }
   }
 
   void _deleteCategory() async {
