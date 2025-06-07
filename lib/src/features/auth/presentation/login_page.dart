@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     _authBloc = serviceLocator<AuthBloc>();
-    _usernameController.text = 'test';
+    _usernameController.text = 'nhungchan';
     _passwordController.text = '123456';
     _deviceToken = serviceLocator<NotificationService>().token;
     super.initState();
@@ -81,12 +81,6 @@ class _LoginPageState extends State<LoginPage> {
                   key: _formKey,
                   child: _loginForm(context),
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: _logInButton(),
-                ),
                 isLoading ? Positioned.fill(child: const LoadingWidget()) : const SizedBox.shrink(),
               ],
             );
@@ -97,75 +91,88 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _loginForm(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _appIcon(),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: Input(
-            textInputAction: TextInputAction.next,
-            controller: _usernameController,
-            focusNode: FocusNode(),
-            onChanged: (text) {},
-            keyboardType: TextInputType.text,
-            hint: 'Tên đăng nhập',
-            prefixIcon: Icons.email_outlined,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập tên đăng nhập';
-              }
-              return null;
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: InputPasswordField(
-            controller: _passwordController,
-            onChanged: (text) {},
-            keyboardType: TextInputType.text,
-            hint: 'Mật khẩu',
-            obscureText: !_isShowPassword,
-            onTapSuffixIcon: () {
-              setState(() {
-                _isShowPassword = !_isShowPassword;
-              });
-            },
-            validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return 'Vui lòng nhập mật khẩu';
-              }
-              if (value.isNotEmpty && value.length < 6) {
-                return 'Mật khẩu phải có ít nhất 6 ký tự';
-              } else if (value.length > 40) {
-                return 'Mật khẩu không được quá 40 ký tự';
-              }
-              return null;
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              GestureDetector(
-                onTap: _navToForgotPassword,
-                child: Text(
-                  'Quên mật khẩu?',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                    fontStyle: FontStyle.italic,
-                    color: context.theme.primaryColor,
+    return SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
+      child: SizedBox(
+        height: context.screenSize.height,
+        child: Column(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _appIcon(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Input(
+                      textInputAction: TextInputAction.next,
+                      controller: _usernameController,
+                      focusNode: FocusNode(),
+                      onChanged: (text) {},
+                      keyboardType: TextInputType.text,
+                      hint: 'Tên đăng nhập',
+                      prefixIcon: Icons.email_outlined,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập tên đăng nhập';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: InputPasswordField(
+                      controller: _passwordController,
+                      onChanged: (text) {},
+                      keyboardType: TextInputType.text,
+                      hint: 'Mật khẩu',
+                      obscureText: !_isShowPassword,
+                      onTapSuffixIcon: () {
+                        setState(() {
+                          _isShowPassword = !_isShowPassword;
+                        });
+                      },
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập mật khẩu';
+                        }
+                        if (value.isNotEmpty && value.length < 6) {
+                          return 'Mật khẩu phải có ít nhất 6 ký tự';
+                        } else if (value.length > 40) {
+                          return 'Mật khẩu không được quá 40 ký tự';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: _navToForgotPassword,
+                          child: Text(
+                            'Quên mật khẩu?',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              fontStyle: FontStyle.italic,
+                              color: context.theme.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            _logInButton(),
+          ],
         ),
-      ],
+      ),
     );
   }
 

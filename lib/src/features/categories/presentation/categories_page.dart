@@ -300,18 +300,16 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
           child: Divider(height: 1, color: Colors.grey.withOpacity(0.3)),
         ),
         if (isExpanded)
-          SizedBox(
-            height: 50 * (category.childCategory?.length ?? 0).toDouble(),
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: category.childCategory?.length,
-              itemBuilder: (context, indexx) => _itemChildCategory(
-                category.childCategory?[indexx],
-                parentId: category.id,
-                parentName: category.name,
-                iconParentUrl: category.logoImageUrl,
-              ),
+          ListView.builder(
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: category.childCategory?.length,
+            itemBuilder: (context, indexx) => _itemChildCategory(
+              category.childCategory?[indexx],
+              parentId: category.id,
+              parentName: category.name,
+              iconParentUrl: category.logoImageUrl,
             ),
           ),
       ],
@@ -442,18 +440,15 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                                       child: Divider(height: 1, color: Colors.grey.withOpacity(0.3)),
                                     ),
                                     if (isExpanded)
-                                      SizedBox(
-                                        height: 50 * (listCoCategory[index].childCategory?.length ?? 0).toDouble(),
-                                        child: ListView.builder(
-                                          padding: EdgeInsets.zero,
-                                          physics: const NeverScrollableScrollPhysics(),
-                                          itemCount: listCoCategory[index].childCategory?.length,
-                                          itemBuilder: (context, indexx) => _itemChildCategory(
-                                            listCoCategory[index].childCategory?[indexx],
-                                            parentId: listCoCategory[index].id,
-                                            parentName: listCoCategory[index].name,
-                                            iconParentUrl: listCoCategory[index].logoImageUrl,
-                                          ),
+                                      ListView.builder(
+                                        padding: EdgeInsets.zero,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: listCoCategory[index].childCategory?.length,
+                                        itemBuilder: (context, indexx) => _itemChildCategory(
+                                          listCoCategory[index].childCategory?[indexx],
+                                          parentId: listCoCategory[index].id,
+                                          parentName: listCoCategory[index].name,
+                                          iconParentUrl: listCoCategory[index].logoImageUrl,
                                         ),
                                       ),
                                   ],
@@ -555,7 +550,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
     String? iconParentUrl,
   }) {
     return SizedBox(
-      height: 50,
+      height: 54,
       child: Column(
         children: [
           Expanded(

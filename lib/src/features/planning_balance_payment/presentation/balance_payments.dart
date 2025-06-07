@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/components/select_wallets.dart';
 import 'package:flutter/material.dart';
@@ -46,8 +48,9 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
   @override
   void initState() {
     _tabController = TabController(length: 5, vsync: this);
-    listWalletSelected = widget.listWallet?.where((wallet) => wallet.groupId == null).toList() ?? [];
+    listWalletSelected = widget.listWallet ?? [];
     walletIDs = initWallet(listWalletSelected);
+    log('Wallets: ${widget.listWallet}');
     super.initState();
   }
 
@@ -81,62 +84,73 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
         centerTitle: true,
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _selectWallet(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
+      body: listWalletSelected.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  'Bạn chưa có tài khoản nào.\nVui lòng tạo tài khoản để sử dụng tính năng này.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _current(),
-                // _chartsMonth(),
-                _char(
-                  title: 'Month',
-                  childSelect: _selectYearTime(),
-                  child: MonthAnalytic(
-                    walletIDs: walletIDs,
-                    year: currentYear,
-                    groupId: listWalletSelected.first.groupId,
-                  ),
-                ),
-                // _chartsPrecious(),
-                _char(
-                  title: 'Precious',
-                  childSelect: _selectYearTime(),
-                  child: PreciousAnalytic(
-                    year: currentYear,
-                    walletIDs: walletIDs,
-                    groupId: listWalletSelected.first.groupId,
-                  ),
-                ),
-                // _chartsYear(),
-                _char(
-                  title: 'Year',
-                  childSelect: _selectYearToYear(),
-                  child: YearAnalytic(
-                    walletIDs: walletIDs,
-                    year: currentYear,
-                    toYear: toYear,
-                    groupId: listWalletSelected.first.groupId,
-                  ),
-                ),
-                // _chartsCustom(),
-                _char(
-                  title: 'Custom',
-                  childSelect: _selectDayTime(context),
-                  child: CustomAnalytic(
-                    walletIDs: walletIDs,
-                    fromTime: fromTime,
-                    toTime: toTime,
-                    groupId: listWalletSelected.first.groupId,
+                _selectWallet(),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _current(),
+                      // _chartsMonth(),
+                      _char(
+                        title: 'Month',
+                        childSelect: _selectYearTime(),
+                        child: MonthAnalytic(
+                          walletIDs: walletIDs,
+                          year: currentYear,
+                          groupId: listWalletSelected.first.groupId,
+                        ),
+                      ),
+                      // _chartsPrecious(),
+                      _char(
+                        title: 'Precious',
+                        childSelect: _selectYearTime(),
+                        child: PreciousAnalytic(
+                          year: currentYear,
+                          walletIDs: walletIDs,
+                          groupId: listWalletSelected.first.groupId,
+                        ),
+                      ),
+                      // _chartsYear(),
+                      _char(
+                        title: 'Year',
+                        childSelect: _selectYearToYear(),
+                        child: YearAnalytic(
+                          walletIDs: walletIDs,
+                          year: currentYear,
+                          toYear: toYear,
+                          groupId: listWalletSelected.first.groupId,
+                        ),
+                      ),
+                      // _chartsCustom(),
+                      _char(
+                        title: 'Custom',
+                        childSelect: _selectDayTime(context),
+                        child: CustomAnalytic(
+                          walletIDs: walletIDs,
+                          fromTime: fromTime,
+                          toTime: toTime,
+                          groupId: listWalletSelected.first.groupId,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 

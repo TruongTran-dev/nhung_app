@@ -289,6 +289,7 @@ class _OptionCategoryPageState extends State<OptionCategoryPage> with SingleTick
           SizedBox(
             height: 50 * (category.childCategory?.length ?? 0).toDouble(),
             child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: category.childCategory?.length,
               itemBuilder: (context, indexx) => _itemChildCategory(
                 category.childCategory?[indexx],
