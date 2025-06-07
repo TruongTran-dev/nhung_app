@@ -3,6 +3,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/components/select_wallets.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/components/day_analytic.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/components/month_analytic.dart';
+import 'package:expensive_management/src/features/planning_expenditure_analysis/presentation/components/year_analytic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -15,11 +18,8 @@ import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/shared/utils/screen_utilities.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 
-import 'components/day_analytic.dart';
 import 'bloc/day_analytic_bloc.dart';
-import 'components/month_analytic.dart';
 import 'bloc/month_analytic_bloc.dart';
-import 'components/year_analytic.dart';
 import 'bloc/year_analytic_bloc.dart';
 
 class ExpenditureProps extends Equatable {
@@ -50,7 +50,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   late TabController _tabController;
 
   ///analytic year
-  String fromYear = '2018';
+  String fromYear = '2020';
   String endYear = '2025';
 
   ///analytic Month
@@ -90,6 +90,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     listWalletSelected = widget.props.listWallet;
+    groupId = listWalletSelected.firstWhereOrNull((group) => group.groupId != null)?.groupId;
     walletIDs = initWallet(widget.props.listWallet);
     listCateSelected = _initListCateSelected();
     super.initState();
@@ -112,10 +113,6 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return _body();
-  }
-
-  Widget _body() {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -231,6 +228,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
               fromYear: fromYear,
               toYear: endYear,
               type: widget.props.type,
+              groupId: groupId,
             ),
           ],
         ),
@@ -258,104 +256,101 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
               padding: EdgeInsets.only(left: 16, right: 20),
               child: Icon(Icons.calendar_month, size: 30, color: Colors.grey),
             ),
-            _buildSelectTime(),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final DateTime? timePick = await _pickDayTime(firstDayOfMonth);
+                        if (timePick == null) {
+                          return;
+                        } else if (DateTime.parse(lastDayOfMonth).isBefore(timePick) && context.mounted) {
+                          if (!mounted) {
+                            return;
+                          }
+                          showMessage1OptionDialog(
+                            this.context,
+                            'Vui lòng chọn thời gian bắt đâu sau thời gian kết thúc.',
+                          );
+                        } else {
+                          if (!mounted) {
+                            return;
+                          }
+                          setState(() {
+                            firstDayOfMonth = DateFormat('yyyy-MM-dd').format(timePick);
+
+                            this.context.read<DayAnalyticBloc>().add(
+                                  DayAnalyticEvent(
+                                    walletIDs: walletIDs,
+                                    categoryIDs: initEXCate(listCateSelected),
+                                    fromDate: firstDayOfMonth,
+                                    toDate: lastDayOfMonth,
+                                    type: widget.props.type,
+                                    groupId: groupId,
+                                  ),
+                                );
+                          });
+                          showLoading(this.context);
+                          Future.delayed(const Duration(seconds: 3), () {
+                            if (!mounted) {
+                              return;
+                            }
+                            setState(() {});
+                            Navigator.pop(this.context);
+                            // Navigator.pop(context);
+                          });
+                        }
+                      },
+                      child: Text('Từ: $firstDayOfMonth', style: const TextStyle(fontSize: 16, color: Colors.black)),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final DateTime? timePick = await _pickDayTime(lastDayOfMonth);
+                        if (timePick == null) {
+                          return;
+                        } else if (DateTime.parse(firstDayOfMonth).isAfter(timePick) && context.mounted) {
+                          showMessage1OptionDialog(
+                              this.context, 'Vui lòng chọn thời gian kết thúc sau thời gian bắt đâu.');
+                        } else {
+                          if (!mounted) {
+                            return;
+                          }
+                          setState(() {
+                            lastDayOfMonth = DateFormat('yyyy-MM-dd').format(timePick);
+                            this.context.read<DayAnalyticBloc>().add(
+                                  DayAnalyticEvent(
+                                    walletIDs: walletIDs,
+                                    categoryIDs: initEXCate(listCateSelected),
+                                    fromDate: firstDayOfMonth,
+                                    toDate: lastDayOfMonth,
+                                    type: widget.props.type,
+                                    groupId: groupId,
+                                  ),
+                                );
+                          });
+                          showLoading(context);
+                          Future.delayed(const Duration(seconds: 3), () {
+                            setState(() {});
+                            Navigator.pop(context);
+                            // Navigator.pop(context);
+                          });
+                        }
+                      },
+                      child: Text('Đến: $lastDayOfMonth', style: const TextStyle(fontSize: 16, color: Colors.black)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const Padding(
               padding: EdgeInsets.only(right: 16),
               child: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSelectTime() {
-    return Expanded(
-      child: Row(
-        children: [
-          Expanded(
-            child: InkWell(
-              onTap: () async {
-                final DateTime? timePick = await _pickDayTime(firstDayOfMonth);
-                if (timePick == null) {
-                  return;
-                } else if (DateTime.parse(lastDayOfMonth).isBefore(timePick) && context.mounted) {
-                  if (!mounted) {
-                    return;
-                  }
-                  showMessage1OptionDialog(
-                    context,
-                    'Vui lòng chọn thời gian bắt đâu sau thời gian kết thúc.',
-                  );
-                } else {
-                  if (!mounted) {
-                    return;
-                  }
-                  setState(() {
-                    firstDayOfMonth = DateFormat('yyyy-MM-dd').format(timePick);
-
-                    context.read<DayAnalyticBloc>().add(
-                          DayAnalyticEvent(
-                            walletIDs: walletIDs,
-                            categoryIDs: initEXCate(listCateSelected),
-                            fromDate: firstDayOfMonth,
-                            toDate: lastDayOfMonth,
-                            type: widget.props.type,
-                            groupId: groupId,
-                          ),
-                        );
-                  });
-                  showLoading(context);
-                  Future.delayed(const Duration(seconds: 3), () {
-                    if (!mounted) {
-                      return;
-                    }
-                    setState(() {});
-                    Navigator.pop(context);
-                    // Navigator.pop(context);
-                  });
-                }
-              },
-              child: Text('Từ: $firstDayOfMonth', style: const TextStyle(fontSize: 16, color: Colors.black)),
-            ),
-          ),
-          Expanded(
-            child: InkWell(
-              onTap: () async {
-                final DateTime? timePick = await _pickDayTime(lastDayOfMonth);
-                if (timePick == null) {
-                  return;
-                } else if (DateTime.parse(firstDayOfMonth).isAfter(timePick) && context.mounted) {
-                  showMessage1OptionDialog(context, 'Vui lòng chọn thời gian kết thúc sau thời gian bắt đâu.');
-                } else {
-                  if (!mounted) {
-                    return;
-                  }
-                  setState(() {
-                    lastDayOfMonth = DateFormat('yyyy-MM-dd').format(timePick);
-                    context.read<DayAnalyticBloc>().add(
-                          DayAnalyticEvent(
-                            walletIDs: walletIDs,
-                            categoryIDs: initEXCate(listCateSelected),
-                            fromDate: firstDayOfMonth,
-                            toDate: lastDayOfMonth,
-                            type: widget.props.type,
-                            groupId: groupId,
-                          ),
-                        );
-                  });
-                  showLoading(context);
-                  Future.delayed(const Duration(seconds: 2), () {
-                    setState(() {});
-                    Navigator.pop(context);
-                    // Navigator.pop(context);
-                  });
-                }
-              },
-              child: Text('Đến: $lastDayOfMonth', style: const TextStyle(fontSize: 16, color: Colors.black)),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -572,76 +567,6 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
     );
   }
 
-  void _onSelectCategory() async {
-    if (listCateSelected.length == initCatesLenght()) {
-      for (var category in listCateSelected) {
-        category.isChecked = true;
-        if (category.childCategory != null) {
-          for (CategoryModel childCategory in category.childCategory!) {
-            childCategory.isChecked = true;
-          }
-        }
-      }
-    }
-
-    final itemSelected = await showModalBottomSheet<List<CategoryModel>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: false,
-      enableDrag: false,
-      constraints: BoxConstraints(maxHeight: context.screenSize.height * 0.8),
-      builder: (context) => SelectCategory(
-        type: widget.props.type,
-        listCategory: listCateSelected,
-      ),
-    );
-
-    if (itemSelected != null) {
-      setState(() {
-        listCateSelected = itemSelected;
-        context.read<DayAnalyticBloc>().add(
-              DayAnalyticEvent(
-                walletIDs: walletIDs,
-                categoryIDs: initEXCate(listCateSelected),
-                fromDate: firstDayOfMonth,
-                toDate: lastDayOfMonth,
-                type: widget.props.type,
-                groupId: groupId,
-              ),
-            );
-        context.read<MonthAnalyticBloc>().add(
-              MonthAnalyticEvent(
-                walletIDs: walletIDs,
-                categoryIDs: initEXCate(listCateSelected),
-                fromMonth: fromMonth,
-                toMonth: endMonth,
-                type: widget.props.type,
-                groupId: groupId,
-              ),
-            );
-        context.read<YearAnalyticBloc>().add(
-              YearAnalyticEvent(
-                walletIDs: walletIDs,
-                categoryIDs: initEXCate(listCateSelected),
-                fromYear: fromYear,
-                toYear: endYear,
-                type: widget.props.type,
-                groupId: groupId,
-              ),
-            );
-      });
-      showLoading(context);
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {});
-        // Navigator.pop(context);
-        Navigator.pop(context);
-      });
-    } else {
-      return;
-    }
-  }
-
   int initCatesLenght() {
     int count = 0;
     for (CategoryModel category in widget.props.listCategory) {
@@ -656,12 +581,80 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
   Widget _selectCategory() {
     return ListTile(
-      onTap: _onSelectCategory,
+      onTap: () async {
+        if (listCateSelected.length == initCatesLenght()) {
+          for (var category in listCateSelected) {
+            category.isChecked = true;
+            if (category.childCategory != null) {
+              for (CategoryModel childCategory in category.childCategory!) {
+                childCategory.isChecked = true;
+              }
+            }
+          }
+        }
+
+        final itemSelected = await showModalBottomSheet<List<CategoryModel>>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          isDismissible: false,
+          enableDrag: false,
+          constraints: BoxConstraints(maxHeight: context.screenSize.height * 0.8),
+          builder: (context) => SelectCategory(
+            type: widget.props.type,
+            listCategory: listCateSelected,
+          ),
+        );
+
+        if (itemSelected != null) {
+          setState(() {
+            listCateSelected = itemSelected;
+            context.read<DayAnalyticBloc>().add(
+                  DayAnalyticEvent(
+                    walletIDs: walletIDs,
+                    categoryIDs: initEXCate(listCateSelected),
+                    fromDate: firstDayOfMonth,
+                    toDate: lastDayOfMonth,
+                    type: widget.props.type,
+                    groupId: groupId,
+                  ),
+                );
+            context.read<MonthAnalyticBloc>().add(
+                  MonthAnalyticEvent(
+                    walletIDs: walletIDs,
+                    categoryIDs: initEXCate(listCateSelected),
+                    fromMonth: fromMonth,
+                    toMonth: endMonth,
+                    type: widget.props.type,
+                    groupId: groupId,
+                  ),
+                );
+            context.read<YearAnalyticBloc>().add(
+                  YearAnalyticEvent(
+                    walletIDs: walletIDs,
+                    categoryIDs: initEXCate(listCateSelected),
+                    fromYear: fromYear,
+                    toYear: endYear,
+                    type: widget.props.type,
+                    groupId: groupId,
+                  ),
+                );
+          });
+          showLoading(context);
+          Future.delayed(const Duration(seconds: 2), () {
+            setState(() {});
+            // Navigator.pop(context);
+            Navigator.pop(context);
+          });
+        } else {
+          return;
+        }
+      },
       dense: false,
       horizontalTitleGap: 10,
       leading: const Icon(Icons.category_outlined, size: 30, color: Colors.grey),
       title: Text(
-        (listCateSelected.length == initCatesLenght())
+        (listCateSelected.length == initCatesLenght() && widget.props.listCategory.isNotEmpty)
             ? 'Tất cả hạng mục'
             : isNullOrEmpty(listCateSelected)
                 ? 'Chọn hạng mục'
@@ -672,93 +665,82 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
     );
   }
 
-  void _onSelectWallet() async {
-    final wallet = await showModalBottomSheet<List<Wallet>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: false,
-      enableDrag: false,
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: SelectWallets(
-          wallets: listWalletSelected,
-          isMultiSelect: true,
-        ),
-      ),
-    );
-
-    setState(() {
-      listWalletSelected = wallet ?? [];
-      walletIDs = initWallet(listWalletSelected);
-      groupId = listWalletSelected.isNotEmpty ? listWalletSelected.first.groupId : null;
-
-      context.read<DayAnalyticBloc>().add(
-            DayAnalyticEvent(
-              walletIDs: walletIDs,
-              categoryIDs: initEXCate(listCateSelected),
-              fromDate: firstDayOfMonth,
-              toDate: lastDayOfMonth,
-              type: widget.props.type,
-              groupId: groupId,
-            ),
-          );
-      context.read<MonthAnalyticBloc>().add(
-            MonthAnalyticEvent(
-              walletIDs: walletIDs,
-              categoryIDs: initEXCate(listCateSelected),
-              fromMonth: fromMonth,
-              toMonth: endMonth,
-              type: widget.props.type,
-              groupId: groupId,
-            ),
-          );
-      context.read<YearAnalyticBloc>().add(
-            YearAnalyticEvent(
-              walletIDs: walletIDs,
-              categoryIDs: initEXCate(listCateSelected),
-              fromYear: fromYear,
-              toYear: endYear,
-              type: widget.props.type,
-              groupId: groupId,
-            ),
-          );
-    });
-    if (!mounted) {
-      return;
-    }
-    showLoading(context);
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {});
-      // Navigator.pop(context);
-      Navigator.pop(context);
-    });
-  }
-
   Widget _selectWallet() {
     List<String> titles = listWalletSelected.map((wallet) => wallet.name).toList();
     String walletsName = titles.join(', ');
-    String text;
-
-    if (listWalletSelected.isEmpty) {
-      text = 'Chọn tài khoản';
-    } else if (listWalletSelected.length == widget.props.listWallet.where((wallet) => wallet.groupId == null).length &&
-        listWalletSelected.any((wallet) => wallet.groupId == null)) {
-      text = 'Tất cả tài khoản cá nhân';
-    } else if (listWalletSelected.length == widget.props.listWallet.where((wallet) => wallet.groupId != null).length &&
-        listWalletSelected.any((wallet) => wallet.groupId != null)) {
-      text = 'Tất cả tài khoản nhóm (${listWalletSelected.first.groupName})';
-    } else {
-      text = walletsName;
-    }
 
     return ListTile(
-      onTap: _onSelectWallet,
+      onTap: () async {
+        final wallet = await showModalBottomSheet<List<Wallet>>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          isDismissible: false,
+          enableDrag: false,
+          builder: (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: SelectWallets(
+              wallets: listWalletSelected,
+              isMultiSelect: true,
+            ),
+          ),
+        );
+
+        setState(() {
+          listWalletSelected = wallet ?? [];
+          walletIDs = initWallet(listWalletSelected);
+          groupId = listWalletSelected.firstWhereOrNull((group) => group.groupId != null)?.groupId;
+
+          context.read<DayAnalyticBloc>().add(
+                DayAnalyticEvent(
+                  walletIDs: walletIDs,
+                  categoryIDs: initEXCate(listCateSelected),
+                  fromDate: firstDayOfMonth,
+                  toDate: lastDayOfMonth,
+                  type: widget.props.type,
+                  groupId: groupId,
+                ),
+              );
+          context.read<MonthAnalyticBloc>().add(
+                MonthAnalyticEvent(
+                  walletIDs: walletIDs,
+                  categoryIDs: initEXCate(listCateSelected),
+                  fromMonth: fromMonth,
+                  toMonth: endMonth,
+                  type: widget.props.type,
+                  groupId: groupId,
+                ),
+              );
+          context.read<YearAnalyticBloc>().add(
+                YearAnalyticEvent(
+                  walletIDs: walletIDs,
+                  categoryIDs: initEXCate(listCateSelected),
+                  fromYear: fromYear,
+                  toYear: endYear,
+                  type: widget.props.type,
+                  groupId: groupId,
+                ),
+              );
+        });
+        if (!mounted) {
+          return;
+        }
+        showLoading(context);
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {});
+          // Navigator.pop(context);
+          Navigator.pop(context);
+        });
+      },
       dense: false,
       horizontalTitleGap: 10,
       leading: const Icon(Icons.wallet, size: 30, color: Colors.grey),
       title: Text(
-        text,
+        listWalletSelected.isEmpty
+            ? 'Chọn tài khoản'
+            : listWalletSelected.length == widget.props.listWallet.length
+                ? 'Tất cả tài khoản'
+                : walletsName,
         style: TextStyle(fontSize: 16, color: listWalletSelected.isEmpty ? Colors.grey : Colors.black),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
@@ -767,10 +749,9 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
   Future<DateTime?> _pickDayTime(String current) async {
     return await showDatePicker(
-      context: context,
-      initialDate: DateTime.parse(current),
-      firstDate: DateTime(1990, 01, 01),
-      lastDate: DateTime(2050, 12, 31),
-    );
+        context: context,
+        initialDate: DateTime.parse(current),
+        firstDate: DateTime(1990, 01, 01),
+        lastDate: DateTime(2050, 12, 31));
   }
 }
