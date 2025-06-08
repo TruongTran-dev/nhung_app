@@ -39,7 +39,19 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
   @override
   void initState() {
     _tabController = TabController(length: 5, vsync: this);
-    listWalletSelected = (widget.listWallet ?? []).where((wallet) => wallet.groupId == null).toList();
+
+    final wallets = widget.listWallet ?? [];
+    if (wallets.any((wallet) => wallet.groupId == null)) {
+      // If there are any personal wallets (groupId == null), select all of them
+      listWalletSelected = wallets.where((wallet) => wallet.groupId == null).toList();
+    } else if (wallets.isNotEmpty) {
+      // If there are only group wallets, select the first one
+      final itemFirst = wallets.firstWhereOrNull((wallet) => wallet.groupId != null);
+      if (itemFirst != null) {
+        listWalletSelected = [itemFirst];
+      }
+    }
+
     super.initState();
   }
 
