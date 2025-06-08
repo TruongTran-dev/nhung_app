@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/components/select_wallets.dart';
@@ -75,9 +76,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   }
 
   List<int> initWallet(List<Wallet> wallets) {
-    return List.generate(wallets.length, (index) {
-      return listWalletSelected[index].id;
-    });
+    return wallets.where((wallet) => wallet.groupId == null).map((wallet) => wallet.id).toList();
   }
 
   List<CategoryModel> listCateSelected = [];
@@ -89,7 +88,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
-    listWalletSelected = widget.props.listWallet;
+    listWalletSelected = widget.props.listWallet.where((wallet) => wallet.groupId == null).toList();
     groupId = listWalletSelected.firstWhereOrNull((group) => group.groupId != null)?.groupId;
     walletIDs = initWallet(widget.props.listWallet);
     listCateSelected = _initListCateSelected();
@@ -99,12 +98,16 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   List<CategoryModel> _initListCateSelected() {
     final List<CategoryModel> listCate = [];
     for (CategoryModel category in widget.props.listCategory) {
-      category.isChecked = true;
-      listCate.add(category);
-      if (category.childCategory != null) {
-        for (CategoryModel childCategory in category.childCategory!) {
-          childCategory.isChecked = true;
-          listCate.add(childCategory);
+      if (category.groupId == null) {
+        category.isChecked = true;
+        listCate.add(category);
+        if (category.childCategory != null) {
+          for (CategoryModel childCategory in category.childCategory!) {
+            if (childCategory.groupId == null) {
+              childCategory.isChecked = true;
+              listCate.add(childCategory);
+            }
+          }
         }
       }
     }
