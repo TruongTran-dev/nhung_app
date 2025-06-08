@@ -38,11 +38,13 @@ class DayAnalyticBloc extends Bloc<DayAnalyticEvent, DayAnalyticState> {
             if (event.walletIDs.isNotEmpty) 'walletIds': event.walletIDs,
             if (event.categoryIDs.isNotEmpty) 'categoryIds': event.categoryIDs,
           };
+          // print("param: $query - data: $data");
 
           final response = await AnalyticProvider().getDayEXAnalytic(
             query: query,
             data: data,
           );
+          // print("response: ${response.runtimeType}");
 
           if (response is AnalyticModel) {
             emit(state.copyWith(
@@ -56,6 +58,7 @@ class DayAnalyticBloc extends Bloc<DayAnalyticEvent, DayAnalyticState> {
             emit(state.copyWith(
               isLoading: false,
               apiError: ApiError.internalServerError,
+              data: null,
             ));
           }
         }

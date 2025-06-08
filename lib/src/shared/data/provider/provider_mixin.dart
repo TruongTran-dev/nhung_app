@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:expensive_management/src/core/di/injection_container.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
+import 'package:expensive_management/src/shared/data/response/error_response.dart';
 import 'package:flutter/foundation.dart';
 import '../response/base_get_response.dart';
 import '../response/base_response.dart';
@@ -30,6 +33,20 @@ mixin ProviderMixin {
   BaseResponse errorResponse(error, stacktrace, apiPath) {
     showErrorLog(error, stacktrace, apiPath);
     debugPrint('error: ${error.toString()}');
+
+    if (error is DioException) {
+      log(":Error : ${error.response}");
+      return BaseResponse.withHttpError(
+        message: error.message ?? 'An error occurred',
+        httpStatus: error.response?.statusCode,
+        errors: [
+          Errors(
+            errorCode: error.response?.data['status'].toString() ?? '500',
+            errorMessage: error.response?.data['error'] ?? 'An error occurred',
+          )
+        ],
+      );
+    }
 
     return BaseResponse.withHttpError(
       message: error.toString(),

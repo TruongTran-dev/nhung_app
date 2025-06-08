@@ -28,7 +28,7 @@ class CurrentAnalyticBloc extends Bloc<CurrentAnalyticEvent, CurrentAnalyticStat
         } else {
           final Map<String, dynamic> query = {
             'type': 'CURRENT',
-            if(event.groupId!= null) 'groupId': event.groupId,
+            if (event.groupId != null) 'groupId': event.groupId,
           };
 
           final Map<String, dynamic> data = {
@@ -39,6 +39,7 @@ class CurrentAnalyticBloc extends Bloc<CurrentAnalyticEvent, CurrentAnalyticStat
             query: query,
             data: data,
           );
+          // print("response: ${response}");
 
           if (response is ReportDataResponse) {
             emit(state.copyWith(

@@ -8,7 +8,7 @@ import 'package:expensive_management/src/shared/data/response/report_expenditure
 import 'provider_mixin.dart';
 
 class AnalyticProvider with ProviderMixin {
-  Future<Object> getDayEXAnalytic({
+  Future<dynamic> getDayEXAnalytic({
     required Map<String, dynamic> query,
     required Map<String, dynamic> data,
   }) async {
@@ -29,6 +29,18 @@ class AnalyticProvider with ProviderMixin {
       // print("📡 RESPONSE [PUT]: ${response.data}");
 
       return AnalyticModel.fromJson(response.data);
+    } on DioException catch (error) {
+      // print("error dio: ${error.response?.statusCode} - ${error.response?.data}");
+      return BaseResponse(
+        httpStatus: error.response?.statusCode,
+        message: "Server error occurred. Please try again later.",
+        errors: [
+          Errors(
+            errorCode: (error.response?.data['status'] ?? 404).toString(),
+            errorMessage: error.response?.data['error'],
+          ),
+        ],
+      );
     } catch (error, stacktrace) {
       return errorResponse(error, stacktrace, ApiPath.reportStatistic);
     }
@@ -54,9 +66,21 @@ class AnalyticProvider with ProviderMixin {
       );
       // print("📡 RESPONSE [PUT]: ${response.data}");
       return ReportDataResponse.fromJson(response.data);
+    } on DioException catch (error) {
+      // print("error dio: ${error.response?.statusCode} - ${error.response?.data}");
+      return BaseResponse(
+        httpStatus: error.response?.statusCode,
+        message: "Server error occurred. Please try again later.",
+        errors: [
+          Errors(
+            errorCode: (error.response?.data['status'] ?? 404).toString(),
+            errorMessage: error.response?.data['error'],
+          ),
+        ],
+      );
     } catch (error, stacktrace) {
+      // print("📡 ERROR [PUT]: ${error}");
       if (error is DioException) {
-        // log("📡 ERROR [PUT]: ${error.response?.statusCode} - ${error.response?.data}");
         return BaseResponse(
           httpStatus: error.response?.statusCode,
           message: "Server error occurred. Please try again later.",
