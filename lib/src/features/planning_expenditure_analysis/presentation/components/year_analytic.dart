@@ -9,7 +9,6 @@ import 'package:expensive_management/src/shared/utils/enum/enum.dart';
 import 'package:expensive_management/src/core/storage/shared_pref_storage.dart';
 import 'package:expensive_management/src/shared/utils/utils.dart';
 
-
 class YearAnalytic extends StatefulWidget {
   final String fromYear, toYear;
   final List<int> walletIDs, categoryIDs;
@@ -32,7 +31,7 @@ class YearAnalytic extends StatefulWidget {
 
 class _YearAnalyticState extends State<YearAnalytic> {
   final currency = serviceLocator<AppPrefStorage>().getCurrency();
-  bool _showDetail = false;
+  bool _showDetail = true;
 
   @override
   void initState() {
@@ -73,7 +72,7 @@ class _YearAnalyticState extends State<YearAnalytic> {
                           dataSource: listReport,
                           xValueMapper: (CategoryReport data, _) => data.time,
                           yValueMapper: (CategoryReport data, _) => data.totalAmount / 1000000,
-                          name: 'Chi tiêu năm',
+                          name: widget.type == TransactionType.expense ? 'Chi tiêu năm' : 'Thu nhập năm',
                           color: Colors.lightBlueAccent,
                         ),
                       ],
@@ -83,7 +82,9 @@ class _YearAnalyticState extends State<YearAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          widget.type == TransactionType.expense
+                              ? const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey))
+                              : const Text('Tổng thu nhập', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
                             '${formatterDouble((state.data?.totalAmount ?? 0).toInt())} $currency',
                             style: const TextStyle(fontSize: 14, color: Colors.black),
@@ -96,7 +97,7 @@ class _YearAnalyticState extends State<YearAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Trung bình chỉ/năm', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          const Text('Trung bình/năm', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
                             '${formatterDouble((state.data?.mediumAmount ?? 0).toInt())} $currency',
                             style: const TextStyle(fontSize: 14, color: Colors.black),
@@ -130,8 +131,10 @@ class _YearAnalyticState extends State<YearAnalytic> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Xem chi tiết',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+                  const Text(
+                    'Xem chi tiết',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+                  ),
                   Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
                 ],
               ),
@@ -155,28 +158,26 @@ class _YearAnalyticState extends State<YearAnalytic> {
   }
 
   Widget details(CategoryReport report) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-            bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-          ),
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        border: BorderDirectional(
+          top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
+          bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-            Row(
-              children: [
-                Text('${formatterDouble(report.totalAmount.toInt())} $currency ', style: const TextStyle(color: Colors.red)),
-                const Icon(Icons.keyboard_arrow_right_rounded, size: 20, color: Colors.grey),
-              ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+          Expanded(
+            child: Text(
+              '${formatterDouble((report.totalAmount).toInt())} $currency',
+              textAlign: TextAlign.end,
+              style: const TextStyle(color: Colors.red),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

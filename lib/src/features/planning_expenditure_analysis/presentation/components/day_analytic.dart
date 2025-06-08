@@ -31,7 +31,7 @@ class DayAnalytic extends StatefulWidget {
 
 class _DayAnalyticState extends State<DayAnalytic> {
   final currency = serviceLocator<AppPrefStorage>().getCurrency();
-  bool _showDetail = false;
+  bool _showDetail = true;
 
   @override
   void initState() {
@@ -73,7 +73,7 @@ class _DayAnalyticState extends State<DayAnalytic> {
                           xValueMapper: (CategoryReport data, _) =>
                               DateFormat('dd/MM').format(DateTime.parse(data.time)),
                           yValueMapper: (CategoryReport data, _) => (data.totalAmount / 1000),
-                          name: 'Chi tiêu ngày',
+                          name: widget.type == TransactionType.expense ? 'Chi tiêu ngày' : 'Thu nhập ngày',
                           color: Colors.lightBlueAccent,
                         ),
                       ],
@@ -83,7 +83,9 @@ class _DayAnalyticState extends State<DayAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          widget.type == TransactionType.expense
+                              ? const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey))
+                              : const Text('Tổng thu nhập', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
                             '${formatterDouble((state.data?.totalAmount ?? 0).toInt())} $currency',
                             style: const TextStyle(fontSize: 14, color: Colors.black),
@@ -96,7 +98,7 @@ class _DayAnalyticState extends State<DayAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Trung bình chỉ/ngày', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          const Text('Trung bình/ngày', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
                             '${formatterDouble((state.data?.mediumAmount ?? 0).toInt())} $currency',
                             style: const TextStyle(fontSize: 14, color: Colors.black),
@@ -130,8 +132,10 @@ class _DayAnalyticState extends State<DayAnalytic> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Xem chi tiết',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
+                  const Text(
+                    'Xem chi tiết',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+                  ),
                   Icon(_showDetail ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
                 ],
               ),

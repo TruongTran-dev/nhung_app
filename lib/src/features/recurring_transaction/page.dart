@@ -101,14 +101,14 @@ class _RecurringPageState extends State<RecurringPage> {
                 style: TextStyle(fontStyle: FontStyle.italic, color: Theme.of(context).primaryColor),
               ),
             ),
-            Expanded(child: _body(context)),
+            Expanded(child: _body()),
           ],
         ),
       ),
     );
   }
 
-  Widget _body(BuildContext context) {
+  Widget _body() {
     return BlocConsumer<RecurringTransactionBloc, RecurringTransactionState>(
       listenWhen: (preState, curState) {
         return curState.apiError != ApiError.noError;
@@ -167,8 +167,6 @@ class _RecurringPageState extends State<RecurringPage> {
             );
             if (result) {
               _reloadPage();
-            } else {
-              return;
             }
           },
           leading: Container(
@@ -197,9 +195,10 @@ class _RecurringPageState extends State<RecurringPage> {
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    "${recurring.amount.toString()} $currency",
+                    "${formatterDouble((recurring.amount ?? 0).toInt())} $currency",
                     style: TextStyle(
-                        color: (recurring.transactionType == TransactionType.expense) ? Colors.red : Colors.green),
+                      color: (recurring.transactionType == TransactionType.expense) ? Colors.red : Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -216,19 +215,8 @@ class _RecurringPageState extends State<RecurringPage> {
                     style: const TextStyle(fontSize: 14),
                   ),
                 ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(timeFromTo, style: const TextStyle(fontSize: 14)),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text("Ví: ${recurring.walletName}", style: const TextStyle(fontSize: 14)),
-                  ),
-                ],
-              ),
+              Text(timeFromTo, style: const TextStyle(fontSize: 14)),
+              Text("Ví: ${recurring.walletName}", style: const TextStyle(fontSize: 14)),
             ],
           ),
         ),
@@ -236,7 +224,6 @@ class _RecurringPageState extends State<RecurringPage> {
     );
   }
 
-  Future handleButton() async {}
 
   Widget _itemType() {
     return Padding(

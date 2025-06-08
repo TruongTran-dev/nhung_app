@@ -133,7 +133,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
               xValueMapper: (DataSf data, _) => data.title,
               yValueMapper: (DataSf data, _) => data.value,
               name: 'Thu',
-              color: Colors.grey,
+              color: Colors.green.withValues(alpha: 0.8),
               // Enable data label
               // dataLabelSettings: DataLabelSettings(isVisible: true)
             ),
@@ -142,19 +142,19 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
               xValueMapper: (DataSf data, _) => data.title,
               yValueMapper: (DataSf data, _) => data.value,
               name: 'Chi',
-              color: Colors.blue,
+              color: Colors.red.withValues(alpha: 0.8),
               // Enable data label
               // dataLabelSettings: DataLabelSettings(isVisible: true)
             ),
-            ColumnSeries<DataSf, String>(
-              dataSource: listRemain,
-              xValueMapper: (DataSf data, _) => data.title,
-              yValueMapper: (DataSf data, _) => data.value,
-              name: 'Còn lại',
-              color: Colors.red,
-              // Enable data label
-              // dataLabelSettings: DataLabelSettings(isVisible: true)
-            )
+            // ColumnSeries<DataSf, String>(
+            //   dataSource: listRemain,
+            //   xValueMapper: (DataSf data, _) => data.title,
+            //   yValueMapper: (DataSf data, _) => data.value,
+            //   name: 'Còn lại',
+            //   color: Colors.red,
+            //   // Enable data label
+            //   // dataLabelSettings: DataLabelSettings(isVisible: true)
+            // )
           ],
         ),
       ],

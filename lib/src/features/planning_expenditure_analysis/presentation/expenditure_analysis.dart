@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-
 import 'package:equatable/equatable.dart';
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/components/select_wallets.dart';
@@ -82,7 +81,6 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   List<CategoryModel> listCateSelected = [];
   List<Wallet> listWalletSelected = [];
   List<int> listCategoryId = [];
-  List<int> walletIDs = [];
   int? groupId;
 
   @override
@@ -90,7 +88,6 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
     _tabController = TabController(length: 3, vsync: this);
     listWalletSelected = widget.props.listWallet.where((wallet) => wallet.groupId == null).toList();
     groupId = listWalletSelected.firstWhereOrNull((group) => group.groupId != null)?.groupId;
-    walletIDs = initWallet(widget.props.listWallet);
     listCateSelected = _initListCateSelected();
     super.initState();
   }
@@ -172,7 +169,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
             _selectWallet(),
             Divider(color: Colors.grey.withOpacity(0.2), height: 10, thickness: 10),
             DayAnalytic(
-              walletIDs: walletIDs,
+              walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
               categoryIDs: initEXCate(listCateSelected),
               fromDate: firstDayOfMonth,
               toDate: lastDayOfMonth,
@@ -199,7 +196,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
             _selectWallet(),
             Divider(color: Colors.grey.withOpacity(0.2), height: 10, thickness: 10),
             MonthAnalytic(
-              walletIDs: walletIDs,
+              walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
               categoryIDs: initEXCate(listCateSelected),
               fromMonth: fromMonth,
               toMonth: endMonth,
@@ -226,7 +223,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
             _selectWallet(),
             Divider(color: Colors.grey.withOpacity(0.2), height: 10, thickness: 10),
             YearAnalytic(
-              walletIDs: walletIDs,
+              walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
               categoryIDs: initEXCate(listCateSelected),
               fromYear: fromYear,
               toYear: endYear,
@@ -285,7 +282,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
                             this.context.read<DayAnalyticBloc>().add(
                                   DayAnalyticEvent(
-                                    walletIDs: walletIDs,
+                                    walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
                                     categoryIDs: initEXCate(listCateSelected),
                                     fromDate: firstDayOfMonth,
                                     toDate: lastDayOfMonth,
@@ -325,7 +322,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                             lastDayOfMonth = DateFormat('yyyy-MM-dd').format(timePick);
                             this.context.read<DayAnalyticBloc>().add(
                                   DayAnalyticEvent(
-                                    walletIDs: walletIDs,
+                                    walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
                                     categoryIDs: initEXCate(listCateSelected),
                                     fromDate: firstDayOfMonth,
                                     toDate: lastDayOfMonth,
@@ -387,7 +384,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
                           context.read<MonthAnalyticBloc>().add(
                                 MonthAnalyticEvent(
-                                  walletIDs: walletIDs,
+                                  walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
                                   categoryIDs: initEXCate(listCateSelected),
                                   fromMonth: fromMonth,
                                   toMonth: endMonth,
@@ -425,7 +422,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
                           context.read<MonthAnalyticBloc>().add(
                                 MonthAnalyticEvent(
-                                  walletIDs: walletIDs,
+                                  walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
                                   categoryIDs: initEXCate(listCateSelected),
                                   fromMonth: fromMonth,
                                   toMonth: endMonth,
@@ -490,7 +487,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
                                   fromYear = valuer.year.toString();
                                   this.context.read<YearAnalyticBloc>().add(
                                         YearAnalyticEvent(
-                                          walletIDs: walletIDs,
+                                          walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
                                           categoryIDs: initEXCate(listCateSelected),
                                           fromYear: fromYear,
                                           toYear: endYear,
@@ -534,7 +531,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
                                   this.context.read<YearAnalyticBloc>().add(
                                         YearAnalyticEvent(
-                                          walletIDs: walletIDs,
+                                          walletIDs: listWalletSelected.map((wallet) => wallet.id).toList(),
                                           categoryIDs: initEXCate(listCateSelected),
                                           fromYear: fromYear,
                                           toYear: endYear,
@@ -612,6 +609,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
         if (itemSelected != null) {
           setState(() {
             listCateSelected = itemSelected;
+            final walletIDs = listWalletSelected.map((wallet) => wallet.id).toList();
             context.read<DayAnalyticBloc>().add(
                   DayAnalyticEvent(
                     walletIDs: walletIDs,
@@ -671,6 +669,7 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   Widget _selectWallet() {
     List<String> titles = listWalletSelected.map((wallet) => wallet.name).toList();
     String walletsName = titles.join(', ');
+    print("wallet Selected: ${listWalletSelected}");
 
     return ListTile(
       onTap: () async {
@@ -691,8 +690,8 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
 
         setState(() {
           listWalletSelected = wallet ?? [];
-          walletIDs = initWallet(listWalletSelected);
           groupId = listWalletSelected.firstWhereOrNull((group) => group.groupId != null)?.groupId;
+          final walletIDs = listWalletSelected.map((wallet) => wallet.id).toList();
 
           context.read<DayAnalyticBloc>().add(
                 DayAnalyticEvent(

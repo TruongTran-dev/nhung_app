@@ -9,7 +9,6 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:expensive_management/src/features/planning_balance_payment/presentation/bloc/precious_bloc.dart';
 import 'package:expensive_management/src/features/planning_balance_payment/domain/models/data_sfcartesian_char_model.dart';
 
-
 class PreciousAnalytic extends StatefulWidget {
   final int year;
   final List<int> walletIDs;
@@ -144,7 +143,7 @@ class _PreciousAnalyticState extends State<PreciousAnalytic> {
               xValueMapper: (DataSf data, _) => data.title,
               yValueMapper: (DataSf data, _) => data.value,
               name: 'Thu',
-              color: Colors.grey,
+              color: Colors.green.withValues(alpha: 0.8),
               // Enable data label
               // dataLabelSettings: DataLabelSettings(isVisible: true)
             ),
@@ -153,19 +152,19 @@ class _PreciousAnalyticState extends State<PreciousAnalytic> {
               xValueMapper: (DataSf data, _) => data.title,
               yValueMapper: (DataSf data, _) => data.value,
               name: 'Chi',
-              color: Colors.blue,
+              color: Colors.red.withValues(alpha: 0.8),
               // Enable data label
               // dataLabelSettings: DataLabelSettings(isVisible: true)
             ),
-            ColumnSeries<DataSf, String>(
-              dataSource: listRemain,
-              xValueMapper: (DataSf data, _) => data.title,
-              yValueMapper: (DataSf data, _) => data.value,
-              name: 'Còn lại',
-              color: Colors.red,
-              // Enable data label
-              // dataLabelSettings: DataLabelSettings(isVisible: true)
-            )
+            // ColumnSeries<DataSf, String>(
+            //   dataSource: listRemain,
+            //   xValueMapper: (DataSf data, _) => data.title,
+            //   yValueMapper: (DataSf data, _) => data.value,
+            //   name: 'Còn lại',
+            //   color: Colors.red,
+            //   // Enable data label
+            //   // dataLabelSettings: DataLabelSettings(isVisible: true)
+            // )
           ],
         ),
       ],

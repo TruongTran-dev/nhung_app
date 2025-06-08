@@ -29,7 +29,7 @@ class MonthAnalytic extends StatefulWidget {
 }
 
 class _MonthAnalyticState extends State<MonthAnalytic> {
-  bool _showDetail = false;
+  bool _showDetail = true;
 
   final currency = serviceLocator<AppPrefStorage>().getCurrency();
 
@@ -72,7 +72,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
                           dataSource: listReport,
                           xValueMapper: (CategoryReport data, _) => data.time,
                           yValueMapper: (CategoryReport data, _) => data.totalAmount / 1000000,
-                          name: 'Chi tiêu tháng',
+                          name: widget.type == TransactionType.expense ? 'Chi tiêu tháng' : 'Thu nhập tháng',
                           color: Colors.lightBlueAccent,
                         ),
                       ],
@@ -82,7 +82,9 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          widget.type == TransactionType.expense
+                              ? const Text('Tổng chi tiêu', style: TextStyle(fontSize: 14, color: Colors.grey))
+                              : const Text('Tổng thu nhập', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(
                             formatterDouble((state.data?.totalAmount ?? 0).toInt()),
                             style: const TextStyle(fontSize: 14, color: Colors.black),
@@ -95,7 +97,7 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Trung bình chỉ/tháng', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          const Text('Trung bình/tháng', style: TextStyle(fontSize: 14, color: Colors.grey)),
                           Text(formatterDouble((state.data?.mediumAmount ?? 0).toInt()),
                               style: const TextStyle(fontSize: 14, color: Colors.black)),
                         ],
@@ -152,29 +154,26 @@ class _MonthAnalyticState extends State<MonthAnalytic> {
   }
 
   Widget details(CategoryReport report) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-            bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
-          ),
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        border: BorderDirectional(
+          top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
+          bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.2)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
-            Row(
-              children: [
-                Text('${formatterDouble((report.totalAmount).toInt())} $currency',
-                    style: const TextStyle(color: Colors.red)),
-                const Icon(Icons.keyboard_arrow_right_rounded, size: 20, color: Colors.grey),
-              ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(report.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+          Expanded(
+            child: Text(
+              '${formatterDouble((report.totalAmount).toInt())} $currency',
+              textAlign: TextAlign.end,
+              style: const TextStyle(color: Colors.red),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
