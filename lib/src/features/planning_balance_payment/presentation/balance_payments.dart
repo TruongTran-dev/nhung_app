@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:expensive_management/src/core/common/extensions.dart';
 import 'package:expensive_management/src/features/limit_expenditure/presentation/components/select_wallets.dart';
 import 'package:flutter/material.dart';
@@ -35,9 +33,13 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
   List<int> walletIDs = [];
 
   List<int> initWallet(List<Wallet> wallets) {
-    return List.generate(wallets.length, (index) {
-      return listWalletSelected[index].id;
-    });
+    List<int> ids = [];
+    for (var wallet in wallets) {
+      if (wallet.groupId == null) {
+        ids.add(wallet.id);
+      }
+    }
+    return ids;
   }
 
   int currentYear = DateTime.now().year;
@@ -48,9 +50,11 @@ class _BalancePaymentsState extends State<BalancePayments> with SingleTickerProv
   @override
   void initState() {
     _tabController = TabController(length: 5, vsync: this);
-    listWalletSelected = widget.listWallet ?? [];
+    listWalletSelected = (widget.listWallet ?? [])
+        .where((wallet) => wallet.groupId == null)
+        .toList(); // Default to personal wallets if no group wallets are selected
     walletIDs = initWallet(listWalletSelected);
-    log('Wallets: ${widget.listWallet}');
+    // log('Wallets: ${widget.listWallet}');
     super.initState();
   }
 

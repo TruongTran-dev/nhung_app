@@ -54,6 +54,7 @@ class CustomAnalyticBloc extends Bloc<CustomAnalyticEvent, CustomAnalyticState> 
             emit(state.copyWith(
               isLoading: false,
               apiError: ApiError.internalServerError,
+              data: [],
             ));
           }
         }
