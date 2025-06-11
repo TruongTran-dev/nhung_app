@@ -141,7 +141,7 @@ class _LimitInfoPageState extends State<LimitInfoPage> {
               final isLoading = state is LimitExpenditureLoadingState;
               return Stack(
                 children: [
-                  _body(),
+                  SingleChildScrollView(child: _body()),
                   isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
                 ],
               );

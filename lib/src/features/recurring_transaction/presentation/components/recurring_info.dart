@@ -115,48 +115,55 @@ class _RecurringInfoState extends State<RecurringInfo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          icon: const Icon(Icons.close, size: 24, color: Colors.white),
+    return GestureDetector(
+      onTap: () {
+        if (FocusScope.of(context).hasFocus) {
+          FocusScope.of(context).unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).primaryColor,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            icon: const Icon(Icons.close, size: 24, color: Colors.white),
+          ),
+          centerTitle: true,
+          title: const Text(
+            'Giao dịch định kỳ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+          ),
         ),
-        centerTitle: true,
-        title: const Text(
-          'Giao dịch định kỳ',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+        body: BlocConsumer<RecurringInfoBloc, RecurringInfoState>(
+          bloc: _recurringBloc,
+          listener: (context, state) {
+            if (state is AddRecurringSuccessState) {
+              AppUtils.showSnackBar(context, 'Thêm giao dịch định kỳ thành công');
+              initWhenEdit();
+            } else if (state is AddRecurringFailureState) {
+              showMessage1OptionDialog(context, state.message);
+            } else if (state is UpdateRecurringSuccessState) {
+              AppUtils.showSnackBar(context, 'Cập nhật giao dịch định kỳ thành công');
+              Navigator.of(context).pop(true);
+            } else if (state is UpdateRecurringFailureState) {
+              showMessage1OptionDialog(context, state.message);
+            } else if (state is DeleteRecurringSuccessState) {
+              AppUtils.showSnackBar(context, 'Xóa giao dịch định kỳ thành công');
+              Navigator.of(context).pop(true);
+            } else if (state is DeleteRecurringFailureState) {
+              showMessage1OptionDialog(context, state.message);
+            }
+          },
+          builder: (context, state) {
+            final isLoading = state is RecurringInfoLoading;
+            return Stack(
+              children: [
+                _body(),
+                isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
+              ],
+            );
+          },
         ),
-      ),
-      body: BlocConsumer<RecurringInfoBloc, RecurringInfoState>(
-        bloc: _recurringBloc,
-        listener: (context, state) {
-          if (state is AddRecurringSuccessState) {
-            AppUtils.showSnackBar(context, 'Thêm giao dịch định kỳ thành công');
-            initWhenEdit();
-          } else if (state is AddRecurringFailureState) {
-            showMessage1OptionDialog(context, state.message);
-          } else if (state is UpdateRecurringSuccessState) {
-            AppUtils.showSnackBar(context, 'Cập nhật giao dịch định kỳ thành công');
-            Navigator.of(context).pop(true);
-          } else if (state is UpdateRecurringFailureState) {
-            showMessage1OptionDialog(context, state.message);
-          } else if (state is DeleteRecurringSuccessState) {
-            AppUtils.showSnackBar(context, 'Xóa giao dịch định kỳ thành công');
-            Navigator.of(context).pop(true);
-          } else if (state is DeleteRecurringFailureState) {
-            showMessage1OptionDialog(context, state.message);
-          }
-        },
-        builder: (context, state) {
-          final isLoading = state is RecurringInfoLoading;
-          return Stack(
-            children: [
-              _body(),
-              isLoading ? const Positioned.fill(child: LoadingWidget()) : const SizedBox.shrink(),
-            ],
-          );
-        },
       ),
     );
   }
@@ -245,7 +252,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
                   "toDate": toDate,
                   "transactionType": itemCategorySelected?.type.name.toUpperCase(),
                   "walletId": selectedWallet!.id,
-                  if(selectedWallet!.groupId != null) "groupId": selectedWallet!.groupId,
+                  if (selectedWallet!.groupId != null) "groupId": selectedWallet!.groupId,
                 };
                 _recurringBloc.add(UpdateRecurringEvent(widget.recurringListModel!.id!, data));
               }
@@ -280,7 +287,7 @@ class _RecurringInfoState extends State<RecurringInfo> {
         "toDate": toDate,
         "transactionType": itemCategorySelected?.type.name.toUpperCase(),
         "walletId": selectedWallet!.id,
-       if(selectedWallet!.groupId != null) "groupId": selectedWallet!.groupId,
+        if (selectedWallet!.groupId != null) "groupId": selectedWallet!.groupId,
       };
       log("data : $data");
       _recurringBloc.add(AddRecurringEvent(data));

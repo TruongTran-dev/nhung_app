@@ -118,7 +118,8 @@ class _GroupWalletDetailPageState extends State<GroupWalletDetailPage> {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final String decodedBody = utf8.decode(response.bodyBytes);
+        final Map<String, dynamic> responseData = jsonDecode(decodedBody);
         final List<dynamic> data = responseData['content'] as List;
         final members = data.map((json) => UserMemberData.fromJson(json)).toList();
 

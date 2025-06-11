@@ -170,7 +170,9 @@ class _SelectGroupBottomSheetState extends State<SelectGroupBottomSheet> {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final String decodedBody = utf8.decode(response.bodyBytes);
+        final Map<String, dynamic> responseData = jsonDecode(decodedBody);
+        // final Map<String, dynamic> responseData = jsonDecode(response.body);
         final List<GroupWallet> wallets = GroupWalletResponse.fromJson(responseData).content;
         return wallets;
       } else {

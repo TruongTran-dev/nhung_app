@@ -669,7 +669,6 @@ class _ExpenditureState extends State<Expenditure> with SingleTickerProviderStat
   Widget _selectWallet() {
     List<String> titles = listWalletSelected.map((wallet) => wallet.name).toList();
     String walletsName = titles.join(', ');
-    print("wallet Selected: ${listWalletSelected}");
 
     return ListTile(
       onTap: () async {
