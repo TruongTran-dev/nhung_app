@@ -371,6 +371,24 @@ class _NewCollectionPageState extends State<NewCollectionPage> {
                     content:
                         'Số tiền không đủ trong tài khoản. Vui lòng chọn tài khoản khác hoặc nạp thêm tiền vào tài khoản.',
                   );
+                } else if ((selectedWallet?.groupId == null &&
+                    itemCategorySelected != null &&
+                    itemCategorySelected!.groupId != null)) {
+                  showMessage1OptionDialog(
+                    context,
+                    "Lỗi",
+                    content:
+                        'Tài khoản cá nhân không thể thực hiện giao dịch với danh mục thuộc nhóm. Vui lòng chọn danh mục khác hoặc tài khoản khác.',
+                  );
+                } else if ((selectedWallet?.groupId != null &&
+                    itemCategorySelected != null &&
+                    itemCategorySelected!.groupId != selectedWallet?.groupId)) {
+                  showMessage1OptionDialog(
+                    context,
+                    "Lỗi",
+                    content:
+                        'Danh mục không thuộc nhóm của tài khoản. Vui lòng chọn danh mục khác hoặc tài khoản khác.',
+                  );
                 } else {
                   await _postCollection();
                 }
@@ -1050,16 +1068,18 @@ class ItemCategory extends Equatable {
   final String title;
   final String iconLeading;
   final TransactionType type;
+  final int? groupId;
 
   const ItemCategory({
     required this.categoryId,
     required this.title,
     required this.iconLeading,
     this.type = TransactionType.expense,
+    this.groupId,
   });
 
   @override
-  List<Object?> get props => [categoryId, title, iconLeading, type];
+  List<Object?> get props => [categoryId, title, iconLeading, type, groupId];
   @override
   bool get stringify => true;
 
@@ -1068,12 +1088,14 @@ class ItemCategory extends Equatable {
     String? title,
     String? iconLeading,
     TransactionType? type,
+    int? groupId,
   }) {
     return ItemCategory(
       categoryId: categoryId ?? this.categoryId,
       title: title ?? this.title,
       iconLeading: iconLeading ?? this.iconLeading,
       type: type ?? this.type,
+      groupId: groupId ?? this.groupId,
     );
   }
 }

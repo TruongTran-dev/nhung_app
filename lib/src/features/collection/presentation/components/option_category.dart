@@ -84,6 +84,7 @@ class _OptionCategoryPageState extends State<OptionCategoryPage> with SingleTick
       title: category.name ?? '',
       iconLeading: category.logoImageUrl ?? '',
       type: category.categoryType?.toUpperCase() == 'EXPENSE' ? TransactionType.expense : TransactionType.income,
+      groupId: category.groupId,
     );
     Navigator.of(context).pop(itemSelected);
   }
