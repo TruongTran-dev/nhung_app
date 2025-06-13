@@ -115,7 +115,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       }
 
       GlobalExtensions.runEmitterBlocSafe(emit, (emit) {
-        emit(CreateWalletErrorState(message: error.message, key: error is ServerError ? error.key : ''));
+        emit(DeleteWalletErrorState(message: error.message, key: error is ServerError ? error.key : ''));
       });
       return;
     }

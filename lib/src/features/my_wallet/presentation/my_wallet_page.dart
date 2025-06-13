@@ -59,7 +59,11 @@ class _MyWalletPageState extends State<MyWalletPage> {
             showMessage1OptionDialog(context, state.message);
           }
           if (state is DeleteWalletErrorState) {
-            showMessage1OptionDialog(context, state.message);
+            showMessage1OptionDialog(
+              context,
+              state.message,
+              onClose: _reloadPage,
+            );
           }
           if (state is DeleteWalletSuccessState) {
             AppUtils.showSnackBar(context, 'Xoá tài khoản thành công');
